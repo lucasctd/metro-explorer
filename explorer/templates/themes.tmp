@@ -1,0 +1,91 @@
+<style>
+	.color{
+		width: 40px;
+		height: 40px;
+		float: left;
+		cursor: pointer;
+		margin-top: -2px;;
+	}
+</style>
+<div class="_center">
+	<form id="updateThemeForm" method="post" action="/updateTheme">
+		<h4 id="editUserHeader" class="txtcenter gray sub-header">Choose your preffered color</h4>
+		<br />
+		<table class="_center">
+			<tr>
+				<td>
+					<div class="color bg-lightGreen"><input type="hidden" value="block-shadow-light-green bg-lightGreen" /></div>
+					<div class="color bg-lime"><input type="hidden" value="block-shadow-light-green bg-lime" /></div>
+					<div class="color bg-lightOlive"><input type="hidden" value="block-shadow-light-green bg-lightOlive" /></div>
+					<div class="color bg-green"><input type="hidden" value="block-shadow-green bg-green" /></div>
+					<div class="color bg-emerald"><input type="hidden" value="block-shadow-green bg-emerald" /></div>
+					<div class="color bg-darkGreen"><input type="hidden" value="block-shadow-dark-green bg-darkGreen" /></div>
+					<div class="color bg-darkEmerald"><input type="hidden" value="block-shadow-dark-green bg-darkEmerald" /></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="color bg-cobalt"><input type="hidden" value="block-shadow-info bg-cobalt" /></div>
+					<div class="color bg-blue"><input type="hidden" value="block-shadow-info bg-blue" /></div>
+					<div class="color bg-cyan"><input type="hidden" value="block-shadow-info bg-cyan" /></div>
+					<div class="color bg-teal"><input type="hidden" value="block-shadow-info bg-teal" /></div>
+					<div class="color bg-darkCyan"><input type="hidden" value="block-shadow-dark-blue bg-darkCyan" /></div>
+					<div class="color bg-darkCobalt"><input type="hidden" value="block-shadow-dark-blue bg-darkCobalt" /></div>
+					<div class="color bg-darkTeal"><input type="hidden" value="block-shadow-dark-blue bg-darkTeal" /></div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="color bg-indigo"><input type="hidden" value="block-shadow-dark-purple bg-indigo" /></div>
+					<div class="color bg-darkIndigo"><input type="hidden" value="block-shadow-dark-purple bg-darkIndigo" /></div>
+					<div class="color bg-violet"><input type="hidden" value="block-shadow-purple bg-violet" /></div>
+					<div class="color bg-pink"><input type="hidden" value="block-shadow-pink bg-pink" /></div>
+					<div class="color bg-magenta"><input type="hidden" value="block-shadow-pink bg-magenta" /></div>
+					<div class="color bg-crimson"><input type="hidden" value="block-shadow-red bg-crimson" /></div>
+					<div class="color bg-darkMagenta"><input type="hidden" value="block-shadow-red bg-darkMagenta" /></div>
+				</td>
+			</tr>
+		</table>
+	</form>
+</div>
+<script>
+	var originalMenuTheme = $('.h-menu').attr('class').replace("h-menu", "").replace("menu", "").trim();
+	var originalShadowTheme = $("#explorerContainer").attr("class").replace("explorer", "").trim();
+	$(".color").on('mouseover', function (e){
+		$(this).css("border", "2px solid yellow");
+		var classes = $(this).children()[0];
+		classes = $(classes).val().split(" ");
+		removeClassRegex(/bg*/, ".h-menu");
+		removeClassRegex(/block-shadow*/, "#explorerContainer");
+		$('.h-menu').addClass(classes[1]);
+		$("#explorerContainer").addClass(classes[0]);
+	});
+	$(".color").on('mouseout', function (e){
+		$(this).css("border", "0px solid yellow");
+		removeClassRegex(/bg*/, ".h-menu");
+		removeClassRegex(/block-shadow*/, "#explorerContainer");
+		$('.h-menu').addClass(originalMenuTheme);
+		$("#explorerContainer").addClass(originalShadowTheme);
+	});
+	$(".color").on('mousedown', function (e){
+		var classes = $(this).children()[0];
+		classes = $(classes).val();
+		loading(true);
+		$.post("/UpdateTheme",{theme: classes}, function( data ) {
+			explorer.closeBaseDialog();
+			if(data.success){
+				classes = classes.split(" ");
+				originalMenuTheme = classes[1];
+				originalShadowTheme = classes[0];
+				removeClassRegex(/bg*/, ".h-menu");
+				removeClassRegex(/block-shadow*/, "#explorerContainer");
+				$('.h-menu').addClass(originalMenuTheme);
+				$("#explorerContainer").addClass(originalShadowTheme);
+				$("#theme").val(originalMenuTheme);
+			}
+		}, 'json')
+		.always(function (){
+			loading(false);
+		});
+	});
+</script>

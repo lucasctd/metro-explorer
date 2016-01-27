@@ -1,0 +1,15 @@
+{
+	"LANG_LBL_NEW_FOLDER": "Nouvelle Dossier",
+	"LANG_LBL_UPLOAD": "Upload",
+	"LANG_LBL_MOVE": "Remplacer",
+	"LANG_LBL_MOVE_ALL": "Remplacer Tout",
+	"LANG_LBL_DEL": "Effacer",
+	"LANG_LBL_DEL_ALL": "Tout effacer",
+	"LANG_LBL_SHARE": "Partager",
+	"LANG_LBL_SHARE_ALL": "Partager tout",
+	"LANG_LBL_DOWNLOAD": "Télecharger",
+	"LANG_LBL_DOWNLOAD_ALL": "Télecharger tout",
+	"LANG_LBL_OPEN": "Ouvrir",
+	"LANG_LBL_RENAME": "Renommer",
+	"LANG_LBL_UP": "Retourner"
+}

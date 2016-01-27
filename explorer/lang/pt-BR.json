@@ -1,0 +1,22 @@
+{
+	"LANG_LBL_NEW_FOLDER": "Nova Pasta",
+	"LANG_LBL_UPLOAD": "Upload",
+	"LANG_LBL_MOVE": "Mover",
+	"LANG_LBL_MOVE_ALL": "Mover Todos",
+	"LANG_LBL_DEL": "Excluir",
+	"LANG_LBL_DEL_ALL": "Excluir Todos",
+	"LANG_LBL_SHARE": "Compartilhar",
+	"LANG_LBL_SHARE_ALL": "Compartilhar Todos",
+	"LANG_LBL_DOWNLOAD": "Baixar",
+	"LANG_LBL_DOWNLOAD_ALL": "Baixar Todos",
+	"LANG_LBL_OPEN": "Abrir",
+	"LANG_LBL_RENAME": "Renomear",
+	"LANG_LBL_UP": "Voltar",
+	"LANG_LBL_MOVE_HEADER": "Selecione a pasta para qual seus arquivos ser\u00E3o movidos",
+	"LANG_LBL_MOVE_BT_MOVE": "Mover",
+	"LANG_LBL_MOVE_BT_MOVE_TITLE": "Isso mover\u00E1 todos os arquivos selecionados para a pasta escolhida.",
+	"LANG_LBL_DELETE_FOLDER_WARNING_MSG": "Voc\u00EA selecionou uma pasta e/ou outros arquivos. Todos os arquivos que estiverem dentro da(s) pasta(s) selecionada(s) ser\u00E3o tamb\u00E9m exclu\u00EDdos. Deseja continuar?",
+	"LANG_LBL_DELETE_FOLDER_WARNING_TITLE": "Aten\u00E7\u00E3o",
+	"LANG_LBL_DELETE_FOLDER_WARNING_BT_YES":"Sim",
+	"LANG_LBL_DELETE_FOLDER_WARNING_BT_NO":"N\u00E3o"
+}

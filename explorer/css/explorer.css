@@ -1,0 +1,222 @@
+.explorer {
+    position: absolute;
+}
+.explorer *, .explorer *::before, .explorer *::after {
+    box-sizing: content-box;
+}
+.file {
+    background-color: #e8e8e8;
+    border: 1px solid darkgray;
+    height: 140px;
+    margin: 5px;
+    width: 120px;
+    z-index: 20;
+}
+.field {
+    border: 0 dashed gray;
+    height: 150px;
+    margin: 5px;
+    position: absolute;
+    width: 130px;
+    z-index: 10;
+}
+.newFileHelper {
+    border: 1px solid white;
+    float: left;
+    height: 140px;
+    margin: 5px -129px 5px 4px;
+    width: 120px;
+}
+.inputFileName {
+    background-color: #e8e8e8;
+    border: medium none;
+    color: black;
+    cursor: default;
+    height: 40px;
+    width: 117px;
+}
+.contextMenuFile {
+    background-color: white;
+    border: 2px solid gray;
+    height: 190px;
+    position: relative;
+    width: 130px;
+}
+.contextMenuFolder {
+    background-color: white;
+    border: 2px solid gray;
+    height: 220px;
+    position: relative;
+    width: 130px;
+}
+.contextMenuVoid {
+    background-color: white;
+    border: 2px solid gray;
+    height: 140px;
+    position: absolute;
+    width: 130px;
+    z-index: 9999;
+}
+.baseDialog {
+    background-color: white;
+    border: 2px solid gray;
+    display: none;
+    overflow-x: hidden;
+    overflow-y: auto;
+    position: absolute;
+    z-index: 9999;
+}
+._selected {
+    background-color: blue;
+    box-sizing: inherit;
+    height: 139px;
+    margin-top: -126px;
+    position: relative;
+    width: 120px;
+}
+.contextMenuOption:hover {
+    background-color: gray;
+    color: white;
+}
+.disabledContextMenuOption {
+    background-color: white !important;
+    color: #c8c8c8 !important;
+    cursor: default !important;
+    font-style: italic !important;
+}
+.explorerButton {
+    background-color: #1b58b8;
+    border: 3px solid white;
+    color: white;
+    font-weight: bold;
+    height: 45px;
+    padding: 10px;
+    text-align: center;
+    width: 170px;
+}
+.explorerButton:hover {
+    background-color: #00abf3;
+}
+.explorerButtonDisabled {
+    background-color: darkgray !important;
+    cursor: default;
+}
+.explorerButtonDisabled:hover {
+    background-color: darkgray !important;
+}
+.explorerInput {
+    height: 30px;
+}
+.onLeft {
+    float: left;
+}
+.onRight {
+    float: right;
+}
+._center {
+    margin: 0 auto;
+}
+.transferEffect {
+    border: 1px solid gray;
+}
+.handCursor {
+    cursor: pointer;
+}
+.bold {
+    font-weight: bold;
+}
+.opacity4 {
+    opacity: 0.4;
+}
+.opacity6 {
+    opacity: 0.6;
+}
+.opacity8 {
+    opacity: 0.8;
+}
+.opacity9 {
+    opacity: 0.9;
+}
+.opacity98 {
+    opacity: 0.98;
+}
+.gray {
+    color: gray;
+}
+.white {
+    color: white;
+}
+.ft8 {
+    font-size: 8pt;
+}
+.ft10 {
+    font-size: 10pt;
+}
+.ft11 {
+    font-size: 11pt;
+}
+.ft12 {
+    font-size: 12pt;
+}
+.ft14 {
+    font-size: 14pt;
+}
+.ft16 {
+    font-size: 16pt;
+}
+.ft18 {
+    font-size: 18pt;
+}
+.ft30 {
+    font-size: 30pt;
+}
+.ft40 {
+    font-size: 40pt;
+}
+.ft45 {
+    font-size: 45pt;
+}
+.ft50 {
+    font-size: 50pt;
+}
+.txtcenter {
+    text-align: center;
+}
+.txtjustify {
+    text-align: justify;
+}
+.txtleft {
+    text-align: left;
+}
+.txtmargin {
+    padding: 2px 7px;
+}
+.displayNone {
+    display: none;
+}
+.center {
+    margin: 0 auto;
+}
+.radius10 {
+    border-radius: 10px;
+}
+.radius20 {
+    border-radius: 20px;
+}
+.closeBaseDialog {
+    background: rgba(0, 0, 0, 0) url("../icons/close-base-dialog.png") no-repeat scroll 0 0;
+    height: 32px;
+    position: relative;
+    width: 32px;
+    z-index: 9999;
+}
+.closeBaseDialog:hover {
+    opacity: 0.4;
+}
+.quickAccessLink {
+    color: #23649d;
+}
+.quickAccessLink:hover {
+    background-color: #23649d;
+    color: white;
+}

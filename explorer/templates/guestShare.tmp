@@ -1,0 +1,83 @@
+<style>
+	.ui-effects-transfer { border: 3px dashed gray; z-index: 99999}
+	.picture{
+		cursor: pointer;
+		border-radius: 15px;
+	}
+	.inputWidth{
+		width: 400px !important;
+		font-size: 10pt;
+		color: gray;
+	}
+</style>
+<div class="_center">
+	<div id="previewPictures" class="_center displayNone">
+	</div>
+	<br />
+	<p id="shareHeader" class="txtcenter gray"></p>
+	<div class="_center" style="width:80%;">
+		<table>
+			<tr>
+				<td>
+					<div id="shareLink" class="input-control text inputWidth" data-role="input">
+						<input type="text" class="inputWidth" readonly="readonly">
+						<button class="button"><span class="mif-share"></span></button>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div id="shortLink" class="input-control text inputWidth" data-role="input">
+						<input type="text" class="inputWidth" readonly="readonly">
+						<button class="button"><span class="mif-rocket"></span></button>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div id="previewLink" class="input-control text inputWidth" data-role="input">
+						<input type="text" class="inputWidth" readonly="readonly">
+						<button class="button"><span class=""></span></button>
+					</div>
+				</td>
+			</tr>
+		</table>
+	</div>
+</div>
+<script type="application/javascript" charset="UTF-8">
+	function share() {
+		var shareLink = {input: $("#shareLink").find("input"), button: $("#shareLink").find("button")};
+		var shortLink = {input: $("#shortLink").find("input"), button: $("#shortLink").find("button")};
+		var previewLink = {id:$("#previewLink"), input: $("#previewLink").find("input"), icon: $("#previewLink").find("span"), button: $("#previewLink").find("button")}
+		var file = explorer.TEMP_VAR;
+		shareLink.input.val(file.url);
+		shortLink.input.val(file.downloadShortUrl.id);
+		if(file.previewType != undefined){
+			previewLink.input.val(file.previewShortUrl.id);
+			if(file.previewType == VIDEO){
+				previewLink.icon.addClass("mif-film");
+			}else if(file.previewType == IMAGE) {
+				previewLink.icon.addClass("mif-image");
+			}else if(file.previewType == MUSIC) {
+				previewLink.icon.addClass("mif-music");
+			}
+			previewLink.id.fadeIn("fast");
+		}
+		shareLink.button.unbind("click");
+		shareLink.button.on("click", function(){
+			openURL(shareLink.input.val());
+		});
+		shortLink.button.unbind("click");
+		shortLink.button.on("click", function(){
+			openURL(shortLink.input.val());
+		});
+		previewLink.button.unbind("click");
+		previewLink.button.on("click", function(){
+			openURL(previewLink.input.val());
+		});
+		$("#previewPictures").prepend("<div class='file center iconBorder "+file.ext+"'></div>");
+		$("#previewPictures").css("margin-top", ($("#previewPictures").height() * .4)+"px");
+		$("#previewPictures").fadeIn("fast");
+	}
+	share();
+</script>
