@@ -43,8 +43,8 @@ function ExUpload(explorer, url, params) {
             }
         },
         validadeExtension: function (ext){
-			if(allowedExtensions !== undefined ){
-                return allowedExtensions.indexOf(ext.toLowerCase()) == -1;
+			if(exUpload.allowedExtensions !== undefined ){
+                return exUpload.allowedExtensions.indexOf(ext.toLowerCase()) != -1;
             }
             var extIndex = AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
             if(extIndex == -1 && AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) == -1){
