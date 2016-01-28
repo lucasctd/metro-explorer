@@ -8,6 +8,7 @@ function ExUpload(explorer, url, params) {
         debugMode: false,
         callback: undefined,
         explorer: explorer,
+		allowedExtensions: undefined,
         MSG_INVALID_EXT: "You cannot upload {ext} files here.",
         ERROR_INVALID_FILE: 1,
         start: function () {
@@ -22,7 +23,7 @@ function ExUpload(explorer, url, params) {
         validate: function (){
             if(exUpload.params == undefined){
                 exUpload.params =  {"fileParam": "file"};
-                exUpload.log("uploadParam was not defined, so its default value ('file') will be set.");
+                exUpload.info("uploadParam was not defined, so its default value ('file') will be set.");
             }
             if(exUpload.explorer == undefined || exUpload.explorer.ROOT == undefined){
                 throw "ExUpload will not work if you do not set Explorer's instance.";
@@ -36,7 +37,15 @@ function ExUpload(explorer, url, params) {
                 console.warn(str);
             }
         },
+        info: function (str) {
+            if(exUpload.debugMode){
+                console.info(str);
+            }
+        },
         validadeExtension: function (ext){
+			if(allowedExtensions !== undefined ){
+                return allowedExtensions.indexOf(ext.toLowerCase()) == -1;
+            }
             var extIndex = AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
             if(extIndex == -1 && AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) == -1){
                 return false;

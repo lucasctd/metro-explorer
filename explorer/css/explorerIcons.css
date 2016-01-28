@@ -1,182 +1,157 @@
-.iconBorder{
-	border: 2px solid white;
-	-moz-border-radius: 40px; /* Para Firefox */
-	-webkit-border-radius: 40px; /*Para Safari e Chrome */
-	border-radius: 40px; /* Para Opera 10.5+*/
-	margin-top: 5px !important;
-}
 .ps{
-	background: url(../icons/ps.png);
+	background: url(../icons/adobe.photoshop.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
+}
+.pdf{
+	background: url(../icons/adobe.acrobat.png);
+	background-repeat: no-repeat;
+	width: 80px;
+	height: 80px;
 }
 .dir{
-	background: url(../icons/folder2.png);
+	background: url(../icons/folder.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .mp3{
-	background: url(../icons/mp3.png);
+	background: url(../icons/music.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .wma{
 	background: url(../icons/music.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .wav{
-	background: url(../icons/wav.png);
+	background: url(../icons/music.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .mp4{
-	background: url(../icons/mov.png);
+	background: url(../icons/movie.clapper.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .mkv{
-	background: url(../icons/vlc.png);
+	background: url(../icons/movie.clapper.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .avi{
-	background: url(../icons/mov.png);
+	background: url(../icons/film.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .mpeg{
-	background: url(../icons/vlc.png);
+	background: url(../icons/film.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .flv{
-	background: url(../icons/vlc.png);
+	background: url(../icons/film.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .docx{
-	background: url(../icons/docx.png);
+	background: url(../icons/office.word.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .doc{
-	background: url(../icons/docx.png);
+	background: url(../icons/office.word.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .xlsx{
-	background: url(../icons/xlsx.png);
+	background: url(../icons/office.excel.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .xls{
-	background: url(../icons/xlsx.png);
+	background: url(../icons/office.excel.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .pptx{
-	background: url(../icons/pptx.png);
+	background: url(../icons/office.powerpoint.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .ppt{
-	background: url(../icons/pptx.png);
+	background: url(../icons/office.powerpoint.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .txt{
-	background: url(../icons/txt.png);
+	background: url(../icons/text.align.justify.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .rar{
 	background: url(../icons/archive.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .zip{
-	background: url(../icons/zip.png);
+	background: url(../icons/archive.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .jpg{
-	background: url(../icons/jpg.png);
+	background: url(../icons/image.macro.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .jpeg{
-	background: url(../icons/jpg.png);
+	background: url(../icons/image.macro.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .png{
-	background: url(../icons/png.png);
+	background: url(../icons/image.macro.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
+
 .gif{
-	background: url(../icons/gif.png);
+	background: url(../icons/image.macro.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
 .goUp{
-	background: url(../icons/folder-upload.png);
+	background: url(../icons/arrow.up.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }
-.noIcon{/*No Icon Extention Available*/
-	background: url(../icons/add-doc.png);
+.noIcon{/*No Icon Extension Available*/
+	background: url(../icons/page.png);
 	background-repeat: no-repeat;
 	width: 80px;
 	height: 80px;
-	margin-top: 5px;
 }

@@ -12,6 +12,16 @@
     width: 120px;
     z-index: 20;
 }
+.iconBorder{
+    border: 2px solid white;
+    -moz-border-radius: 40px; /* Para Firefox */
+    -webkit-border-radius: 40px; /*Para Safari e Chrome */
+    border-radius: 40px; /* Para Opera 10.5+*/
+	margin-top: 5px !important;
+    width: 80px;
+    height: 80px;
+	background-color: #1B6EAE;
+}
 .field {
     border: 0 dashed gray;
     height: 150px;
@@ -38,21 +48,21 @@
 .contextMenuFile {
     background-color: white;
     border: 2px solid gray;
-    height: 190px;
+    height: auto;
     position: relative;
     width: 130px;
 }
 .contextMenuFolder {
     background-color: white;
     border: 2px solid gray;
-    height: 220px;
+    height: auto;
     position: relative;
     width: 130px;
 }
 .contextMenuVoid {
     background-color: white;
     border: 2px solid gray;
-    height: 140px;
+    height: auto;
     position: absolute;
     width: 130px;
     z-index: 9999;
@@ -69,8 +79,8 @@
 ._selected {
     background-color: blue;
     box-sizing: inherit;
-    height: 139px;
-    margin-top: -126px;
+    height: 140px;
+    margin-top: -131px;
     position: relative;
     width: 120px;
 }
