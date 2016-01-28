@@ -36,7 +36,7 @@ function Explorer(width, height, container, position, fileList){
         TEMP_VAR: undefined,
         EVENT_DROP: 1,EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1,DISABLED: 2,
-        CONTEXT_MENU_OPTIONS: {"DOWNLOAD" : 0, "UPLOAD" : 0, "OPEN" : 0, "MOVE": 0, "RENAME" : 0, "DELETE" : 0, "SHARE" : 0, "NEW_FOLDER" : 0},
+        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, UPLOAD: 0, OPEN: 0, MOVE: 0, RENAME: 0, DELETE: 0, SHARE: 0, NEW_FOLDER: 0},
         DOWNLOAD: 0,UPLOAD : 1, OPEN : 2, MOVE: 3, RENAME : 4, DELETE : 5, SHARE : 6, NEW_FOLDER : 7,
         ROOT: 0,
         baseDialogEffect: "fade",
@@ -60,6 +60,7 @@ function Explorer(width, height, container, position, fileList){
         browserContextMenuDisabled: true,//Browser Context Menu must be disabled to make everything works fine
         currentParent: 0,
         availableIconExtensions: null,
+        iconsBackgroundColor: "#00ABA9",
         addFiles: function (param, resize) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -157,7 +158,7 @@ function Explorer(width, height, container, position, fileList){
                     explorer.fields.fieldList[x].filesOn.push(file.id);
                     explorer.fields.usedFields++;
                     index = explorer.checkIfExists(file.id);
-                    if(file.found === 0){
+                    if(!file.found){
                         explorer.fileList[index].field = x; //field's index
                     }
                     explorer.loadFileEvents(file);
@@ -509,12 +510,22 @@ function Explorer(width, height, container, position, fileList){
             }
             $(explorer.element).fadeIn("fast");
             explorer.showEmptyMessage();
+            explorer.setIconsBackgroundColor(explorer.iconsBackgroundColor);
             $(explorer.container).on("drop", function (){
                 if(explorer.currentParent == -1){
                     explorer.log("While searching dropped files will be uploaded at the root.", 1);
                     $(document).trigger( "droppedWhenSearching", ["While searching dropped files will be uploaded at the root."]);
                 }
             });
+        },
+        setIconsBackgroundColor: function (color){
+            var id = $("#iconsBackgroundColor");
+            if(id.length){
+                id.empty();
+                id.append(".iconBorder{ background-color:"+color+"; }");
+            }else{
+                $("head").append("<style id=\"iconsBackgroundColor\"> .iconBorder{ background-color:"+color+"; }");
+            }
         },
         resizeExplorer: function(){
             explorer.setExplorerPosition(); //resize Explorer
