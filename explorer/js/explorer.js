@@ -36,7 +36,7 @@ function Explorer(width, height, container, position, fileList){
         TEMP_VAR: undefined,
         EVENT_DROP: 1,EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1,DISABLED: 2,
-        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, UPLOAD: 0, OPEN: 0, MOVE: 0, RENAME: 0, DELETE: 0, SHARE: 0, NEW_FOLDER: 0},
+        CONTEXT_MENU_OPTIONS: {"DOWNLOAD" : 0, "UPLOAD" : 0, "OPEN" : 0, "MOVE": 0, "RENAME" : 0, "DELETE" : 0, "SHARE" : 0, "NEW_FOLDER" : 0},
         DOWNLOAD: 0,UPLOAD : 1, OPEN : 2, MOVE: 3, RENAME : 4, DELETE : 5, SHARE : 6, NEW_FOLDER : 7,
         ROOT: 0,
         baseDialogEffect: "fade",
@@ -129,8 +129,8 @@ function Explorer(width, height, container, position, fileList){
                     var top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
                     var left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
-                        "left:"+left+"'> <div class='center iconBorder'><div style='margin-left: 3px;' class='"+file.ext+"'></div></div> <input class='txtcenter ft11 inputFileName'"+
-                        "maxlength='13' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/></div>");
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> <input class='txtcenter ft11 inputFileName'"+
+                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/></div>");
                     explorer.fields.fieldList[file.field].filesOn.push(file.id);
                     var field = explorer.fields.fieldList[file.field];
                     $("#"+file.id).css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
@@ -152,9 +152,9 @@ function Explorer(width, height, container, position, fileList){
                     var top = (explorer.fields.fieldList[x].top + 5)+"px;";
                     var left = (explorer.fields.fieldList[x].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
-                        "left:"+left+"'> <div class='center iconBorder'><div style='margin-left: 3px;' class='"+file.ext+"'></div></div> <input class='txtcenter ft11 inputFileName' "+
-                        "maxlength='13' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' /></div>");
-                    $("#"+file.id).fadeIn(1000);
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> <input class='txtcenter ft11 inputFileName' "+
+                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' /></div>");
+                    $("#"+file.id).fadeIn(300);
                     explorer.fields.fieldList[x].filesOn.push(file.id);
                     explorer.fields.usedFields++;
                     index = explorer.checkIfExists(file.id);
@@ -183,7 +183,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.createFields(1, true);
             var grandpaId = $.grep(explorer.fileList, function(e){ return e.id == parentId; });
             $(explorer.element).append("<div id='goup' class='file fileButton' style='float:left; top: 5px; left: 5px; position: absolute'>" +
-                "<div class='center iconBorder'><div style='margin-left: 3px;' class='goUp'></div></div><p class='txtcenter ft11'>"+explorer.LANG_LBL_UP+"</p></div>");
+                "<div class='center iconBorder'><div class='goUp center'></div></div><p class='txtcenter ft11'>"+explorer.LANG_LBL_UP+"</p></div>");
             $("#goup").on("click", function() {
                 $(".file").fadeOut("slow");
                 explorer.hide([".contextMenuFile", ".contextMenuFolder", ".contextMenuVoid"]);
@@ -498,7 +498,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.createQuickFolderAccess(0);
             explorer.setExplorerPosition();
             $( window ).resize(function() {//it makes explorer responsive.
-                explorer.resizeExplorer(); //irei acompanhar o desempenho da aplica??o em stage para ver se uso o truque abaixo ou n?o
+                explorer.resizeExplorer(); //irei acompanhar o desempenho da aplica��o em stage para ver se uso o truque abaixo ou n�o
                 //clearTimeout(resizeId);//little trick to resize Explorer only after resizing get done.
                 //resizeId = setTimeout(explorer.resizeExplorer, 50);
             });
@@ -734,24 +734,23 @@ function Explorer(width, height, container, position, fileList){
             }else{
                 $("#baseDialogContent").append(content);
             }
-			explorer.repositionBaseDialog();
+			      explorer.repositionBaseDialog();
         },
         showBaseDialog: function(hideCloseButton, def) {
             if(!$(".baseDialog").ready()){
                 this.showBaseDialog(hideCloseButton, def);
                 return;
             }
-            $( ".baseDialog" ).show(explorer.baseDialogEffect, {}, 500);
-            setTimeout(function () {
-                if(hideCloseButton !== true) {
-                    $(".closeBaseDialog").fadeIn("fast");
+            if(hideCloseButton !== true) {
+                $(".closeBaseDialog").fadeIn("fast");
+            }
+            $(".baseDialog").ready(function (){
+                if(def !== undefined){
+                    def.resolve();
                 }
-                $(".baseDialog").ready(function (){
-                    if(def !== undefined){
-                        def.resolve();
-                    }
-                });
-            }, 600);
+            });
+            $( ".baseDialog" ).show(explorer.baseDialogEffect, {}, 500);
+            
         },
         closeBaseDialog: function() {
             $(".closeBaseDialog").fadeOut(100);
@@ -841,21 +840,23 @@ function Explorer(width, height, container, position, fileList){
             }, 300);
         },
         rename: function(id, save){
+          var file = {id:  $("#"+id), input: $("#"+id).find("input")};
             if(save){//if the user has finished renaming this file.
                 var index = explorer.checkIfExists(id);
-                var newName = $("#"+id).find("input").val();
+                var newName = file.input.val();
                 if(newName.trim() === ""){
                     newName = "none";
-                    $("#"+id).find("input").val(newName);
+                    file.input.val(newName);
                 }
                 explorer.fileList[index].name = newName;
-                $("#"+id).find("input").attr("readonly", "readonly");
-                $("#"+id).find("input").css({"border":"none", "cursor": "default"});
-                $("#"+id).trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
+                file.input.attr({readonly: "readonly", title: newName });
+                file.input.val(explorer.fileList[index].getName());
+                file.input.css({border: "none", cursor: "default"});
+                file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
             }else{
-                $("#"+id).find("input").removeAttr("readonly");
-                $("#"+id).find("input").css({"border":"2px dashed gray", "cursor": "text"});
-                setTimeout( function () {moveCursorToEnd($("#"+id).find("input"));}, 300);
+                file.input.removeAttr("readonly");
+                file.input.css({"border":"2px dashed gray", "cursor": "text"});
+                setTimeout( function () {moveCursorToEnd(file.input);}, 300);
             }
         },
         move: function() {
@@ -894,10 +895,9 @@ function Explorer(width, height, container, position, fileList){
                 var name = file.name;
             }else{//it is ROOT folder
                 var id = file;
-                var name = "Root";
             }
             $("#foldersList").append("<div id='mv_"+id+"' class='file mvFolderItem fileButton' style='float:left;'>"+
-                "<div class='center iconBorder'><div style='margin-left: 3px;' class='dir'></div></div> <input class='txtcenter ft11 inputFileName'"+
+                "<div class='center iconBorder'><div class='dir center'></div></div> <input class='txtcenter ft11 inputFileName'"+
                 "maxlength='13' readonly='readonly' value='"+name+"'/></div>");
             $("#mv_"+id).on("mousedown", function () {
                 $(".movFolderSelect").remove();
@@ -1071,7 +1071,7 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(400, 300);
+            explorer.createBaseDialog(400, 200);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
@@ -1115,20 +1115,7 @@ function Explorer(width, height, container, position, fileList){
           return "";
         },
         preview: function (file){
-            var def = $.Deferred();
-            explorer.TEMP_VAR = file;
-            explorer.createBaseDialog("auto", "auto", {"min-width": "350px", "min-height": "300px"});
-            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/preview.tmp", def);
-            $.when(def).then(function (){
-                explorer.showBaseDialog(false);
-                if($("#previewHeader").length && $("#previewHeader").text().length === 0){
-                    $("#previewHeader").text(explorer.LANG_LBL_PREVIEW_HEADER);
-                }
-                if($("#previewEnlarge").length && $("#previewEnlarge").text().length === 0){
-                    $("#previewEnlarge").html(explorer.LANG_LBL_PREVIEW_ENLARGE);
-                }
-                $("#previewNoVideoSupport").text(explorer.LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT);
-            });
+            
         },
         getAvailableIconExtensions: function (){
             var files = document.styleSheets;
@@ -1203,8 +1190,8 @@ function File(id, name, ext, parent, field){
     };
     this.getName = function(){
         var name = this.name;
-        if(name.length > 13){
-            name = name.substring(0, 13) + "...";
+        if(name.length > 12){
+            name = name.substring(0, 12) + "...";
         }
         return name;
     };

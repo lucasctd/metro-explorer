@@ -17,10 +17,9 @@
     -moz-border-radius: 40px; /* Para Firefox */
     -webkit-border-radius: 40px; /*Para Safari e Chrome */
     border-radius: 40px; /* Para Opera 10.5+*/
-	margin-top: 5px !important;
+    background-color: #1B6EAE;
     width: 80px;
     height: 80px;
-	background-color: #1B6EAE;
 }
 .field {
     border: 0 dashed gray;
@@ -80,7 +79,7 @@
     background-color: blue;
     box-sizing: inherit;
     height: 140px;
-    margin-top: -131px;
+    margin-top: -122px;
     position: relative;
     width: 120px;
 }
@@ -122,9 +121,6 @@
 }
 .onRight {
     float: right;
-}
-._center {
-    margin: 0 auto;
 }
 .transferEffect {
     border: 1px solid gray;
@@ -205,7 +201,7 @@
     display: none;
 }
 .center {
-    margin: 0 auto;
+    margin: 0 auto !important;
 }
 .radius10 {
     border-radius: 10px;

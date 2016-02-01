@@ -1,8 +1,8 @@
-<div class="_center">
+<div class="center">
 	<h4 id="moveHeader" class="txtcenter gray" style="margin-top:35px;"></h4>
 	<br />
-	<div class="_center" style="width:80%;">
-		<div id="foldersList" class="_center" style="overflow-y: auto; overflow-x: hidden; height:280px;"></div>
+	<div class="center" style="width:80%;">
+		<div id="foldersList" class="center" style="overflow-y: auto; overflow-x: hidden; height:250px;"></div>
 	</div>
-	<button id="buttonMoveFiles" class="explorerButton explorerButtonDisabled onRight" style="margin: 20px;" disabled="disabled"></button>
+	<button id="buttonMoveFiles" class="explorerButton explorerButtonDisabled onRight" style="margin: 10px;" disabled="disabled"></button>
 </div>
