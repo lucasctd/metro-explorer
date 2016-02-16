@@ -129,8 +129,12 @@ function Explorer(width, height, container, position, fileList){
                     var top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
                     var left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
-                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> <input class='txtcenter ft11 inputFileName'"+
-                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/></div>");
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
+                        "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
+                        "<input class='txtcenter ft11 inputFileName'"+
+                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/>"+
+                        "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div>"+
+                        "</div>");
                     explorer.fields.fieldList[file.field].filesOn.push(file.id);
                     var field = explorer.fields.fieldList[file.field];
                     $("#"+file.id).css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
@@ -152,8 +156,12 @@ function Explorer(width, height, container, position, fileList){
                     var top = (explorer.fields.fieldList[x].top + 5)+"px;";
                     var left = (explorer.fields.fieldList[x].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
-                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> <input class='txtcenter ft11 inputFileName' "+
-                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' /></div>");
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div>"+
+                        "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
+                        "<input class='txtcenter ft11 inputFileName' "+
+                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' />"+
+                        "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div>"+
+                        "</div>");
                     $("#"+file.id).fadeIn(300);
                     explorer.fields.fieldList[x].filesOn.push(file.id);
                     explorer.fields.usedFields++;
@@ -840,7 +848,7 @@ function Explorer(width, height, container, position, fileList){
             }, 300);
         },
         rename: function(id, save){
-          var file = {id:  $("#"+id), input: $("#"+id).find("input")};
+          var file = {id:  $("#"+id), input: $("#"+id).find("#input"+id).find("input"), cover:$("#"+id).find("#input"+id).find("div")};
             if(save){//if the user has finished renaming this file.
                 var index = explorer.checkIfExists(id);
                 var newName = file.input.val();
@@ -852,8 +860,13 @@ function Explorer(width, height, container, position, fileList){
                 file.input.attr({readonly: "readonly", title: newName });
                 file.input.val(explorer.fileList[index].getName());
                 file.input.css({border: "none", cursor: "default"});
+                file.cover.css("display", "block");
                 file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
             }else{
+                file.input.val(file.input.prop("title"));
+                file.cover.css("display", "none");
+                file.id.find("._selected").remove();
+                file.id.css("border", "1px solid darkgray");
                 file.input.removeAttr("readonly");
                 file.input.css({"border":"2px dashed gray", "cursor": "text"});
                 setTimeout( function () {moveCursorToEnd(file.input);}, 300);
@@ -1113,6 +1126,9 @@ function Explorer(width, height, container, position, fileList){
         },
         customMenuOption: function (file){
           return "";
+        },
+        buildCustomMenuOption: function (label, callback){
+            return "<p class='contextMenuOption handCursor' onmousedown='"+callback+"()'>"+label+"</p>";
         },
         preview: function (file){
             

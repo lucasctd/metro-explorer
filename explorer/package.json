@@ -1,0 +1,33 @@
+{
+  "name": "explorer",
+  "description": "Front end files explorer in JS",
+  "readmeFilename": "README.md" ,
+  "keywords": [
+    "javascript",
+    "explorer",
+    "file management"
+  ],
+  "tags": [
+    "js",
+    "explorer",
+	""
+  ],
+  "version": "0.0.1",
+  "author": {
+    "name": "Lucas Reis",
+    "email": "lucas@programmer.com.br",
+    "homepage": "http://www.metroui.us/Explorer"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://git.assembla.com/explorer-.git"
+  },
+  "dependencies":{
+  
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "main": "js/explorer.js"
+}
