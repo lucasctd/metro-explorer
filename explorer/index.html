@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>MetroUI</title>
+  <link type='text/css' href="/css/explorer.css" rel="stylesheet">
+	<link type='text/css' href="/css/explorerIcons.css" rel="stylesheet">
+	<style>
+	  .moveToTooltip{
+  		background-color:white;
+  		left: 103%;
+  		top: -192%;
+  	/*	font-weight: bold;*/
+  		display: none;
+  		position: relative;
+  		opacity: .95;
+  		border-radius: 4px;
+  		color: blue;
+	  }
+	</style>
+</head>
+<body>
+</body>
+  <footer>
+  	<script type="text/javascript" charset="UTF-8" src="/js/jquery-1.11.0.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/js/jquery-ui-1.11.4.min.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/js/explorer.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/extensions/ExUpload/exUpload.js"></script>
+  	<script>
+  	  var explorer = new Explorer(600, 400);
+  	  explorer.debugMode = false;
+  	  explorer.createExplorer();
+  	  explorer.addFiles(new File(1, "Lucia", "png"));
+  	  explorer.addFiles(new File(2, "Picture", "dir"));
+  	  explorer.addFiles(new File(3, "Music", "dir"));
+  	  explorer.setIconsBackgroundColor("#1A9ADA");
+  	  explorer.border = "5px dashed gray";
+  	  explorer.start();
+  	</script>
+	</footer>
+</html>
