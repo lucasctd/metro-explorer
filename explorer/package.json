@@ -1,33 +1,52 @@
 {
-  "name": "explorer",
-  "description": "Front end files explorer in JS",
-  "readmeFilename": "README.md" ,
+  "name": "metro-explorer",
+  "description": "File explorer in JS",
   "keywords": [
-    "javascript",
-    "explorer",
-    "file management"
-  ],
-  "tags": [
     "js",
     "explorer",
-	""
+    "file",
+    "file management",
+    "metro",
+    "metro ui"
   ],
-  "version": "0.0.1",
+  "tags": [],
+  "version": "1.0.7",
   "author": {
     "name": "Lucas Reis",
-    "email": "lucas@programmer.com.br",
-    "homepage": "http://www.metroui.us/Explorer"
+    "email": "lucas@programmer.com.br"
   },
   "repository": {
     "type": "git",
-    "url": "https://git.assembla.com/explorer-.git"
+    "url": "https://www.assembla.com/spaces/explorer-/git/source"
   },
-  "dependencies":{
-  
-  },
+  "dependencies": {},
   "license": "MIT",
   "engines": {
     "node": ">=0.8.0"
   },
-  "main": "js/explorer.js"
+  "main": "js/explorer.js",
+  "_id": "metro-explorer@1.0.7",
+  "_shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",
+  "_from": "metro-explorer@latest",
+  "_npmVersion": "1.4.9",
+  "_npmUser": {
+    "name": "lucasreis",
+    "email": "lucasmreis@outlook.com"
+  },
+  "maintainers": [
+    {
+      "name": "lucasreis",
+      "email": "lucasmreis@outlook.com"
+    }
+  ],
+  "dist": {
+    "shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",
+    "tarball": "http://registry.npmjs.org/metro-explorer/-/metro-explorer-1.0.7.tgz"
+  },
+  "_npmOperationalInternal": {
+    "host": "packages-9-west.internal.npmjs.com",
+    "tmp": "tmp/metro-explorer-1.0.7.tgz_1454610252769_0.1410689139738679"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/metro-explorer/-/metro-explorer-1.0.7.tgz"
 }
