@@ -28,6 +28,7 @@
   	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/jquery-ui-1.11.4.min.js"></script>
   	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/explorer.js"></script>
   	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/extensions/ExUpload/exUpload.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/preload.js"></script>
   	<script>
   	  var explorer = new Explorer(600, 400);
   	  explorer.debugMode = false;
@@ -38,6 +39,8 @@
   	  explorer.setIconsBackgroundColor("#1A9ADA");
   	  explorer.border = "5px dashed gray";
   	  explorer.start();
+  	  var preload = new Preload(["icons/film.png","icons/folder.png"]);
+  	  preload.run();
   	</script>
 	</footer>
 </html>

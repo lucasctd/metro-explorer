@@ -269,7 +269,7 @@ function Explorer(width, height, container, position, fileList){
                             if(topFile == explorer.GO_UP_ID){//move to parent's folder
                               explorer.selectedFiles = [file];
                               var parent = explorer.getFileById(explorer.currentParent);
-                              explorer.clientMove(parent.parent);
+                              explorer.clientMove(parent.parent, true);
                               return;
                             }else{
                                 topFile = explorer.getFileById(topFile);
@@ -401,6 +401,7 @@ function Explorer(width, height, container, position, fileList){
         },
         createQuickFolderAccess: function (stopAt){
             var currentPath = [];
+            var quickAccess= $("#quickAccess");
             if(!$("#quickAccess").length){
                 $(explorer.container).prepend("<div id='quickAccess' style='width: auto; height: 20px; position: relative;' style='margin-left: 10px;'></div>");
             }else{
@@ -958,14 +959,15 @@ function Explorer(width, height, container, position, fileList){
             });
             explorer.initMouseOverEvent();
         },
-        clientMove: function(newFolderId){
-            var fileIndex = -1, destFolderIndex = -1;
+        clientMove: function(newFolderId, goUp){
+            var fileIndex = -1, destFolder = null;
             var def = $.Deferred();
             var folders = [];
             var files = [];
+            var file = null;
             for(var x = 0; x < explorer.selectedFiles.length; x++) {//create a list of files and folders that are going to be moved
                 fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
-                destFolderIndex = explorer.checkIfExists(newFolderId);
+                //destFolderIndex = explorer.checkIfExists(newFolderId);
                 if (explorer.selectedFiles[x].ext == "dir") {
                     var subfolders = explorer.getMySubFolders(explorer.selectedFiles[x].id);
                     if ($.inArray(newFolderId, subfolders) != -1) {//if moving folder to inside itself
@@ -983,19 +985,26 @@ function Explorer(width, height, container, position, fileList){
                 if(response === true){
                     explorer.closeBaseDialog();
                     for(var x = 0; x < explorer.selectedFiles.length; x++){
-                        fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
-                        destFolderIndex = explorer.checkIfExists(newFolderId);
-                        if(destFolderIndex != -1 && explorer.fileList[fileIndex].parent == explorer.currentParent && explorer.fileList[destFolderIndex].parent == explorer.currentParent){
-                            $("#"+explorer.fileList[fileIndex].id).css("z-index",999).animate({
-                                top: $("#"+explorer.fileList[destFolderIndex].id).css("top"),
-                                left: $("#"+explorer.fileList[destFolderIndex].id).css("left")
+                        console.log(newFolderId);
+                        file = explorer.getFileById(explorer.selectedFiles[x].id);
+                        destFolder = explorer.getFileById(newFolderId);
+                        //destFolderIndex = explorer.checkIfExists(newFolderId);
+                        if(newFolderId != explorer.ROOT && file.parent == explorer.currentParent && destFolder.parent == explorer.currentParent){
+                            file.getElement().css("z-index",999).animate({
+                                top: destFolder.getElement().css("top"),
+                                left: destFolder.getElement().css("left")
                             }, 1000, function () {
-                                $(this).hide("scale", {percent: 0}, 700);
-                                setTimeout(function (){$("#"+explorer.fileList[fileIndex].id).css("z-index",1);}, 750);
+                                $(this).hide("scale", {percent: 0}, 700, function (){
+                                  file.getElement().css("z-index",1);
+                                });
+                                //setTimeout(function (){file.getElement().css("z-index",1);}, 750);
                             });
+                        }else if(goUp){
+                          file.getElement().hide("slide", {direction: "up"}, 500);
                         }else{
-                            $( "#"+explorer.fileList[fileIndex].id ).hide("clip", {}, 500);
+                            file.getElement().hide("clip", {}, 500);
                         }
+                        fileIndex = explorer.checkIfExists(file.id);
                         explorer.fileList[fileIndex].parent = Number(newFolderId);
                         explorer.fileList[fileIndex].placed = false;
                         explorer.fileList[fileIndex].field = -1;
