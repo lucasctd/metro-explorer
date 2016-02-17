@@ -1,6 +1,6 @@
 function Explorer(width, height, container, position, fileList){
    "use strict";
-    explorer = {
+  var explorer = {
         POSITION_LEFT: 1,
         POSITION_CENTER: 2,
         POSITION_RIGHT: 3,
