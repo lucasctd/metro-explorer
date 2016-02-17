@@ -3,6 +3,7 @@ var Preload = (function () {
         if (loadType === void 0) { loadType = LoadType.ASYNC; }
         this.paths = paths;
         this.loadType = loadType;
+        return this;
     }
     Preload.prototype.run = function () {
         if (this.loadType == LoadType.SYNC) {
@@ -13,9 +14,9 @@ var Preload = (function () {
             }
         }
         else {
-            var xhr = new XMLHttpRequest();
-            for (var x = 0; x < this.paths.length; x++) {
-                xhr.open('GET', this.paths[x]);
+            for (var x_1 = 0; x_1 < this.paths.length; x_1++) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', this.paths[x_1]);
                 xhr.send('');
             }
         }

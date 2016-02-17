@@ -1,6 +1,8 @@
 class Preload{
   
-  constructor(private paths: string[], private loadType = LoadType.ASYNC){}
+  constructor(private paths: string[], private loadType = LoadType.ASYNC){
+    return this;
+  }
   
   public run() : void{
       if(this.loadType == LoadType.SYNC){
@@ -10,8 +12,8 @@ class Preload{
           images[x].src = this.paths[x];
         }
       }else{
-        var xhr = new XMLHttpRequest();
-        for(var x = 0; x < this.paths.length; x++){
+        for(let x = 0; x < this.paths.length; x++){
+          let xhr = new XMLHttpRequest();
           xhr.open('GET', this.paths[x]);
 		      xhr.send('');
         }
