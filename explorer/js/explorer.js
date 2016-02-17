@@ -63,6 +63,7 @@ function Explorer(width, height, container, position, fileList){
         currentParent: 0,
         availableIconExtensions: null,
         iconsBackgroundColor: "#00ABA9",
+        iconPaths: [],
         addFiles: function (param, resize) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -258,7 +259,7 @@ function Explorer(width, height, container, position, fileList){
             for(var x = fieldListSize; x < (fieldListSize + numberFields); x++){
                 create = (function () {//necessary to fix js escope problems :/ 'Let' keyword would solve this problem :S
                     var field = new Field(x, $("<div id='field_"+x+"' class='field' style='top:"+((parseInt(x/filePerLine)*fileDivHeight)+8)+"px; left: "+(parseInt(x%filePerLine)*fileDivWidth)+"px;'/>"),
-                        new Array(), parseInt(x/filePerLine)*fileDivHeight, parseInt(x%filePerLine)*fileDivWidth);
+                        [], parseInt(x/filePerLine)*fileDivHeight, parseInt(x%filePerLine)*fileDivWidth);
                     $(explorer.element).append(field.element);
                     field.element.droppable({
                         drop: function( event, ui ) {
@@ -269,10 +270,11 @@ function Explorer(width, height, container, position, fileList){
                             if(topFile == explorer.GO_UP_ID){//move to parent's folder
                               explorer.selectedFiles = [file];
                               var parent = explorer.getFileById(explorer.currentParent);
-                              explorer.clientMove(parent.parent);
+                              explorer.clientMove(parent.parent, true);
+                              return;
                             }else{
                                 topFile = explorer.getFileById(topFile);
-                              if(topFile && topFile.ext == "dir"){//move it to this folder
+                              if(topFile && topFile.ext == "dir" && topFile.id != file.id){//move it to this folder
                                 explorer.selectedFiles = [file];
                                 explorer.clientMove(topFile.id);
                                 return;
@@ -309,7 +311,9 @@ function Explorer(width, height, container, position, fileList){
                             var topFile = field.filesOn[field.filesOn.length - 1];
                             var file = explorer.getFileById(ui.draggable.context.id);
                             if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
-                              file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to parent's folder</span> ".concat(topFile.name)).fadeIn();
+                              var parent = explorer.getFileById(explorer.currentParent);
+                              var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
+                              file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to parent's folder</span> (".concat(parentName+")")).fadeIn();
                             }else{
                               topFile = explorer.getFileById(topFile);
                               if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
@@ -397,7 +401,8 @@ function Explorer(width, height, container, position, fileList){
             return width;
         },
         createQuickFolderAccess: function (stopAt){
-            var currentPath = new Array();
+            var currentPath = [];
+            var quickAccess= $("#quickAccess");
             if(!$("#quickAccess").length){
                 $(explorer.container).prepend("<div id='quickAccess' style='width: auto; height: 20px; position: relative;' style='margin-left: 10px;'></div>");
             }else{
@@ -525,7 +530,7 @@ function Explorer(width, height, container, position, fileList){
             return true;
         },
         start: function (){
-            var resizeId = null;
+            var resizeId = null, preload = null;
             if(explorer.checkIfContainerExist() === false) {
                 return;
             }
@@ -534,6 +539,8 @@ function Explorer(width, height, container, position, fileList){
                 explorer.log("It looks like you have not include 'explorerIcons.css' on your html document. Explorer will not start without it. :/");
                 return;
             }
+            preload = new Preload(explorer.iconPaths, LoadType.ASYNC);
+            preload.run();
             explorer.started = true;
             explorer.createQuickFolderAccess(0);
             explorer.setExplorerPosition();
@@ -734,32 +741,28 @@ function Explorer(width, height, container, position, fileList){
         //If you want to change the default size, you'll need to create baseDialog again, passing its width and height as paramenters
         createBaseDialog: function(width, height, options) {
             if(options === undefined){
-                options = new Array();
+                options = [];
             }
             if(width === undefined){
-                width = 470;
+                width = "auto";
             }
             options["width"] = $.isNumeric(width) ? width+"px" : width;
             if(height === undefined){
-                height = 400;
+                height = "auto";
             }
             options["height"] = $.isNumeric(height) ? height+"px" : height;
             if(options !== undefined){
                 if(options["min-width"] === undefined){
-                    options["min-width"] = $.isNumeric(width) ? width : 470;
+                    options["min-width"] = $.isNumeric(width) ? width : 0;
                 }
                 if(options["min-height"] === undefined){
-                    options["min-height"] = $.isNumeric(height) ? height : 400;
+                    options["min-height"] = $.isNumeric(height) ? height : 0;
                 }
             }
             $(".baseDialog").remove();
             $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
 				"<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
             $(".baseDialog").css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
-            var halfScreenWidth = $(window).width()/2;
-            var halfBaseDialogWidth = $(".baseDialog").width()/2;
-            $(".baseDialog").css("left", (halfScreenWidth - halfBaseDialogWidth ) + "px" );
-            $(".baseDialog").css("top", "70px" );
         },
         loadBaseDialog: function(content, def) {
             $(".baseDialog").append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
@@ -775,7 +778,6 @@ function Explorer(width, height, container, position, fileList){
             }else{
                 $("#baseDialogContent").append(content);
             }
-			      explorer.repositionBaseDialog();
         },
         showBaseDialog: function(hideCloseButton, def) {
             if(!$(".baseDialog").ready()){
@@ -791,7 +793,8 @@ function Explorer(width, height, container, position, fileList){
                 }
             });
             $( ".baseDialog" ).show(explorer.baseDialogEffect, {}, 500);
-            
+             explorer.centralize(".baseDialog");
+             explorer.repositionBaseDialog();
         },
         closeBaseDialog: function() {
             $(".closeBaseDialog").fadeOut(100);
@@ -805,28 +808,29 @@ function Explorer(width, height, container, position, fileList){
             $(".baseDialog").trigger( "closeDialogEvent");
         },
 		repositionBaseDialog: function (){
-			if($(".baseDialog").length){//if base dialog exists, reposition it
-				var baseDialogWidth = $(".baseDialog").outerWidth();
-				var baseDialogMinWidth = Number($(".baseDialog").css("min-width").replace("px", ""));
-				var baseDialogDefaultWidth = Number($(".baseDialog").find("#defaultWidth").val().replace("px", ""));
+		  var baseDialog = $(".baseDialog");
+			if($("#baseDialogContent").length){//if base dialog is visible, reposition it
+				var baseDialogWidth = baseDialog.outerWidth();
+				var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
+				var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
 				var windowWidth = $(window).width();
-				if((baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
-					$(".baseDialog").css("width", (windowWidth - 10) + "px");
+				if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
+					baseDialog.css("width", (windowWidth - 10) + "px");
 				}
-				var baseDialogHeight = $(".baseDialog").outerHeight();
-				var baseDialogMinHeight = Number($(".baseDialog").css("min-height").replace("px", ""));
-				var baseDialogDefaultHeight = Number($(".baseDialog").find("#defaultHeight").val().replace("px", ""));
+				var baseDialogHeight = baseDialog.outerHeight();
+				var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
+				var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
 				var windowHeight = $(window).height();
-				if((baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
-					$(".baseDialog").css("height", (windowHeight - 10) + "px");
+				if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
+					baseDialog.css("height", (windowHeight - 10) + "px");
 				}
                 explorer.centralize(".baseDialog");
             }
 		},
         centralize: function (id) {
-            var width = $(".baseDialog").outerWidth() / 2;
+            var width = $(id).outerWidth() / 2;
             var windowWidth = $(window).width() / 2;
-            var height = $(".baseDialog").outerHeight() / 2;
+            var height = $(id).outerHeight() / 2;
             var windowHeight = $(window).height() / 2;
             $(id).css({"left": (windowWidth - width) + "px", "top": (windowHeight - height) + "px"});
         },
@@ -871,7 +875,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.selectedFiles = [];
             $(".file").fadeOut(200);
             var index = explorer.checkIfExists(folderId);
-            var item = new quickAccessItem(folderId, explorer.fileList[index].name);
+            var item = new QuickAccessItem(folderId, explorer.fileList[index].name);
             explorer.currentPath.push(item);
             setTimeout( function() {
                 explorer.addFiles(Number(folderId));
@@ -907,7 +911,7 @@ function Explorer(width, height, container, position, fileList){
         },
         move: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(600, "auto");
+            explorer.createBaseDialog(600);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/move.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog(false);
@@ -936,11 +940,12 @@ function Explorer(width, height, container, position, fileList){
             });
         },
         createDestFolder: function (file){
+            var id = null, name = null;
             if(isNaN(file)){//it is a custom folder
-                var id = file.id;
-                var name = file.name;
+                id = file.id;
+                name = file.name;
             }else{//it is ROOT folder
-                var id = file;
+                id = file;
                 name = explorer.LANG_LBL_ROOT_FOLDER;
             }
             $("#foldersList").append("<div id='mv_"+id+"' class='file mvFolderItem fileButton' style='float:left;'>"+
@@ -957,14 +962,15 @@ function Explorer(width, height, container, position, fileList){
             });
             explorer.initMouseOverEvent();
         },
-        clientMove: function(newFolderId){
-            var fileIndex = -1, destFolderIndex = -1;
+        clientMove: function(newFolderId, goUp){
+            var fileIndex = -1, destFolder = null;
             var def = $.Deferred();
-            var folders = new Array();
-            var files = new Array();
+            var folders = [];
+            var files = [];
+            var file = null;
             for(var x = 0; x < explorer.selectedFiles.length; x++) {//create a list of files and folders that are going to be moved
                 fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
-                destFolderIndex = explorer.checkIfExists(newFolderId);
+                //destFolderIndex = explorer.checkIfExists(newFolderId);
                 if (explorer.selectedFiles[x].ext == "dir") {
                     var subfolders = explorer.getMySubFolders(explorer.selectedFiles[x].id);
                     if ($.inArray(newFolderId, subfolders) != -1) {//if moving folder to inside itself
@@ -982,19 +988,26 @@ function Explorer(width, height, container, position, fileList){
                 if(response === true){
                     explorer.closeBaseDialog();
                     for(var x = 0; x < explorer.selectedFiles.length; x++){
-                        fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
-                        destFolderIndex = explorer.checkIfExists(newFolderId);
-                        if(destFolderIndex != -1 && explorer.fileList[fileIndex].parent == explorer.currentParent && explorer.fileList[destFolderIndex].parent == explorer.currentParent){
-                            $("#"+explorer.fileList[fileIndex].id).css("z-index",999).animate({
-                                top: $("#"+explorer.fileList[destFolderIndex].id).css("top"),
-                                left: $("#"+explorer.fileList[destFolderIndex].id).css("left")
+                        console.log(newFolderId);
+                        file = explorer.getFileById(explorer.selectedFiles[x].id);
+                        destFolder = explorer.getFileById(newFolderId);
+                        //destFolderIndex = explorer.checkIfExists(newFolderId);
+                        if(newFolderId != explorer.ROOT && file.parent == explorer.currentParent && destFolder.parent == explorer.currentParent){
+                            file.getElement().css("z-index",999).animate({
+                                top: destFolder.getElement().css("top"),
+                                left: destFolder.getElement().css("left")
                             }, 1000, function () {
-                                $(this).hide("scale", {percent: 0}, 700);
-                                setTimeout(function (){$("#"+explorer.fileList[fileIndex].id).css("z-index",1);}, 750);
+                                $(this).hide("scale", {percent: 0}, 700, function (){
+                                  file.getElement().css("z-index",1);
+                                });
+                                //setTimeout(function (){file.getElement().css("z-index",1);}, 750);
                             });
+                        }else if(goUp){
+                          file.getElement().hide("slide", {direction: "up"}, 500);
                         }else{
-                            $( "#"+explorer.fileList[fileIndex].id ).hide("clip", {}, 500);
+                            file.getElement().hide("clip", {}, 500);
                         }
+                        fileIndex = explorer.checkIfExists(file.id);
                         explorer.fileList[fileIndex].parent = Number(newFolderId);
                         explorer.fileList[fileIndex].placed = false;
                         explorer.fileList[fileIndex].field = -1;
@@ -1122,22 +1135,24 @@ function Explorer(width, height, container, position, fileList){
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
-                $("#inpFolderName").on("keyup", function () {
+                var btCreateFolder = $("#buttonCreateFolder");
+                var inpFolderName =  $("#inpFolderName");
+                inpFolderName.on("keyup", function () {
                     if ($(this).val().length < 1) {
-                        $("#buttonCreateFolder").addClass("explorerButtonDisabled");
-                        $("#buttonCreateFolder").prop("disabled", "disabled");
+                        btCreateFolder.addClass("explorerButtonDisabled");
+                        btCreateFolder.prop("disabled", "disabled");
                     } else {
-                        $("#buttonCreateFolder").removeClass("explorerButtonDisabled");
-                        $("#buttonCreateFolder").removeProp("disabled");
+                        btCreateFolder.removeClass("explorerButtonDisabled");
+                        btCreateFolder.removeProp("disabled");
                     }
                 });
-                $("#buttonCreateFolder").on("click", function () {
+                btCreateFolder.on("click", function () {
                     explorer.clientNewFolder($("#inpFolderName").val());
                 });
-                $("#inpFolderName").focus();
+                inpFolderName.focus();
                 $("#newFolderHeader").text(explorer.LANG_LBL_NEW_FOLDER_HEADER);
                 $("#folderName").text(explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME);
-                $("#buttonCreateFolder").html(explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
+                btCreateFolder.text(explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
             });
         },
         clientNewFolder: function(folderName){
@@ -1169,20 +1184,25 @@ function Explorer(width, height, container, position, fileList){
         },
         getAvailableIconExtensions: function (){
             var files = document.styleSheets;
-            var extensions = new Array();
+            var extensions = [];
+            var path = null;
             for(var x = 0; x < files.length; x++){
                 if(files[x].href === null || files[x].href === undefined){
                     continue;
                 }
                 if(files[x].href.indexOf("explorerIcons") != -1){
                     for(var y = 0; y < files[x].cssRules.length; y++){
+                        path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
+                        if($.inArray(path, explorer.iconPaths) == -1){
+                            explorer.iconPaths.push(path);
+                        }
                         extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
                     }
                     break;
                 }
             }
             return extensions.length === 0 ? null : extensions;
-        }
+        },
     };
     return explorer;
 }
@@ -1209,7 +1229,7 @@ function File(id, name, ext, parent, field){
     this.name = name;
     this.getAvailableIconExtensions = function (){
         var files = document.styleSheets;
-        var extensions = new Array();
+        var extensions = [];
         for(var x = 0; x < files.length; x++){
             if(files[x].href === null || files[x].href === undefined ){
                 continue;
@@ -1225,14 +1245,14 @@ function File(id, name, ext, parent, field){
     };
     this.checkIcon = function(){
         ext = ext === undefined ? "" : ext;
-        if(typeof AVAILABLE_ICON_EXTENSIONS == 'undefined' || AVAILABLE_ICON_EXTENSIONS === null){
-            AVAILABLE_ICON_EXTENSIONS = this.getAvailableIconExtensions();
-            if(AVAILABLE_ICON_EXTENSIONS === null){
+        if(typeof window.AVAILABLE_ICON_EXTENSIONS == 'undefined' || window.AVAILABLE_ICON_EXTENSIONS === null){
+            window.AVAILABLE_ICON_EXTENSIONS = this.getAvailableIconExtensions();
+            if(window.AVAILABLE_ICON_EXTENSIONS === null){
                 return;
             }
         }
-        var extIndex = AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
-        if(extIndex == -1 || AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1){
+        var extIndex = window.AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
+        if(extIndex == -1 || window.AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1){
             return "noIcon";
         }else{
             return ext.toLowerCase();
@@ -1268,7 +1288,7 @@ function Field(id, element, filesOn, top, left){
     };
 }
 
-function quickAccessItem(id, name){
+function QuickAccessItem(id, name){
     this.id = id;
     this.name = name;
 }
@@ -1277,4 +1297,14 @@ function moveCursorToEnd(input) {
     var originalValue = input.val();
     input.val('');
     input.focus().val(originalValue);
+}
+
+function getValueBetweenQuotes(str){
+    var ret = "";
+    if ( /"/.test( str ) ){
+        ret = str.match( /"(.*?)"/ )[1];
+    } else {
+        ret = str;
+    }
+    return ret;
 }
