@@ -1,6 +1,7 @@
 {
   "name": "metro-explorer",
   "description": "File explorer in JS",
+  "readmeFilename": "README.md",
   "keywords": [
     "js",
     "explorer",
@@ -13,7 +14,8 @@
   "version": "1.0.7",
   "author": {
     "name": "Lucas Reis",
-    "email": "lucas@programmer.com.br"
+    "email": "lucas@programmer.com.br",
+    "homepage": "http://metroui.us/Explorer"
   },
   "repository": {
     "type": "git",
