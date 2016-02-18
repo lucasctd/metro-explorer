@@ -1,5 +1,6 @@
 function Explorer(width, height, container, position, fileList){
-    explorer = {
+   "use strict";
+  var explorer = {
         POSITION_LEFT: 1,
         POSITION_CENTER: 2,
         POSITION_RIGHT: 3,
@@ -45,26 +46,27 @@ function Explorer(width, height, container, position, fileList){
         debugMode: false,
         container: container === undefined ? "#explorerContainer" : container,
         element: "#explorer",
-        fields: {"fieldList" : new Array(), "usedFields" : 0},
+        fields: {"fieldList" : [], "usedFields" : 0},
         width: width === undefined ? 800 : width,
         height: height === undefined ? 600 : height,
         position: position === undefined ? 2 : position, //center, by default
         cssPosition: "relative",
-        fileList: fileList === undefined ? new Array() : fileList,
+        fileList: fileList === undefined ? [] : fileList,
         fileUpdateEvent: "fileUpdateEvent",
         border: "0px solid gray",
         language: undefined,
-        currentPath: new Array(),
+        currentPath: [],
         top: 0,
         left: 0,
-        selectedFiles: new Array(),
+        selectedFiles: [],
         started: false,
         browserContextMenuDisabled: true,//Browser Context Menu must be disabled to make everything works fine
         currentParent: 0,
         availableIconExtensions: null,
         iconsBackgroundColor: "#00ABA9",
+        baseDialogId: ".baseDialog",
         iconPaths: [],
-        addFiles: function (param, resize) {
+        addFiles: function (param, resize, def) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
             }
@@ -116,7 +118,7 @@ function Explorer(width, height, container, position, fileList){
             $.each(explorer.fileList, function(i, file) {
                 var index = explorer.checkIfExists(file.id);
                 if(file.parent != explorer.currentParent){ //If it is not in the same folder that the file was uploaded to,
-                    // do not create it on the screen
+                    // do not show it on the screen
                     explorer.fileList[index].placed = false;
                     return;
                 }
@@ -129,8 +131,8 @@ function Explorer(width, height, container, position, fileList){
                         "Make sure you are running createFields(number_of_fields); with enough number of fields to place '"+file.name+"' on.");
                 }
                 if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
-                    var top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
-                    var left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
+                    let top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
+                    let left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
                         "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
                         "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
@@ -139,7 +141,7 @@ function Explorer(width, height, container, position, fileList){
                         "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id"+file.id+"' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>"+
                         "</div>");
                     explorer.fields.fieldList[file.field].filesOn.push(file.id);
-                    var field = explorer.fields.fieldList[file.field];
+                    let field = explorer.fields.fieldList[file.field];
                     file.getElement().css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
                     file.getElement().css("left", (field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5) + "px");
                     file.getElement().fadeIn(300);
@@ -152,12 +154,15 @@ function Explorer(width, height, container, position, fileList){
                 explorer.fileList[index].placed = true; //field's index
             });
             explorer.initMouseOverEvent();
+            if(def !== undefined){
+              def.resolve();
+            }
         },
         placeFileAutomatically: function (file){
-            for(var x=0; x < explorer.fields.fieldList.length; x++){
+            for(let x=0; x < explorer.fields.fieldList.length; x++){
                 if(explorer.fields.fieldList[x].filesOn.length === 0){
-                    var top = (explorer.fields.fieldList[x].top + 5)+"px;";
-                    var left = (explorer.fields.fieldList[x].left + 5)+"px;";
+                    let top = (explorer.fields.fieldList[x].top + 5)+"px;";
+                    let left = (explorer.fields.fieldList[x].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
                         "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div>"+
                         "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
@@ -168,7 +173,7 @@ function Explorer(width, height, container, position, fileList){
                     file.getElement().fadeIn(300);
                     explorer.fields.fieldList[x].filesOn.push(file.id);
                     explorer.fields.usedFields++;
-                    index = explorer.checkIfExists(file.id);
+                    let index = explorer.checkIfExists(file.id);
                     if(!file.found){
                         explorer.fileList[index].field = x; //field's index
                     }
@@ -210,7 +215,7 @@ function Explorer(width, height, container, position, fileList){
             var fileElem = file.getElement();
             //rename event
             fileElem.find("input").on("blur", function (e){
-                explorer.rename(file.id, true);
+                explorer.rename(file, true);
             });
             //double click event
             fileElem.dblclick(function() {
@@ -253,83 +258,84 @@ function Explorer(width, height, container, position, fileList){
             return -1;
         },
         createFields: function(numberFields, isGoUp){
-            var fileDivWidth = 130; var fileDivHeight = 150;
+            const fileDivWidth = 130; 
+            const fileDivHeight = 150;
             var fieldListSize = explorer.fields.fieldList.length;
             var filePerLine = parseInt(explorer.getExplorerCurrentWidth() / fileDivWidth);
-            for(var x = fieldListSize; x < (fieldListSize + numberFields); x++){
-                create = (function () {//necessary to fix js escope problems :/ 'Let' keyword would solve this problem :S
-                    var field = new Field(x, $("<div id='field_"+x+"' class='field' style='top:"+((parseInt(x/filePerLine)*fileDivHeight)+8)+"px; left: "+(parseInt(x%filePerLine)*fileDivWidth)+"px;'/>"),
-                        [], parseInt(x/filePerLine)*fileDivHeight, parseInt(x%filePerLine)*fileDivWidth);
-                    $(explorer.element).append(field.element);
-                    field.element.droppable({
-                        drop: function( event, ui ) {
-                            field.element.css("border-width","0px");
-                            var file = explorer.getFileById(ui.draggable.context.id);
-                            var topFile = field.filesOn[field.filesOn.length - 1];
-                            file.getElement().find(".moveToTooltip").fadeOut();
-                            if(topFile == explorer.GO_UP_ID){//move to parent's folder
-                              explorer.selectedFiles = [file];
-                              var parent = explorer.getFileById(explorer.currentParent);
-                              explorer.clientMove(parent.parent, true);
-                              return;
-                            }else{
-                                topFile = explorer.getFileById(topFile);
-                              if(topFile && topFile.ext == "dir" && topFile.id != file.id){//move it to this folder
-                                explorer.selectedFiles = [file];
-                                explorer.clientMove(topFile.id);
-                                return;
-                              }
-                            }//if the top file is not a folder, place it on the top
-                            //if($.inArray(ui.draggable.context.id, field.filesOn) == -1){
-                            field.filesOn.push(Number(ui.draggable.context.id));
-                            var index = explorer.checkIfExists(ui.draggable.context.id);
-                            explorer.fileList[index].field = field.fieldNumber();//update file field
-                            //}
-                            $(field.element).trigger("fileUpdateEvent", [{"file":file}, explorer.EVENT_DROP]);//fire event
-                            $("#"+ui.draggable.context.id).animate({//organize stack of files
-                                    left: field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5,
-                                    top: field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5
-                                },
-                                {//it's an animate's method
-                                    start: function (e){
-                                        $("#"+e.elem.id).css("z-index", field.filesOn.length * 20);//make sure it will be visible
-                                    }
-                                },300
-                            );
-                        },
-                        out: function( event, ui ) {
-                            field.element.css("border-width","0px");
-                            field.filesOn = $.grep(field.filesOn, function(val, index) {
-                                return val != ui.draggable.context.id;
-                            });
-                            if(field.filesOn.length === 0){
-                                explorer.fields.usedFields-=1;
-                            }
-                        },
-                        over: function( event, ui ) {
-                            field.element.css("border-width","1px");
-                            var topFile = field.filesOn[field.filesOn.length - 1];
-                            var file = explorer.getFileById(ui.draggable.context.id);
-                            if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
-                              var parent = explorer.getFileById(explorer.currentParent);
-                              var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
-                              file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to parent's folder</span> (".concat(parentName+")")).fadeIn();
-                            }else{
-                              topFile = explorer.getFileById(topFile);
-                              if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
-                                file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
-                              }else{
-                                file.getElement().find(".moveToTooltip").fadeOut();
-                              }
-                            }
+            for(let x = fieldListSize; x < (fieldListSize + numberFields); x++){
+               // var create = (function () {//necessary to fix js escope problems :/ 'Let' keyword would solve this problem :S
+                let field = new Field(x, $("<div id='field_"+x+"' class='field' style='top:"+((parseInt(x/filePerLine)*fileDivHeight)+8)+"px; left: "+(parseInt(x%filePerLine)*fileDivWidth)+"px;'/>"),
+                    [], parseInt(x/filePerLine)*fileDivHeight, parseInt(x%filePerLine)*fileDivWidth);
+                $(explorer.element).append(field.element);
+                field.element.droppable({
+                    drop: function( event, ui ) {
+                        field.element.css("border-width","0px");
+                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var topFile = field.filesOn[field.filesOn.length - 1];
+                        file.getElement().find(".moveToTooltip").fadeOut();
+                        if(topFile == explorer.GO_UP_ID){//move to parent's folder
+                          explorer.selectedFiles = [file];
+                          let parent = explorer.getFileById(explorer.currentParent);
+                          explorer.clientMove(parent.parent, true);
+                          return;
+                        }else{
+                            topFile = explorer.getFileById(topFile);
+                          if(topFile && topFile.ext == "dir" && topFile.id != file.id){//move it to this folder
+                            explorer.selectedFiles = [file];
+                            explorer.clientMove(topFile.id);
+                            return;
+                          }
+                        }//if the top file is not a folder, place it on the top
+                        //if($.inArray(ui.draggable.context.id, field.filesOn) == -1){
+                        field.filesOn.push(Number(file.id));
+                        var index = explorer.checkIfExists(file.id);
+                        explorer.fileList[index].field = field.fieldNumber();//update file field
+                        //}
+                        $(field.element).trigger("fileUpdateEvent", [{"file":file}, explorer.EVENT_DROP]);//fire event
+                        file.getElement().animate({//organize stack of files
+                                left: field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5,
+                                top: field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5
+                            },
+                            {//it's an animate's method
+                                start: function (e){
+                                    $("#"+e.elem.id).css("z-index", field.filesOn.length * 20);//make sure it will be visible
+                                }
+                            },300
+                        );
+                    },
+                    out: function( event, ui ) {
+                        field.element.css("border-width","0px");
+                        field.filesOn = $.grep(field.filesOn, function(val, index) {
+                            return val != ui.draggable.context.id;
+                        });
+                        if(field.filesOn.length === 0){
+                            explorer.fields.usedFields-=1;
                         }
-                    });
-                    explorer.fields.fieldList.push(field);
-                    if(isGoUp === true){
-                        explorer.fields.fieldList[0].filesOn = [explorer.GO_UP_ID];
+                    },
+                    over: function( event, ui ) {
+                        field.element.css("border-width","1px");
+                        var topFile = field.filesOn[field.filesOn.length - 1];
+                        var file = explorer.getFileById(ui.draggable.context.id);
+                        if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
+                          var parent = explorer.getFileById(explorer.currentParent);
+                          var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
+                          file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
+                        }else{
+                          topFile = explorer.getFileById(topFile);
+                          if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
+                            file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
+                          }else{
+                            file.getElement().find(".moveToTooltip").fadeOut();
+                          }
+                        }
                     }
-                });
-                create();
+                  });
+                  explorer.fields.fieldList.push(field);
+                  if(isGoUp === true){
+                      explorer.fields.fieldList[0].filesOn = [explorer.GO_UP_ID];
+                  }
+                //});
+               // create();
             }
         },
         getFileById: function(id){
@@ -435,6 +441,12 @@ function Explorer(width, height, container, position, fileList){
                 explorer.loadContextMenuOption(explorer.UPLOAD, explorer.CONTEXT_MENU_OPTIONS.UPLOAD, false) +
                 explorer.customMenuOption() +
                 "</div>");
+            $("#expNewFolder").on("mousedown", function (){
+                explorer.newFolder();
+            });
+            $("#expUpload").on("mousedown", function (){
+                explorer.upload();
+            });
             //If the user clicks on the void
             $(document).on("mousedown", function(event) {
                 if($(event.target).is('.field,#explorer,#quickAccess')){
@@ -539,8 +551,12 @@ function Explorer(width, height, container, position, fileList){
                 explorer.log("It looks like you have not include 'explorerIcons.css' on your html document. Explorer will not start without it. :/");
                 return;
             }
-            preload = new Preload(explorer.iconPaths, LoadType.ASYNC);
-            preload.run();
+            if(typeof Preload != "undefined"){
+              preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
+            }else{
+              explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.")
+            }
+           // preload.run();
             explorer.started = true;
             explorer.createQuickFolderAccess(0);
             explorer.setExplorerPosition();
@@ -590,54 +606,66 @@ function Explorer(width, height, container, position, fileList){
             }
         },
         showContextMenu: function(file) {
+            var allOptions = null, contextMenu4Files = $("#contextMenu4Files");
+            var options = "", contextMenuClass = "contextMenuFile";
             explorer.hide(["#contextMenu4Files", ".contextMenuVoid"]);
-            $("#contextMenu4Files").removeClass("contextMenuFile contextMenuFolder");
+            contextMenu4Files.removeClass("contextMenuFile contextMenuFolder");
             if(file == "void"){
                 $("#contextIdTools").fadeIn("fast");
             }else{
-                $("#contextMenu4Files").empty();
-                if(explorer.selectedFiles.length > 1){
-                    $("#contextMenu4Files").addClass("contextMenuFile");
-                    $("#contextMenu4Files").append(
-                        explorer.loadContextMenuOption(explorer.MOVE, explorer.CONTEXT_MENU_OPTIONS.MOVE, true) +
-                        explorer.loadContextMenuOption(explorer.DELETE, explorer.CONTEXT_MENU_OPTIONS.DELETE, true) +
-                        explorer.loadContextMenuOption(explorer.SHARE, explorer.CONTEXT_MENU_OPTIONS.SHARE, true) +
-                        explorer.loadContextMenuOption(explorer.DOWNLOAD, explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD, true) +
-                        "</div>");
-                }else{
-                    var contextMenu = "contextMenuFile";
-                    var openOption = "";
-                    if(file.ext == "dir"){//if it is a folder, create an 'Open' option at the context menu.
-                        openOption = explorer.loadContextMenuOption(explorer.OPEN, explorer.CONTEXT_MENU_OPTIONS.OPEN, false, file);
-                        contextMenu = "contextMenuFolder";
-                    }
-                    $("#contextMenu4Files").append(
-                        openOption +
-                        explorer.loadContextMenuOption(explorer.MOVE, explorer.CONTEXT_MENU_OPTIONS.MOVE, false) +
-                        explorer.loadContextMenuOption(explorer.RENAME, explorer.CONTEXT_MENU_OPTIONS.RENAME, false, file) +
-                        explorer.loadContextMenuOption(explorer.DELETE, explorer.CONTEXT_MENU_OPTIONS.DELETE, false) +
-                        explorer.loadContextMenuOption(explorer.SHARE, explorer.CONTEXT_MENU_OPTIONS.SHARE, false) +
-                        explorer.loadContextMenuOption(explorer.DOWNLOAD, explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD, false)+
-                        explorer.customMenuOption(file)+
-                        "</div>");
-                    $("#contextMenu4Files").addClass(contextMenu);
+                contextMenu4Files.empty();
+                allOptions = explorer.selectedFiles.length > 1;
+                options = options.concat(
+                  explorer.loadContextMenuOption(explorer.MOVE, explorer.CONTEXT_MENU_OPTIONS.MOVE, allOptions) +
+                  (!allOptions ? explorer.loadContextMenuOption(explorer.RENAME, explorer.CONTEXT_MENU_OPTIONS.RENAME, allOptions) : "") +
+                  explorer.loadContextMenuOption(explorer.DELETE, explorer.CONTEXT_MENU_OPTIONS.DELETE, allOptions) +
+                  explorer.loadContextMenuOption(explorer.SHARE, explorer.CONTEXT_MENU_OPTIONS.SHARE, allOptions) +
+                  explorer.loadContextMenuOption(explorer.DOWNLOAD, explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD, allOptions)
+                );
+                if(!allOptions && file.ext == "dir"){
+                  options = explorer.loadContextMenuOption(explorer.OPEN, explorer.CONTEXT_MENU_OPTIONS.OPEN, allOptions).concat(options);
+                  contextMenuClass = "contextMenuFolder";
                 }
-                $("#contextMenu4Files").addClass("opacity9 gray ft12 txtmargin bold");
-                $("#contextMenu4Files").fadeIn("fast");
-                $("#contextMenu4Files").css("z-index", 9999);
-                $(".contextMenuOption").on("mousedown", function (){$("#contextMenu4Files").fadeOut("fast");});
+                contextMenu4Files.addClass(contextMenuClass);
+                options.concat(explorer.customMenuOption(file));
+                contextMenu4Files.append(options);
+                contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
+                contextMenu4Files.fadeIn("fast");
+                contextMenu4Files.css("z-index", 9999);
+                $(".contextMenuOption").on("mousedown", function (){contextMenu4Files.fadeOut("fast");});
+                explorer.loadContextMenuOptionEvents(file);
             }
         },
-        loadContextMenuOption: function(option, optionMenuState, all, file){
+        loadContextMenuOptionEvents: function (file){
+          $("#expOpen").on("mousedown", function (){
+              explorer.open(file);
+          });
+          $("#expMove").on("mousedown", function (){
+              explorer.move(file);
+          });
+          $("#expRename").on("mousedown", function (){
+              explorer.rename(file, false);
+          });
+          $("#expDelete").on("mousedown", function (){
+              explorer.delete(file);
+          });
+          $("#expShare").on("mousedown", function (){
+              explorer.share(file);
+          });
+          $("#expDownload").on("mousedown", function (){
+              explorer.download(file);
+          });
+        },
+        loadContextMenuOption: function(option, optionMenuState, all){
             var str;
             switch (option){
                 case explorer.MOVE:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str = "<p class='contextMenuOption handCursor' onmousedown='explorer.move();'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
+                            str = "<p id='expMove' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
+                            str = "<p id='expMove' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -647,10 +675,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.DELETE:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str = "<p class='contextMenuOption handCursor' onmousedown='explorer.delete();'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL) + "</p>";
+                            str = "<p id='expDelete' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL)+ "</p>";
+                            str = "<p id='expDelete' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -660,10 +688,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.SHARE:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str = "<p class='contextMenuOption handCursor' onmousedown='explorer.share();'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE) + "</p>";
+                            str = "<p id='expShare' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE)+ "</p>";
+                            str = "<p id='expShare' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -673,10 +701,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.DOWNLOAD:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str = "<p class='contextMenuOption handCursor' onmousedown='explorer.download();'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD) + "</p>";
+                            str = "<p id='expDownload' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD)+ "</p>";
+                            str = "<p id='expDownload' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -686,10 +714,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.NEW_FOLDER:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str =  "<p class='contextMenuOption handCursor' style='margin-top:10px;' onmousedown='explorer.newFolder();'>"+explorer.LANG_LBL_NEW_FOLDER+"</p>";
+                            str =  "<p id='expNewFolder' class='contextMenuOption handCursor' style='margin-top:10px;'>"+explorer.LANG_LBL_NEW_FOLDER+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption' style='margin-top:10px;'>" + explorer.LANG_LBL_NEW_FOLDER + "</p>";
+                            str = "<p id='expNewFolder' class='disabledContextMenuOption' style='margin-top:10px;'>" + explorer.LANG_LBL_NEW_FOLDER + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -699,10 +727,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.UPLOAD:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str =  "<p class='contextMenuOption handCursor' onmousedown='explorer.upload();'>"+explorer.LANG_LBL_UPLOAD+"</p>";
+                            str =  "<p id='expUpload' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_UPLOAD+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + explorer.LANG_LBL_UPLOAD + "</p>";
+                            str = "<p id='expUpload' class='disabledContextMenuOption'>" + explorer.LANG_LBL_UPLOAD + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -712,10 +740,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.RENAME:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str =  "<p class='contextMenuOption handCursor' onmousedown='explorer.rename("+file.id+", false);'>"+explorer.LANG_LBL_RENAME+"</p>";
+                            str =  "<p id='expRename' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_RENAME+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + explorer.LANG_LBL_RENAME + "</p>";
+                            str = "<p id='expRename' class='disabledContextMenuOption'>" + explorer.LANG_LBL_RENAME + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -725,10 +753,10 @@ function Explorer(width, height, container, position, fileList){
                 case explorer.OPEN:
                     switch (optionMenuState) {
                         case explorer.ENABLED:
-                            str =  "<p class='contextMenuOption handCursor' onmousedown='explorer.open("+file.id+");'>"+explorer.LANG_LBL_OPEN+"</p>";
+                            str =  "<p id='expOpen' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_OPEN+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p class='disabledContextMenuOption'>" + explorer.LANG_LBL_OPEN + "</p>";
+                            str = "<p id='expOpen' class='disabledContextMenuOption'>" + explorer.LANG_LBL_OPEN + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -759,56 +787,59 @@ function Explorer(width, height, container, position, fileList){
                     options["min-height"] = $.isNumeric(height) ? height : 0;
                 }
             }
-            $(".baseDialog").remove();
+            $(explorer.baseDialogId).remove();
             $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
 				"<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
-            $(".baseDialog").css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
+            $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
         },
         loadBaseDialog: function(content, def) {
-            $(".baseDialog").append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
-                "title='Close' alt='Close' onclick='explorer.closeBaseDialog()'/>");
-            $(".baseDialog").append("<div id='baseDialogContent' style='top:30px'> </div>");
+            var baseDialog = $(explorer.baseDialogId);
+            baseDialog.append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
+                "title='Close' alt='Close'/>");
+            $(".closeBaseDialog").on("click", function (){
+              explorer.closeBaseDialog();
+            });
+            baseDialog.append("<div id='baseDialogContent' style='top:30px'> </div>");
+            var baseDialogContent = $("#baseDialogContent");
             var patt = /\.tmp$/i;
             if(patt.test(content) === true){//if it is a template file, load it
-                $("#baseDialogContent").load(content, function (){
+                baseDialogContent.load(content, function (){
                     if(typeof def != 'undefined'){
                         def.resolve();
                     }
                 });
             }else{
-                $("#baseDialogContent").append(content);
+                baseDialogContent.append(content);
             }
         },
         showBaseDialog: function(hideCloseButton, def) {
-            if(!$(".baseDialog").ready()){
+            var baseDialog = $(explorer.baseDialogId);
+            if(!baseDialog.ready()){
                 this.showBaseDialog(hideCloseButton, def);
                 return;
             }
             if(hideCloseButton !== true) {
                 $(".closeBaseDialog").fadeIn("fast");
             }
-            $(".baseDialog").ready(function (){
+            baseDialog.ready(function (){
                 if(def !== undefined){
                     def.resolve();
                 }
             });
-            $( ".baseDialog" ).show(explorer.baseDialogEffect, {}, 500);
-             explorer.centralize(".baseDialog");
-             explorer.repositionBaseDialog();
+            baseDialog.show(explorer.baseDialogEffect, {}, 500);
+            explorer.centralize(explorer.baseDialogId);
+            explorer.repositionBaseDialog();
         },
         closeBaseDialog: function() {
-            $(".closeBaseDialog").fadeOut(100);
-            $( "#baseDialogContent" ).fadeOut(100);
-            setTimeout(function () {
-                $( ".baseDialog" ).hide( explorer.baseDialogEffect, {}, 300);
-            }, 150);
-            setTimeout(function () {
-                $('.baseDialog').empty();
-            }, 800);
-            $(".baseDialog").trigger( "closeDialogEvent");
+          var baseDialog = $(explorer.baseDialogId);
+          $(".closeBaseDialog").fadeOut(100);
+            baseDialog.hide( explorer.baseDialogEffect, {}, 300, function (){
+              baseDialog.empty();
+          });
+          baseDialog.trigger( "closeDialogEvent");
         },
 		repositionBaseDialog: function (){
-		  var baseDialog = $(".baseDialog");
+		  var baseDialog = $(explorer.baseDialogId);
 			if($("#baseDialogContent").length){//if base dialog is visible, reposition it
 				var baseDialogWidth = baseDialog.outerWidth();
 				var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
@@ -824,7 +855,7 @@ function Explorer(width, height, container, position, fileList){
 				if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
 					baseDialog.css("height", (windowHeight - 10) + "px");
 				}
-                explorer.centralize(".baseDialog");
+                explorer.centralize(explorer.baseDialogId);
             }
 		},
         centralize: function (id) {
@@ -863,29 +894,31 @@ function Explorer(width, height, container, position, fileList){
                 var patt = /#|\.*/i;
                 if(patt.test(element) === true){//if it is a class or id of an element
                     if(explode){
-                        $(element).effect("explode", null, 700);
+                        $(element).effect("explode", null, 700, function (){
+                          $(this).remove();
+                        });
                     }
-                    setTimeout(function () {$(element).remove();}, 750);
                 }else{
                     explorer.log("You must enter a valid id, or css class. For example, '#my_id' or '.my_class'.");
                 }
             }
         },
-        open: function(folderId) {
+        open: function(file) {
+            var folderId = file.id;
+            var def = $.Deferred();
             explorer.selectedFiles = [];
-            $(".file").fadeOut(200);
-            var index = explorer.checkIfExists(folderId);
-            var item = new QuickAccessItem(folderId, explorer.fileList[index].name);
+            $(".file").fadeOut(200, function (){
+              explorer.addFiles(Number(folderId), null, def);
+            });
+            var item = new QuickAccessItem(folderId, explorer.getFileById(folderId).name);
             explorer.currentPath.push(item);
-            setTimeout( function() {
-                explorer.addFiles(Number(folderId));
-            }, 250);
-            setTimeout( function() {
+            $.when(def).done(function () {
                 $(".file").fadeIn("fast");
-            }, 300);
+            });
         },
-        rename: function(id, save){
-          var file = {id:  $("#"+id), input: $("#"+id).find("#input"+id).find("input"), cover:$("#"+id).find("#input"+id).find("div")};
+        rename: function(_file, save){
+          var id = _file.id;
+          var file = {id:  $("#"+id), inputDiv: $("#"+id).find("#input"+id), input: $("#"+id).find("#input"+id).find("input"), cover:$("#"+id).find("#input"+id).find("div")};
             if(save){//if the user has finished renaming this file.
                 var index = explorer.checkIfExists(id);
                 var newName = file.input.val();
@@ -897,10 +930,11 @@ function Explorer(width, height, container, position, fileList){
                 file.input.attr({readonly: "readonly", title: newName });
                 file.input.val(explorer.fileList[index].getName());
                 file.input.css({border: "none", cursor: "default"});
+                file.inputDiv.prop("title", newName);
                 file.cover.css("display", "block");
                 file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
             }else{
-                file.input.val(file.input.prop("title"));
+                file.input.val(file.inputDiv.prop("title"));
                 file.cover.css("display", "none");
                 file.id.find("._selected").remove();
                 file.id.css("border", "1px solid darkgray");
@@ -914,29 +948,21 @@ function Explorer(width, height, container, position, fileList){
             explorer.createBaseDialog(600);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/move.tmp", def);
             $.when(def).then(function () {
+                var btMoveFiles = $("#buttonMoveFiles");
                 explorer.showBaseDialog(false);
                 $("#moveHeader").text(explorer.LANG_LBL_MOVE_HEADER);
-                $("#buttonMoveFiles").append(explorer.LANG_LBL_MOVE_BT_MOVE);
-                $("#buttonMoveFiles").prop("title",explorer.LANG_LBL_MOVE_BT_MOVE_TITLE);
+                btMoveFiles.append(explorer.LANG_LBL_MOVE_BT_MOVE);
+                btMoveFiles.prop("title",explorer.LANG_LBL_MOVE_BT_MOVE_TITLE);
                 if(explorer.currentParent != explorer.ROOT){
                     explorer.createDestFolder(explorer.ROOT);
                 }
-                $.each(explorer.fileList, function(i, file) {
-                    //for(var file of explorer.fileList){
-                    if(file.ext == "dir" && file.id != explorer.currentParent){
-                        var isMovingToItself = $.grep(explorer.selectedFiles, function(val, i) {//A folder should not be able to move to itself right?
-                            if(val.id == file.id){
-                                return this;
-                            }
-                        });
-                        if(isMovingToItself.length > 0){
-                            return;
-                        }
-                        //creating folders to move your files in
-                        explorer.createDestFolder(file);
+                $.grep(explorer.fileList, function(file, i) {//A folder should not be able to move to itself right?
+                    if(file.ext == "dir" && file.id != explorer.currentParent && !inArray(explorer.selectedFiles, file)){
+                      //creating folders to move your files in
+                      explorer.createDestFolder(file);
                     }
                 });
-                $("#buttonMoveFiles").on("click", function () {explorer.clientMove(explorer.TEMP_VAR);});
+                btMoveFiles.on("click", function () {explorer.clientMove(explorer.TEMP_VAR);});
             });
         },
         createDestFolder: function (file){
@@ -968,7 +994,7 @@ function Explorer(width, height, container, position, fileList){
             var folders = [];
             var files = [];
             var file = null;
-            for(var x = 0; x < explorer.selectedFiles.length; x++) {//create a list of files and folders that are going to be moved
+            for(let x = 0; x < explorer.selectedFiles.length; x++) {//create a list of files and folders that are going to be moved
                 fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
                 //destFolderIndex = explorer.checkIfExists(newFolderId);
                 if (explorer.selectedFiles[x].ext == "dir") {
@@ -987,8 +1013,7 @@ function Explorer(width, height, container, position, fileList){
             $.when(def).then(function(response){//wait for server response
                 if(response === true){
                     explorer.closeBaseDialog();
-                    for(var x = 0; x < explorer.selectedFiles.length; x++){
-                        console.log(newFolderId);
+                    for(let x = 0; x < explorer.selectedFiles.length; x++){
                         file = explorer.getFileById(explorer.selectedFiles[x].id);
                         destFolder = explorer.getFileById(newFolderId);
                         //destFolderIndex = explorer.checkIfExists(newFolderId);
@@ -1026,25 +1051,26 @@ function Explorer(width, height, container, position, fileList){
             $(".quickAccessLink").css("text-decoration", "line-through");
             if(explorer.currentParent != -1){//ao pesquisar, todos os arquivos que estavam sendo exibidos no momento, devem perder seus lugares na tela
                 //Assim, quando o usu?rio clicar no link de acesso r?pido, ele ser? renderizado novamente.
-                for(var x = 0; x < explorer.fileList.length; x++){
+                for(let x = 0; x < explorer.fileList.length; x++){
                     explorer.fileList[x].placed = false;
                 }
             }
             explorer.currentParent = -1;
             $(".file, .field").remove();//Delete each file and field on the screen before add the new ones.
-            for(var x = 0; x < explorer.fileList.length; x++){
+            for(let x = 0; x < explorer.fileList.length; x++){
                 if(explorer.fileList[x].name.toLowerCase().indexOf(string.toLowerCase()) != -1){
-                    var file = explorer.fileList[x];
+                    let file = explorer.fileList[x];
                     file.found = true;
                     explorer.addFiles(file);
                     noFile = false;
                 }
             }
+            var emptyMessage = $("#emptyMessage");
             if(noFile){
-                $("#emptyMessage").text("No file found for: "+string);
-                $("#emptyMessage").fadeIn("fast");
+                emptyMessage.text("No file found for: "+string);
+                emptyMessage.fadeIn("fast");
             }else{
-                $("#emptyMessage").text(explorer.LANG_EMPTY_MESSAGE);
+                emptyMessage.text(explorer.LANG_EMPTY_MESSAGE);
             }
         },
         serverMove: function(newFolderId, files, folders, def){
@@ -1069,21 +1095,21 @@ function Explorer(width, height, container, position, fileList){
             explorer.serverDelete(def);
             $.when(def).then(function(success){
                 if(success === true) {
-                    for (var x = 0; x < explorer.selectedFiles.length; x++) {
+                    for (let x = 0; x < explorer.selectedFiles.length; x++) {
                         if (explorer.selectedFiles[x].ext == "dir") {
                             explorer.deleteFolderRecursively(explorer.selectedFiles[x].id);
                         }
-                        var index = explorer.checkIfExists(explorer.selectedFiles[x].id);//its index will change since his children will be removed from the list first
-                        var list = explorer.fields.fieldList[explorer.fileList[index].field].filesOn;
+                        let index = explorer.checkIfExists(explorer.selectedFiles[x].id);//its index will change since his children will be removed from the list first
+                        let list = explorer.fields.fieldList[explorer.fileList[index].field].filesOn;
                         explorer.fields.fieldList[explorer.fileList[index].field].filesOn = $.grep(list, function (val) {
-                            return val != explorer.fileList[index].id;
+                            return val != explorer.fileList[index].id; //remove file from field
                         });
                         if (explorer.fields.fieldList[explorer.fileList[index].field].filesOn.length === 0) {
                             explorer.fields.usedFields -= 1;
                         }
                         explorer.destroy("#" + explorer.selectedFiles[x].id, true);
                         explorer.fileList = $.grep(explorer.fileList, function (val, i) {
-                            return val.id != explorer.fileList[index].id;
+                            return val.id != explorer.fileList[index].id;//remove file from list
                         });
                     }
                     explorer.selectedFiles = [];
@@ -1124,7 +1150,7 @@ function Explorer(width, height, container, position, fileList){
         dbclick: function(file){
             explorer.TEMP_VAR = file;
             if(file.ext == "dir"){
-                explorer.open(file.id);
+                explorer.open(file);
             }else{
                 explorer.preview(file);
             }
@@ -1171,7 +1197,7 @@ function Explorer(width, height, container, position, fileList){
             return def.resolve(Math.floor((Math.random() * 500) + 200));
         },
         upload: function() {
-
+          
         },
         customMenuOption: function (file){
           return "";
@@ -1192,7 +1218,7 @@ function Explorer(width, height, container, position, fileList){
                 }
                 if(files[x].href.indexOf("explorerIcons") != -1){
                     for(var y = 0; y < files[x].cssRules.length; y++){
-                        path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
+                        path = "/explorer-/dev/explorer/"+getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
                         if($.inArray(path, explorer.iconPaths) == -1){
                             explorer.iconPaths.push(path);
                         }
@@ -1307,4 +1333,43 @@ function getValueBetweenQuotes(str){
         ret = str;
     }
     return ret;
+}
+
+function inArray(array, obj, fieldstoCompare){
+  var properties = [];
+  var equals = false;
+  if(fieldstoCompare === undefined){
+    for(let x = 0; x < array.length; x++){
+      for(let prop in obj){
+        if($.isFunction(array[x][prop])) continue;
+        equals = obj[prop] === array[x][prop];
+        if(!equals){
+          break;
+        }
+      }
+      if(equals){
+        return equals;
+      }
+    }
+    return equals;
+  }else{
+    for(let x = 0; x < array.length; x++){
+      equals = true;
+      for(let y = 0; y < fieldstoCompare.length; y++){
+        let prop = fieldstoCompare[y];
+        if($.isFunction(array[x][prop])) continue;
+        properties[y] = array[x][prop] === obj[prop];
+      }
+      for(let y = 0; y < properties.length; y++){
+        if(properties[y] === false){
+          equals = false;
+          break;
+        }
+      }
+      if(equals === true){
+        return equals;
+      }
+    }
+    return equals;
+  }
 }
