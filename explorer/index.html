@@ -19,15 +19,23 @@
   	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/explorer.js"></script>
   	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/extensions/ExUpload/exUpload.js"></script>
   	<script>
-  	  var explorer = new Explorer(600, 400);
-  	  explorer.debugMode = false;
-  	  explorer.createExplorer();
-  	  explorer.addFiles(new File(1, "Lucia", "png"));
-  	  explorer.addFiles(new File(2, "Picture", "dir"));
-  	  explorer.addFiles(new File(3, "Music", "dir"));
-  	  explorer.setIconsBackgroundColor("#1A9ADA");
-  	  explorer.border = "5px dashed gray";
-  	  explorer.start();
+  	  var xxx = new Explorer(600, 400);
+  	  xxx.debugMode = false;
+  	  xxx.createExplorer();
+  	  xxx.addFiles(new File(1, "Lucia", "png"));
+  	  xxx.addFiles(new File(2, "Picture", "dir"));
+  	  xxx.addFiles(new File(3, "Music", "dir"));
+  	  xxx.setIconsBackgroundColor("#1A9ADA");
+  	  xxx.border = "5px dashed gray";
+  	  /*exp.upload = function (){console.info("upload")};
+  	  exp.open = function (){console.info("open")};
+  	  exp.newFolder = function (){console.info("newFolder")};
+  	  exp.share = function (){console.info("share")};
+  	  exp.rename = function (){console.info("rename")};
+  	  exp.download = function (){console.info("download")};
+  	  exp.delete = function (){console.info("delete")};
+  	  exp.move = function (){console.info("move")};*/
+  	  xxx.start();
   	</script>
 	</footer>
 </html>

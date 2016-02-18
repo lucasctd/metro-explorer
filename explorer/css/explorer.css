@@ -13,16 +13,16 @@
     z-index: 20;
 }
 .moveToTooltip{
-  		background-color:white;
-  		left: 103%;
-  		top: -192%;
-  	/*	font-weight: bold;*/
-  		display: none;
-  		position: relative;
-  		opacity: .95;
-  		border-radius: 4px;
-  		color: blue;
-	  }
+		background-color:white;
+		left: 103%;
+		top: -192%;
+		display: none;
+		position: relative;
+		opacity: .95;
+		border-radius: 4px;
+		color: blue;
+		white-space: nowrap;
+}
 .iconBorder{
     border: 2px solid white;
     -moz-border-radius: 40px; /* Para Firefox */
