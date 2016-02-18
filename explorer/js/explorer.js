@@ -64,6 +64,7 @@ function Explorer(width, height, container, position, fileList){
         currentParent: 0,
         availableIconExtensions: null,
         iconsBackgroundColor: "#00ABA9",
+        baseDialogId: ".baseDialog",
         iconPaths: [],
         addFiles: function (param, resize, def) {
             if($("#emptyMessage").length){
@@ -786,13 +787,13 @@ function Explorer(width, height, container, position, fileList){
                     options["min-height"] = $.isNumeric(height) ? height : 0;
                 }
             }
-            $(".baseDialog").remove();
+            $(explorer.baseDialogId).remove();
             $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
 				"<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
-            $(".baseDialog").css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
+            $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
         },
         loadBaseDialog: function(content, def) {
-            var baseDialog = $(".baseDialog");
+            var baseDialog = $(explorer.baseDialogId);
             baseDialog.append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
                 "title='Close' alt='Close'/>");
             $(".closeBaseDialog").on("click", function (){
@@ -812,7 +813,7 @@ function Explorer(width, height, container, position, fileList){
             }
         },
         showBaseDialog: function(hideCloseButton, def) {
-            var baseDialog = $(".baseDialog");
+            var baseDialog = $(explorer.baseDialogId);
             if(!baseDialog.ready()){
                 this.showBaseDialog(hideCloseButton, def);
                 return;
@@ -826,11 +827,11 @@ function Explorer(width, height, container, position, fileList){
                 }
             });
             baseDialog.show(explorer.baseDialogEffect, {}, 500);
-            explorer.centralize(".baseDialog");
+            explorer.centralize(explorer.baseDialogId);
             explorer.repositionBaseDialog();
         },
         closeBaseDialog: function() {
-          var baseDialog = $(".baseDialog");
+          var baseDialog = $(explorer.baseDialogId);
           $(".closeBaseDialog").fadeOut(100);
             baseDialog.hide( explorer.baseDialogEffect, {}, 300, function (){
               baseDialog.empty();
@@ -838,7 +839,7 @@ function Explorer(width, height, container, position, fileList){
           baseDialog.trigger( "closeDialogEvent");
         },
 		repositionBaseDialog: function (){
-		  var baseDialog = $(".baseDialog");
+		  var baseDialog = $(explorer.baseDialogId);
 			if($("#baseDialogContent").length){//if base dialog is visible, reposition it
 				var baseDialogWidth = baseDialog.outerWidth();
 				var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
@@ -854,7 +855,7 @@ function Explorer(width, height, container, position, fileList){
 				if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
 					baseDialog.css("height", (windowHeight - 10) + "px");
 				}
-                explorer.centralize(".baseDialog");
+                explorer.centralize(explorer.baseDialogId);
             }
 		},
         centralize: function (id) {
