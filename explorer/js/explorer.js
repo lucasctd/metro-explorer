@@ -199,7 +199,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.createFields(1, true);
             var grandpaId = $.grep(explorer.fileList, function(e){ return e.id == parentId; });
             $(explorer.element).append("<div id='goup' class='file fileButton' style='float:left; top: 5px; left: 5px; position: absolute'>" +
-                "<div class='center iconBorder'><div class='goUp center'></div></div><p class='txtcenter ft11'>"+explorer.LANG_LBL_UP+"</p></div>");
+                "<div class='center iconBorder'><div class='goUp center'></div></div><br /><p class='txtcenter ft11'>"+explorer.LANG_LBL_UP+"</p></div>");
             $("#goup").on("click", function() {
                 $(".file").fadeOut("slow");
                 explorer.hide([".contextMenuFile", ".contextMenuFolder", ".contextMenuVoid"]);
@@ -1157,7 +1157,7 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(400, 200);
+            explorer.createBaseDialog(400, 220);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
