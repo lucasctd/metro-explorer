@@ -11,7 +11,7 @@
     "metro ui"
   ],
   "tags": [],
-  "version": "1.0.17",
+  "version": "1.0.19",
   "author": {
     "name": "Lucas Reis",
     "email": "lucas@programmer.com.br",
@@ -21,11 +21,7 @@
     "type": "git",
     "url": "https://www.assembla.com/spaces/explorer-/git/source"
   },
-  "dependencies": {
-    "css-reset": "0.0.1",
-    "install": "^0.4.4",
-    "npm": "^3.7.2"
-  },
+  "dependencies": {},
   "license": "MIT",
   "engines": {
     "node": ">=0.8.0"
