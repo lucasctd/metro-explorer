@@ -67,6 +67,7 @@ function Explorer(width, height, container, position, fileList){
         iconsBackgroundColor: "#00ABA9",
         baseDialogId: ".baseDialog",
         iconPaths: [],
+        preloadIcons: true,
         addFiles: function (param, resize, def) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -553,7 +554,9 @@ function Explorer(width, height, container, position, fileList){
                 return;
             }
             if(typeof Preload != "undefined"){
-              preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
+              if(preloadIcons){
+                 preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
+              }
             }else{
               explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
             }
