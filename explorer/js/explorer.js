@@ -35,7 +35,7 @@ function Explorer(width, height, container, position, fileList){
         LANG_LBL_NEW_FOLDER_BT_CREATE: "Create",
         LANG_LBL_ROOT_FOLDER: "Root",
         LANG_LBL_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
-        LANG_LBL_NO_FOLDERS_MV: "There are no folders where you can move your files to. :/",
+        LANG_LBL_NO_FOLDERS_FOUND: "There are no folders where you can move your files to. :/",
         TEMP_VAR: undefined,
         EVENT_DROP: 1,EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1,DISABLED: 2,
@@ -555,7 +555,7 @@ function Explorer(width, height, container, position, fileList){
             if(typeof Preload != "undefined"){
               preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
             }else{
-              explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.")
+              explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
             }
            // preload.run();
             explorer.started = true;
@@ -800,7 +800,7 @@ function Explorer(width, height, container, position, fileList){
             $(".closeBaseDialog").on("click", function (){
               explorer.closeBaseDialog();
             });
-            baseDialog.append("<div id='baseDialogContent' style='top:30px'> </div>");
+            baseDialog.append("<div id='baseDialogContent' class='baseDialogContent'> </div>");
             var baseDialogContent = $("#baseDialogContent");
             var patt = /\.tmp$/i;
             if(patt.test(content) === true){//if it is a template file, load it
@@ -956,6 +956,7 @@ function Explorer(width, height, container, position, fileList){
                 btMoveFiles.append(explorer.LANG_LBL_MOVE_BT_MOVE);
                 btMoveFiles.prop("title",explorer.LANG_LBL_MOVE_BT_MOVE_TITLE);
                 if(explorer.currentParent != explorer.ROOT){
+                    numFolders++;
                     explorer.createDestFolder(explorer.ROOT);
                 }
                 $.grep(explorer.fileList, function(file, i) {//A folder should not be able to move to itself right?
@@ -966,7 +967,7 @@ function Explorer(width, height, container, position, fileList){
                     }
                 });
                 if(numFolders === 0){
-                  $("#foldersList").append("<br /><br /><p class='gray ft10'>".concat(explorer.LANG_LBL_NO_FOLDERS_MV).concat("</p>"));
+                  $("#foldersList").append("<br /><p class='gray ft10'>"+explorer.LANG_LBL_NO_FOLDERS_FOUND+"</p>");
                 }
                 btMoveFiles.on("click", function () {explorer.clientMove(explorer.TEMP_VAR);});
             });
@@ -1163,7 +1164,7 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(400, 220);
+            explorer.createBaseDialog(400);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
