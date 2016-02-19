@@ -1,8 +1,7 @@
 function ExUpload(explorer, url, params) {
     var exUpload = {        
         explorerContainer: explorerContainer,
-        isAutomaticIdEnabled: false,
-        automaticId: 1,
+        useAutomaticId: false,
         url: url,
         params: params,
         debugMode: false,
@@ -11,6 +10,7 @@ function ExUpload(explorer, url, params) {
 		allowedExtensions: undefined,
         MSG_INVALID_EXT: "You cannot upload {ext} files here.",
         ERROR_INVALID_FILE: 1,
+        ERROR_NO_ID_FOUND: 2,
         start: function () {
             try{
                 exUpload.validate();
@@ -21,14 +21,14 @@ function ExUpload(explorer, url, params) {
             }
         },
         validate: function (){
-            if(exUpload.params == undefined){
+            if(exUpload.params === undefined){
                 exUpload.params =  {"fileParam": "file"};
                 exUpload.info("uploadParam was not defined, so its default value ('file') will be set.");
             }
-            if(exUpload.explorer == undefined || exUpload.explorer.ROOT == undefined){
+            if(exUpload.explorer === undefined || exUpload.explorer.ROOT === undefined){
                 throw "ExUpload will not work if you do not set Explorer's instance.";
             }
-            if(exUpload.url == undefined){
+            if(exUpload.url === undefined){
                 throw "ExUpload will not work if you do not set an url.";
             }
         },
@@ -72,20 +72,40 @@ function ExUpload(explorer, url, params) {
                 var ext = file.name.substr(file.name.lastIndexOf('.')+1);
                 var num = 100;
                 var fakeId = "fake" + num;
-                if(exUpload.validadeExtension(ext) == false){
-                    var data = {message:  exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
-                    if (exUpload.callback != undefined) {
-                        exUpload.callback(data, false);
-                    }
-                    exUpload.log(data);
-                    return;
-                }
                 while (exUpload.explorer.checkIfExists(fakeId) != -1) fakeId = "fake" + (++num);
                 var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
                 var upload = new exUpload.Upload(file, fakeFile);
-                upload.upload(file, fakeFile);
                 exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
+                if(exUpload.validadeExtension(fakeFile.ext) === false){
+                    var msg = {message:  exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
+                    upload.createProgressStructure(fakeFile.id);
+                    exUpload.error(msg, fakeFile);
+                }else{
+                  upload.upload(file, fakeFile);
+                }
             });
+        },
+        error: function(msg, fakeFile){
+          var errorStyle = $("#" + fakeFile.id).find(".errorStyle");
+          var item = $("#" + fakeFile.id);
+          item.find(".exUpload").fadeOut("fast");
+          item.find(".abortStyle").fadeOut("fast");
+          errorStyle.fadeIn("slow");
+          errorStyle.on("mouseover", function () {
+              errorStyle.css("cursor", "pointer");
+              errorStyle.prop("title", "Click to Hide");
+              item.find(".errorFont").text("Remove?");
+          })
+          .on("mouseout", function () {
+              item.find(".errorFont").text("Upload has Failed");
+          })
+          .on("mousedown", function () {
+              item.fadeOut("slow");
+          });
+          if (exUpload.callback !== undefined) {
+              exUpload.callback(msg, false);
+          }
+          exUpload.log(msg);
         },
 		Upload: function (file, fakeFile) {
             var object = {
@@ -93,7 +113,7 @@ function ExUpload(explorer, url, params) {
                 file: file,
                 myXhr: undefined,
                 upload: function () {
-                    var XHR = new window.XMLHttpRequest();
+                    //var XHR = new window.XMLHttpRequest();
                     var formData = new FormData();
                     formData.append(exUpload.params.fileParam, object.file);
                     formData.append("dirId", exUpload.explorer.currentParent);
@@ -114,59 +134,44 @@ function ExUpload(explorer, url, params) {
                             }
                             return object.myXhr;
                         },
-                        beforeSend: function () {
+                        beforeSend: function (xhr) {
                             object.fakeFile.date = Math.round(new Date() / 1000);
                         },
                         success: function (data) {//retorno do servidor
                             var def = $.Deferred();
                             var fakeFileIndex = exUpload.explorer.checkIfExists(object.fakeFile.id);
-                            if (data.id != undefined && data.id != null) {//caso o servidor tenha retornado o id do arquivo upado
+                            if (data.id !== undefined && data.id !== null) {//caso o servidor tenha retornado o id do arquivo upado
                                 //altera o id fake para o id retornado do banco no html e na lista de Explorer
-                                if(exUpload.isAutomaticIdEnabled){
-                                    $("#" + object.fakeFile.id).attr("id", exUpload.automaticId);
-                                    exUpload.explorer.fileList[fakeFileIndex].id = exUpload.automaticId;
-                                    data.id = exUpload.automaticId++;
-                                }else{
-                                    $("#" + object.fakeFile.id).attr("id", data.id);
-                                    exUpload.explorer.fileList[fakeFileIndex].id = data.id;
-                                }
-                            } else {
+                                let fakeId = object.fakeFile.id;
+                                $("#" + fakeId).attr("id", data.id);
+                                $("#" + fakeId).find("#selec_id".concat(fakeId)).attr("id", "selec_id".concat(data.id));
+                                exUpload.explorer.fileList[fakeFileIndex].id = data.id;
+                            } else if(exUpload.useAutomaticId){
                                 data.id = object.fakeFile.id;
+                            }else{
+                              var msg = {messages: "Your server did not return any ID, not did you enable the use of automatic id (exUpload.useAutomaticId).", error: exUpload.ERROR_NO_ID_FOUND};
+                              if (exUpload.callback !== undefined) {
+                                  exUpload.callback(msg, false);
+                              }
+                              this.error(msg, object.fakeFile);
+                              return;
                             }
                             def.resolve();
                             $.when(def).then(function () {
-                                $("#" + data.id).find(".abortStyle").unbind("mouseover");
-                                $("#" + data.id).find(".abortStyle").css("display", "none");
-                                $("#" + data.id).removeClass("uploading");
+                                var item = $("#" + data.id);
+                                item.find(".abortStyle").unbind("mouseover");
+                                item.find(".abortStyle").css("display", "none");
+                                item.removeClass("uploading");
                                 setTimeout(function () {
-                                    $("#" + data.id).find(".exUpload").fadeOut("slow");
+                                    item.find(".exUpload").fadeOut("slow");
                                 }, 2000);
-                                if (exUpload.callback != undefined) {
+                                if (exUpload.callback !== undefined) {
                                     exUpload.callback(data, true);
                                 }
                             });
                         },
                         error: function (e) {
-                                var errorStyle = $("#" + object.fakeFile.id).find(".errorStyle");
-                                var item = $("#" + object.fakeFile.id);
-                                item.find(".exUpload").fadeOut("fast");
-                                item.find(".abortStyle").fadeOut("fast");
-                                errorStyle.fadeIn("slow");
-                                errorStyle.on("mouseover", function () {
-                                errorStyle.css("cursor", "pointer");
-                                errorStyle.prop("title", "Click to Hide");
-                                item.find(".errorFont").text("Remove?");
-                            })
-                            .on("mouseout", function () {
-                                $("#" + object.fakeFile.id).find(".errorFont").text("Upload has Failed");
-                            })
-                            .on("mousedown", function () {
-                                $("#" + object.fakeFile.id).fadeOut("slow");
-                            });
-                            if (exUpload.callback != undefined) {
-                                exUpload.callback(e, false);
-                            }
-                            exUpload.log(e);
+                            exUpload.error(e, object.fakeFile);
                         },
                         data: formData,
                         //Options to tell jQuery not to process data or worry about content-type.
@@ -177,13 +182,12 @@ function ExUpload(explorer, url, params) {
                     });
                 },
                 createProgressStructure: function (id) {
-                    var item = $("#" + id);
-                    if (!item.hasClass("uploading")) {
-                        item.addClass("uploading");
+                    var item = {id: $("#" + id), abortStyle: $("#" + id).find(".abortStyle")};
+                    if (!item.id.hasClass("uploading")) {
+                        item.id.addClass("uploading");
                     }
-                    if (!item.find("#progressBar").length) {
-                        item.addClass("uploading");
-                        item.append('<div id="progressBar" class="progressBar exUpload"></div>'
+                    if (!item.id.find("#progressBar").length) {
+                        item.id.append('<div id="progressBar" class="progressBar exUpload"></div>'
                             + '<div id="errorStyle" class="errorStyle"><p class="errorFont">Upload has Failed</p></div>'
                             + '<div id="abortStyle" class="abortStyle"><p class="abortFont">Abort?</p></div>'
                             + '<div style="position:absolute; left:50%; top:0;" class="exUpload">'
@@ -192,16 +196,16 @@ function ExUpload(explorer, url, params) {
                             + '</div>'
                             + '<span class="uploadSpeed">0 Kbps</span>'
                             + '</div>');
-                        item.find(".abortStyle").find(".abortFont").on("mouseup", function () {
-                            item.find(".abortStyle").unbind("mouseover");
-                            item.find(".abortStyle").css("display", "none");
+                        item.abortStyle.find(".abortFont").on("mouseup", function () {
+                            item.abortStyle.unbind("mouseover");
+                            item.abortStyle.css("display", "none");
                             object.myXhr.abort();
                         });
-                        item.find(".abortStyle").on("mouseover", function () {
-                            item.find(".abortStyle").css("opacity", .8);
+                        item.abortStyle.on("mouseover", function () {
+                            item.abortStyle.css("opacity", 0.8);
                         });
-                        item.find(".abortStyle").on("mouseout", function () {
-                            item.find(".abortStyle").css("opacity", 0);
+                        item.abortStyle.on("mouseout", function () {
+                            item.abortStyle.css("opacity", 0);
                         });
                     }
                 },
@@ -225,9 +229,9 @@ function ExUpload(explorer, url, params) {
                         item.find(".uploadSpeed").html("^ " + Math.floor((e.loaded / 1024) / spentTime) + " Kbps");
                     }
                 }
-            }
+            };
             return object;
 		}
-    }
+    };
     return exUpload;
 }

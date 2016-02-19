@@ -34,7 +34,8 @@ function Explorer(width, height, container, position, fileList){
         LANG_LBL_NEW_FOLDER_FOLDER_NAME: "Folder Name:",
         LANG_LBL_NEW_FOLDER_BT_CREATE: "Create",
         LANG_LBL_ROOT_FOLDER: "Root",
-        LANG_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
+        LANG_LBL_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
+        LANG_LBL_NO_FOLDERS_FOUND: "There are no folders where you can move your files to. :/",
         TEMP_VAR: undefined,
         EVENT_DROP: 1,EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1,DISABLED: 2,
@@ -601,7 +602,7 @@ function Explorer(width, height, container, position, fileList){
                 if ($("#emptyMessage").length) {
                     $("#emptyMessage").fadeIn("fast");
                 } else {
-                    $(explorer.element).append("<p id='emptyMessage' class='gray txtcenter'>" + explorer.LANG_EMPTY_MESSAGE + "</p>");
+                    $(explorer.element).append("<p id='emptyMessage' class='gray txtcenter'>" + explorer.LANG_LBL_EMPTY_MESSAGE + "</p>");
                 }
             }
         },
@@ -799,7 +800,7 @@ function Explorer(width, height, container, position, fileList){
             $(".closeBaseDialog").on("click", function (){
               explorer.closeBaseDialog();
             });
-            baseDialog.append("<div id='baseDialogContent' style='top:30px'> </div>");
+            baseDialog.append("<div id='baseDialogContent' class='baseDialogContent'> </div>");
             var baseDialogContent = $("#baseDialogContent");
             var patt = /\.tmp$/i;
             if(patt.test(content) === true){//if it is a template file, load it
@@ -945,6 +946,7 @@ function Explorer(width, height, container, position, fileList){
         },
         move: function() {
             var def = $.Deferred();
+            var numFolders = 0;
             explorer.createBaseDialog(600);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/move.tmp", def);
             $.when(def).then(function () {
@@ -954,14 +956,19 @@ function Explorer(width, height, container, position, fileList){
                 btMoveFiles.append(explorer.LANG_LBL_MOVE_BT_MOVE);
                 btMoveFiles.prop("title",explorer.LANG_LBL_MOVE_BT_MOVE_TITLE);
                 if(explorer.currentParent != explorer.ROOT){
+                    numFolders++;
                     explorer.createDestFolder(explorer.ROOT);
                 }
                 $.grep(explorer.fileList, function(file, i) {//A folder should not be able to move to itself right?
                     if(file.ext == "dir" && file.id != explorer.currentParent && !inArray(explorer.selectedFiles, file)){
                       //creating folders to move your files in
+                      numFolders++;
                       explorer.createDestFolder(file);
                     }
                 });
+                if(numFolders === 0){
+                  $("#foldersList").append("<br /><p class='gray ft10'>"+explorer.LANG_LBL_NO_FOLDERS_FOUND+"</p>");
+                }
                 btMoveFiles.on("click", function () {explorer.clientMove(explorer.TEMP_VAR);});
             });
         },
@@ -1070,7 +1077,7 @@ function Explorer(width, height, container, position, fileList){
                 emptyMessage.text("No file found for: "+string);
                 emptyMessage.fadeIn("fast");
             }else{
-                emptyMessage.text(explorer.LANG_EMPTY_MESSAGE);
+                emptyMessage.text(explorer.LANG_LBL_EMPTY_MESSAGE);
             }
         },
         serverMove: function(newFolderId, files, folders, def){
@@ -1157,7 +1164,7 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(400, 200);
+            explorer.createBaseDialog(400);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
