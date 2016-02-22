@@ -8,7 +8,7 @@ function ExUpload(explorer, url, params) {
         callback: undefined,
         explorer: explorer,
 		allowedExtensions: undefined,
-        MSG_INVALID_EXT: "You cannot upload {ext} files here.",
+        MSG_INVALID_EXT: "{ext} files are not allowed.",
         ERROR_INVALID_FILE: 1,
         ERROR_NO_ID_FOUND: 2,
         start: function () {
