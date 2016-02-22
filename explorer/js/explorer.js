@@ -37,10 +37,12 @@ function Explorer(width, height, container, position, fileList){
         LANG_LBL_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
         LANG_LBL_NO_FOLDERS_FOUND: "There are no folders where you can move your files to. :/",
         TEMP_VAR: undefined,
-        EVENT_DROP: 1,EVENT_RENAME: 2,
-        ENABLED: 0, HIDDEN: 1,DISABLED: 2,
-        CONTEXT_MENU_OPTIONS: {"DOWNLOAD" : 0, "UPLOAD" : 0, "OPEN" : 0, "MOVE": 0, "RENAME" : 0, "DELETE" : 0, "SHARE" : 0, "NEW_FOLDER" : 0},
-        DOWNLOAD: 0,UPLOAD : 1, OPEN : 2, MOVE: 3, RENAME : 4, DELETE : 5, SHARE : 6, NEW_FOLDER : 7,
+        EVENT_DROP: 1, EVENT_RENAME: 2,
+        ENABLED: 0, HIDDEN: 1, DISABLED: 2,
+        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, DOWNLOAD_ALL: 0, UPLOAD: 0, UPLOAD_ALL: 0, MOVE: 0, MOVE_ALL: 0, 
+        DELETE: 0, DELETE_ALL: 0, SHARE: 0, SHARE_ALL: 0, RENAME: 0, NEW_FOLDER: 0, OPEN: 0},
+        DOWNLOAD: 0, DOWNLOAD_ALL: 1, UPLOAD : 2, UPLOAD_ALL: 3, MOVE: 4, MOVEL_ALL: 5, DELETE : 6, DELETE_ALL: 7, 
+        SHARE : 8, SHARE_ALL: 9, RENAME : 10, NEW_FOLDER : 11, OPEN : 12,
         ROOT: 0,
         GO_UP_ID: -1,
         baseDialogEffect: "fade",
@@ -68,6 +70,7 @@ function Explorer(width, height, container, position, fileList){
         baseDialogId: ".baseDialog",
         iconPaths: [],
         preloadIcons: true,
+        multiSelect: true,
         addFiles: function (param, resize, def) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -225,7 +228,7 @@ function Explorer(width, height, container, position, fileList){
             });
             //Add click event
             fileElem.on("mousedown", function(e){
-                if(!$(e.target).is('._selected') && e.which == 3){//if it was not selected and it is a right click,
+                if((!$(e.target).is('._selected') && e.which == 3) || !explorer.multiSelect){//if it was not selected and it is a right click,
                     explorer.selectedFiles = [];//clean the list to add a new one
                     $("._selected").removeClass('_selected');
                     $(".file").css("border", "1px solid darkgray");
@@ -618,13 +621,13 @@ function Explorer(width, height, container, position, fileList){
                 $("#contextIdTools").fadeIn("fast");
             }else{
                 contextMenu4Files.empty();
-                allOptions = explorer.selectedFiles.length > 1;
+                allOptions = explorer.selectedFiles.length > 1 && explorer.multiSelect;
                 options = options.concat(
-                  explorer.loadContextMenuOption(explorer.MOVE, explorer.CONTEXT_MENU_OPTIONS.MOVE, allOptions) +
+                  explorer.loadContextMenuOption(explorer.MOVE, allOptions ? explorer.CONTEXT_MENU_OPTIONS.MOVE_ALL : explorer.CONTEXT_MENU_OPTIONS.MOVE, allOptions) +
                   (!allOptions ? explorer.loadContextMenuOption(explorer.RENAME, explorer.CONTEXT_MENU_OPTIONS.RENAME, allOptions) : "") +
-                  explorer.loadContextMenuOption(explorer.DELETE, explorer.CONTEXT_MENU_OPTIONS.DELETE, allOptions) +
-                  explorer.loadContextMenuOption(explorer.SHARE, explorer.CONTEXT_MENU_OPTIONS.SHARE, allOptions) +
-                  explorer.loadContextMenuOption(explorer.DOWNLOAD, explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD, allOptions)
+                  explorer.loadContextMenuOption(explorer.DELETE, allOptions ? explorer.CONTEXT_MENU_OPTIONS.DELETE_ALL : explorer.CONTEXT_MENU_OPTIONS.DELETE, allOptions) +
+                  explorer.loadContextMenuOption(explorer.SHARE, allOptions ? explorer.CONTEXT_MENU_OPTIONS.SHARE_ALL : explorer.CONTEXT_MENU_OPTIONS.SHARE, allOptions) +
+                  explorer.loadContextMenuOption(explorer.DOWNLOAD, allOptions ? explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD_ALL : explorer.CONTEXT_MENU_OPTIONS.DOWNLOAD, allOptions)
                 );
                 if(!allOptions && file.ext == "dir"){
                   options = explorer.loadContextMenuOption(explorer.OPEN, explorer.CONTEXT_MENU_OPTIONS.OPEN, allOptions).concat(options);
@@ -633,6 +636,9 @@ function Explorer(width, height, container, position, fileList){
                 contextMenu4Files.addClass(contextMenuClass);
                 options.concat(explorer.customMenuOption(file));
                 contextMenu4Files.append(options);
+                if(contextMenu4Files.html().length < 1){
+                  return;
+                }
                 contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
                 contextMenu4Files.fadeIn("fast");
                 contextMenu4Files.css("z-index", 9999);
