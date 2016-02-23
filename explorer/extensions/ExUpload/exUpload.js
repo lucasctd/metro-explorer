@@ -100,7 +100,21 @@ function ExUpload(explorer, url, params) {
               item.find(".errorFont").text("Upload has Failed");
           })
           .on("mousedown", function () {
-              item.fadeOut("slow");
+              item.fadeOut("slow", function (){
+                var field = exUpload.explorer.getFileById(fakeFile.id).field;
+                let list = exUpload.explorer.fields.fieldList[field].filesOn;
+                exUpload.explorer.fields.fieldList[field].filesOn = $.grep(list, function (val) {
+                    return val != fakeFile.id; //remove file from field
+                });
+                if (exUpload.explorer.fields.fieldList[field].filesOn.length === 0) {
+                    exUpload.explorer.fields.usedFields -= 1;
+                }
+                exUpload.explorer.fileList = $.grep(exUpload.explorer.fileList, function (val, i) {
+                    return val.id != fakeFile.id;//remove file from list
+                });
+                $(this).remove();
+              });
+              
           });
           if (exUpload.callback !== undefined) {
               exUpload.callback(msg, false);
