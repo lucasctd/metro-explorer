@@ -811,7 +811,7 @@ function Explorer(width, height, container, position, fileList){
             });
             baseDialog.append("<div id='baseDialogContent' class='baseDialogContent'> </div>");
             var baseDialogContent = $("#baseDialogContent");
-            var patt = /\.tmp$/i;
+            var patt = /\.tmp$|\.html/i;
             if(patt.test(content) === true){//if it is a template file, load it
                 baseDialogContent.load(content, function (){
                     if(typeof def != 'undefined'){
@@ -836,9 +836,21 @@ function Explorer(width, height, container, position, fileList){
                     def.resolve();
                 }
             });
-            baseDialog.show(explorer.baseDialogEffect, {}, 500);
-            explorer.centralize(explorer.baseDialogId);
-            explorer.repositionBaseDialog();
+            if(baseDialog.find("#defaultHeight").val() != "auto" && baseDialog.find("#defaultWidth").val() != "auto"){
+              explorer.centralize(explorer.baseDialogId);
+              explorer.repositionBaseDialog();
+            }else{
+              baseDialog.css("opacity", 0);
+            }
+            baseDialog.show(explorer.baseDialogEffect, {}, 500, function (){
+              if(baseDialog.find("#defaultHeight").val() == "auto" || baseDialog.find("#defaultWidth").val() == "auto"){
+                explorer.centralize(explorer.baseDialogId);
+                explorer.repositionBaseDialog();
+                baseDialog.animate({
+                  opacity: 1
+                }, 300);
+              }
+            });
         },
         closeBaseDialog: function() {
           var baseDialog = $(explorer.baseDialogId);
