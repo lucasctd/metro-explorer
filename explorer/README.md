@@ -6,4 +6,6 @@ You can know more about Explorer and also get its documentation at www.metroui.u
 
 I am also using it on my own cloud storage web site. Check this out -> www.heyupload.us xD
 
+If you guys have any suggestion, feel free to contact me. Email: lucas@programmer.com.br
+
 I hope you like it :)
