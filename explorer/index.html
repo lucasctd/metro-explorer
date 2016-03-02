@@ -23,7 +23,7 @@
   	  var exp = new Explorer(600, 400);
   	  exp.debugMode = false;
   	  exp.multiSelect = false;
-  	  exp.CONTEXT_MENU_OPTIONS.DELETE_ALL = exp.HIDDEN;
+  	  /*exp.CONTEXT_MENU_OPTIONS.DELETE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.MOVE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.UPLOAD_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.SHARE_ALL = exp.HIDDEN;
@@ -35,7 +35,7 @@
       exp.CONTEXT_MENU_OPTIONS.DOWNLOAD = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.RENAME = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;
-      exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;
+      exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;*/
   	  exp.createExplorer();
   	  exp.addFiles(new File(1, "Lucia", "png"));
   	  exp.addFiles(new File(2, "Picture", "dir"));
@@ -50,6 +50,15 @@
   	  exp.download = function (file){console.info("download "+file.name)};
   	  exp.delete = function (file){console.info("delete "+file.name)};
   	  exp.move = function (file){console.info("move "+file.name)};
+  	 /* exp.customMenuOption = function(file){
+        return exp.buildCustomMenuOption("Teste", "fuck") + 
+        exp.buildCustomMenuOption("Yahoo", "fuck");
+        
+      };*/
+
+      function fuck(){
+          alert("teste");
+      }
   	  exp.start();
   	</script>
 	</footer>

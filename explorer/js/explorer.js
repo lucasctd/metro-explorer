@@ -634,7 +634,7 @@ function Explorer(width, height, container, position, fileList){
                   contextMenuClass = "contextMenuFolder";
                 }
                 contextMenu4Files.addClass(contextMenuClass);
-                options.concat(explorer.customMenuOption(file));
+                options = options.concat(explorer.customMenuOption(file));
                 contextMenu4Files.append(options);
                 if(contextMenu4Files.html().length < 1){
                   return;
