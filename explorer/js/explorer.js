@@ -1364,6 +1364,7 @@ function getValueBetweenQuotes(str){
 }
 
 function inArray(array, obj, fieldstoCompare){
+  "use strict";
   var properties = [];
   var equals = false;
   if(fieldstoCompare === undefined){

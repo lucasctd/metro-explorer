@@ -1,4 +1,5 @@
 function ExUpload(explorer, url, params) {
+    "use strict";
     var exUpload = {        
         explorerContainer: explorerContainer,
         useAutomaticId: false,
