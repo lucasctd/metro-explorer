@@ -165,7 +165,6 @@ function ExUpload(explorer, url, params) {
                             if (data.id !== undefined && data.id !== null) {//caso o servidor tenha retornado o id do arquivo upado
                                 //altera o id fake para o id retornado do banco no html e na lista de Explorer
                                 let fakeId = object.fakeFile.id;
-                                console.log(fakeId);
                                 $("#" + fakeId).find("#selec_id".concat(fakeId)).attr("id", "selec_id".concat(data.id));
                                 $("#" + fakeId).attr("id", data.id);
                                 exUpload.explorer.fileList[fakeFileIndex].id = data.id;
