@@ -70,21 +70,28 @@ function ExUpload(explorer, url, params) {
                 e.preventDefault();
                 e.stopPropagation();
                 var file = e.dataTransfer.files[0];//file to upload
-                var ext = file.name.substr(file.name.lastIndexOf('.')+1);
-                var num = 100;
-                var fakeId = "fake" + num;
-                while (exUpload.explorer.checkIfExists(fakeId) != -1) fakeId = "fake" + (++num);
-                var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
-                var upload = new exUpload.Upload(file, fakeFile);
-                exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
-                if(exUpload.validadeExtension(fakeFile.ext) === false){
-                    var msg = {message:  exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
-                    upload.createProgressStructure(fakeFile.id);
-                    exUpload.error(msg, fakeFile);
-                }else{
-                  upload.upload(file, fakeFile);
-                }
+                exUpload.upload(file);
             });
+        },
+        upload: function (file){
+            var ext = file.name.substr(file.name.lastIndexOf('.')+1);
+            var fakeId = exUpload.generateFakeId();
+            var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
+            var uploader = new exUpload.Uploader(file, fakeFile);
+            exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
+            if(exUpload.validadeExtension(fakeFile.ext) === false){
+                var msg = {message:  exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
+                uploader.createProgressStructure(fakeFile.id);
+                exUpload.error(msg, fakeFile);
+            }else{
+                uploader.upload(file, fakeFile);
+            }
+        },
+        generateFakeId: function(){
+            var num = 100;
+            var fakeId = "fake" + num;
+            while (exUpload.explorer.checkIfExists(fakeId) != -1) fakeId = "fake" + (++num);
+            return fakeId;
         },
         error: function(msg, fakeFile){
           var errorStyle = $("#" + fakeFile.id).find(".errorStyle");
