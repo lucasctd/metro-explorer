@@ -149,7 +149,11 @@ function Explorer(width, height, container, position, fileList){
                     let field = explorer.fields.fieldList[file.field];
                     file.getElement().css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
                     file.getElement().css("left", (field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5) + "px");
-                    file.getElement().fadeIn(300);
+                    if(resize === true){
+                        file.getElement().css("display", "block");
+                    }else{
+                        file.getElement().fadeIn(300);
+                    }
                     explorer.fields.usedFields++;
                     explorer.loadFileEvents(file);
                 }else{
@@ -163,7 +167,7 @@ function Explorer(width, height, container, position, fileList){
               def.resolve();
             }
         },
-        placeFileAutomatically: function (file){
+        placeFileAutomatically: function (file, resize){
             for(let x=0; x < explorer.fields.fieldList.length; x++){
                 if(explorer.fields.fieldList[x].filesOn.length === 0){
                     let top = (explorer.fields.fieldList[x].top + 5)+"px;";
@@ -175,7 +179,11 @@ function Explorer(width, height, container, position, fileList){
                         "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' />"+
                         "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id"+file.id+"' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>"+
                         "</div>");
-                    file.getElement().fadeIn(300);
+                    if(resize === true){
+                        file.getElement().css("display", "block");
+                    }else{
+                        file.getElement().fadeIn(300);
+                    }
                     explorer.fields.fieldList[x].filesOn.push(file.id);
                     explorer.fields.usedFields++;
                     let index = explorer.checkIfExists(file.id);
