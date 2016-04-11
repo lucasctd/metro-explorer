@@ -204,7 +204,7 @@ function ExUpload(explorer, url, params) {
                     });
                 },
                 createProgressStructure: function (id) {
-                    var item = {id: $("#" + id), abortStyle: $("#" + id).find(".abortStyle")};
+                    var item = {id: $("#" + id), abortStyle: null};
                     if (!item.id.hasClass("uploading")) {
                         item.id.addClass("uploading");
                     }
@@ -218,6 +218,8 @@ function ExUpload(explorer, url, params) {
                             + '</div>'
                             + '<span class="uploadSpeed">0 Kbps</span>'
                             + '</div>');
+                        item.abortStyle = $("#" + id).find(".abortStyle");
+                        item.abortStyle.find("p").prop("title", "Abort the upload of "+this.file.name);
                         item.abortStyle.find(".abortFont").on("mouseup", function () {
                             item.abortStyle.unbind("mouseover");
                             item.abortStyle.css("display", "none");
