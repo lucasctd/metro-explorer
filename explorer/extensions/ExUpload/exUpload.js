@@ -73,6 +73,8 @@ function ExUpload(explorer, url, params) {
                 exUpload.upload(file);
             });
         },
+        beforeSend: function (xhr) {
+        },
         upload: function (file){
             var ext = file.name.substr(file.name.lastIndexOf('.')+1);
             var fakeId = exUpload.generateFakeId();
@@ -157,6 +159,7 @@ function ExUpload(explorer, url, params) {
                             return object.myXhr;
                         },
                         beforeSend: function (xhr) {
+                            exUpload.beforeSend(xhr);
                             object.fakeFile.date = Math.round(new Date() / 1000);
                         },
                         success: function (data) {//retorno do servidor
