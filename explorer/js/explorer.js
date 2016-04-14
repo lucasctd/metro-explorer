@@ -1041,7 +1041,7 @@ function Explorer(width, height, container, position, fileList){
                 if (explorer.selectedFiles[x].ext == "dir") {
                     var subfolders = explorer.getMySubFolders(explorer.selectedFiles[x].id);
                     if ($.inArray(newFolderId, subfolders) != -1) {//if moving folder to inside itself
-                        $(document).trigger( "movingToItself", [explorer.selectedFiles[x], explorer.LANG_LBL_MOVE_FOLDER_ERROR_MSG.replace("{folderName}", "<b>" + explorer.selectedFiles[x].name + "</b>")] );
+                        $(document).trigger( "movingToItself", [{file: explorer.selectedFiles[x], msg: explorer.LANG_LBL_MOVE_FOLDER_ERROR_MSG.replace("{folderName}", "<b>" + explorer.selectedFiles[x].name + "</b>")}] );
                         explorer.selectedFiles.splice(x, 1);
                     }else{
                         folders.push(explorer.selectedFiles[x]);
