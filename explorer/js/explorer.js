@@ -98,7 +98,12 @@ function Explorer(width, height, container, position, fileList){
                 }
                 explorer.fields.fieldList = [];
                 explorer.fields.usedFields = 0;
-                $(".file, .field").remove();//Delete each file and field on the screen before add the new ones.
+                //console.log($(".file, .field"));
+                $(".file, .field").each(function( index ) {
+                    if(this.id.substring(0,3) != "mv_"){//do not remove folders on the move dialog 
+                        this.remove();//Delete each file and field on the screen before add the new ones.
+                    } 
+                });
                 explorer.currentParent = parentId;
                 explorer.createQuickFolderAccess(parentId);
                 if(parentId !== 0){ //if it is not the root, create a link to go back to its parent
@@ -576,7 +581,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.createQuickFolderAccess(0);
             explorer.setExplorerPosition();
             $( window ).resize(function() {//it makes explorer responsive.
-                explorer.resizeExplorer(); //irei acompanhar o desempenho da aplicaï¿½ï¿½o em stage para ver se uso o truque abaixo ou nï¿½o
+                explorer.resizeExplorer();
                 //clearTimeout(resizeId);//little trick to resize Explorer only after resizing get done.
                 //resizeId = setTimeout(explorer.resizeExplorer, 50);
             });
@@ -609,7 +614,7 @@ function Explorer(width, height, container, position, fileList){
         resizeExplorer: function(){
             explorer.setExplorerPosition(); //resize Explorer
             explorer.addFiles(explorer.currentParent, true); //reorganize files' position.
-			explorer.repositionBaseDialog();            
+			      explorer.repositionBaseDialog();            
         },
         showEmptyMessage: function (){
             if(explorer.fileList.length === 0) {
@@ -977,7 +982,7 @@ function Explorer(width, height, container, position, fileList){
             var def = $.Deferred();
             var numFolders = 0;
             explorer.createBaseDialog(600);
-            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/move.tmp", def);
+            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/move.html", def);
             $.when(def).then(function () {
                 var btMoveFiles = $("#buttonMoveFiles");
                 explorer.showBaseDialog(false);
@@ -1120,7 +1125,7 @@ function Explorer(width, height, container, position, fileList){
                     folders+= item.id + "," +explorer.getMySubFolders(item.id);
                 }
             });
-            folders = $.grep(folders.split(","), function(val, i) { if(val !== "") return this; });
+            folders = $.grep(folders.split(","), function(val, i) { if(val !== "") return val; });
             return folders;
         },
         delete: function() {
@@ -1194,7 +1199,7 @@ function Explorer(width, height, container, position, fileList){
         newFolder: function() {
             var def = $.Deferred();
             explorer.createBaseDialog(400);
-            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.tmp", def);
+            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.html", def);
             $.when(def).then(function () {
                 explorer.showBaseDialog();
                 var btCreateFolder = $("#buttonCreateFolder");
