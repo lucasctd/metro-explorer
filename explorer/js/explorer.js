@@ -296,7 +296,7 @@ function Explorer(width, height, container, position, fileList){
                           let parent = explorer.getFileById(explorer.currentParent);
                           explorer.clientMove(parent.parent, true);
                           return;
-                        }else{
+                        }else{//move to this folder
                             topFile = explorer.getFileById(topFile);
                           if(topFile && topFile.ext == "dir" && topFile.id != file.id){//move it to this folder
                             explorer.selectedFiles = [file];
@@ -304,13 +304,13 @@ function Explorer(width, height, container, position, fileList){
                             return;
                           }
                         }//if the top file is not a folder, place it on the top
-                        //if($.inArray(ui.draggable.context.id, field.filesOn) == -1){
-                        field.filesOn.push(Number(file.id));
-                        var index = explorer.checkIfExists(file.id);
-                        explorer.fileList[index].field = field.fieldNumber();//update file field
-                        //}
+                        if($.inArray(file.id, field.filesOn) == -1){//do not repeat files on the field...
+                          field.filesOn.push(Number(file.id));
+                          var index = explorer.checkIfExists(file.id);
+                          explorer.fileList[index].field = field.fieldNumber();//update file field
+                        }
                         $(field.element).trigger("fileUpdateEvent", [{"file":file}, explorer.EVENT_DROP]);//fire event
-                        file.getElement().animate({//organize stack of files
+                            file.getElement().animate({//organize stack of files
                                 left: field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5,
                                 top: field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5
                             },
@@ -337,7 +337,8 @@ function Explorer(width, height, container, position, fileList){
                         if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
                           var parent = explorer.getFileById(explorer.currentParent);
                           var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
-                          file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
+                          //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
+                          file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to ".concat(parentName)).fadeIn();
                         }else{
                           topFile = explorer.getFileById(topFile);
                           if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
@@ -1029,18 +1030,17 @@ function Explorer(width, height, container, position, fileList){
             });
             explorer.initMouseOverEvent();
         },
-        clientMove: function(newFolderId, goUp){
+        clientMove: function(destFolderId, goUp){
             var fileIndex = -1, destFolder = null;
             var def = $.Deferred();
             var folders = [];
             var files = [];
-            var file = null;
             for(let x = 0; x < explorer.selectedFiles.length; x++) {//create a list of files and folders that are going to be moved
                 fileIndex = explorer.checkIfExists(explorer.selectedFiles[x].id);
-                //destFolderIndex = explorer.checkIfExists(newFolderId);
+                //destFolderIndex = explorer.checkIfExists(destFolderId);
                 if (explorer.selectedFiles[x].ext == "dir") {
                     var subfolders = explorer.getMySubFolders(explorer.selectedFiles[x].id);
-                    if ($.inArray(newFolderId, subfolders) != -1) {//if moving folder to inside itself
+                    if ($.inArray(destFolderId, subfolders) != -1) {//if moving folder to inside itself
                         $(document).trigger( "movingToItself", [{file: explorer.selectedFiles[x], msg: explorer.LANG_LBL_MOVE_FOLDER_ERROR_MSG.replace("{folderName}", "<b>" + explorer.selectedFiles[x].name + "</b>")}] );
                         explorer.selectedFiles.splice(x, 1);
                     }else{
@@ -1050,15 +1050,15 @@ function Explorer(width, height, container, position, fileList){
                     files.push(explorer.selectedFiles[x]);
                 }
             }
-            explorer.serverMove(newFolderId,files, folders, def);
+            explorer.serverMove(destFolderId,files, folders, def);
             $.when(def).then(function(response){//wait for server response
                 if(response === true){
                     explorer.closeBaseDialog();
                     for(let x = 0; x < explorer.selectedFiles.length; x++){
-                        file = explorer.getFileById(explorer.selectedFiles[x].id);
-                        destFolder = explorer.getFileById(newFolderId);
-                        //destFolderIndex = explorer.checkIfExists(newFolderId);
-                        if(newFolderId != explorer.ROOT && file.parent == explorer.currentParent && destFolder.parent == explorer.currentParent){
+                        let file = explorer.getFileById(explorer.selectedFiles[x].id);
+                        destFolder = explorer.getFileById(destFolderId);
+                        //if it's in the same folder of the new folder
+                        if(destFolderId != explorer.ROOT && file.parent == explorer.currentParent && destFolder.parent == explorer.currentParent){
                             file.getElement().css("z-index",999).animate({
                                 top: destFolder.getElement().css("top"),
                                 left: destFolder.getElement().css("left")
@@ -1066,15 +1066,24 @@ function Explorer(width, height, container, position, fileList){
                                 $(this).hide("scale", {percent: 0}, 700, function (){
                                   file.getElement().css("z-index",1);
                                 });
-                                //setTimeout(function (){file.getElement().css("z-index",1);}, 750);
                             });
-                        }else if(goUp){
+                        }else if(goUp){//if it was dropped on the goUp 'file'
                           file.getElement().hide("slide", {direction: "up"}, 500);
                         }else{
-                            file.getElement().hide("clip", {}, 500);
+                            let destFolderParent = explorer.getFileById(explorer.currentParent).parent;
+                            if(destFolderId == destFolderParent){
+                                file.getElement().css("z-index",999).animate({
+                                    top: explorer.fields.fieldList[0].element.css("top"),
+                                    left: explorer.fields.fieldList[0].element.css("left")
+                                }, 1000 + (x * 500), function () {//a small delay between the files
+                                    file.getElement().hide("slide", {direction: "up"}, 500);
+                                });
+                            }else{
+                              file.getElement().hide("clip", {}, 500);
+                            }
                         }
                         fileIndex = explorer.checkIfExists(file.id);
-                        explorer.fileList[fileIndex].parent = Number(newFolderId);
+                        explorer.fileList[fileIndex].parent = Number(destFolderId);
                         explorer.fileList[fileIndex].placed = false;
                         explorer.fileList[fileIndex].field = -1;
                     }
@@ -1114,7 +1123,7 @@ function Explorer(width, height, container, position, fileList){
                 emptyMessage.text(explorer.LANG_LBL_EMPTY_MESSAGE);
             }
         },
-        serverMove: function(newFolderId, files, folders, def){
+        serverMove: function(destFolderId, files, folders, def){
             def.resolve(true);
         },
         getMySubFolders: function (folderId){
