@@ -71,6 +71,7 @@ function Explorer(width, height, container, position, fileList){
         iconPaths: [],
         preloadIcons: true,
         multiSelect: true,
+        exUpload: null,
         addFiles: function (param, resize, def) {
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -166,6 +167,12 @@ function Explorer(width, height, container, position, fileList){
                 }
                 index = explorer.checkIfExists(file.id);
                 explorer.fileList[index].placed = true; //field's index
+                if(explorer.fileList[index].uploading === true){
+                    console.log(file.name+" is uploading");
+                    explorer.fileList[index].uploader.fileIndex = index;
+                    explorer.fileList[index].uploader.createProgressStructure(file.id);
+                    explorer.fileList[index].uploader.progressEvent({lengthComputable: null}, true);
+                }
             });
             explorer.initMouseOverEvent();
             if(def !== undefined){
@@ -615,7 +622,7 @@ function Explorer(width, height, container, position, fileList){
         resizeExplorer: function(){
             explorer.setExplorerPosition(); //resize Explorer
             explorer.addFiles(explorer.currentParent, true); //reorganize files' position.
-			      explorer.repositionBaseDialog();            
+            explorer.repositionBaseDialog();
         },
         showEmptyMessage: function (){
             if(explorer.fileList.length === 0) {
@@ -1268,7 +1275,7 @@ function Explorer(width, height, container, position, fileList){
                 }
                 if(files[x].href.indexOf("explorerIcons") != -1){
                     for(var y = 0; y < files[x].cssRules.length; y++){
-                        path = "/explorer-/dev/explorer/"+getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
+                        path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
                         if($.inArray(path, explorer.iconPaths) == -1){
                             explorer.iconPaths.push(path);
                         }
