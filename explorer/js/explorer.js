@@ -31,7 +31,7 @@ function Explorer(width, height, container, position, fileList){
         LANG_LBL_PREVIEW_ENLARGE: "Click to Enlarge",
         LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT:"Your browser does not support the video tag.",
         LANG_LBL_NEW_FOLDER_HEADER: "Create a new Folder",
-        LANG_LBL_NEW_FOLDER_FOLDER_NAME: "Folder Name:",
+        LANG_LBL_NEW_FOLDER_FOLDER_NAME: "Folder:",
         LANG_LBL_NEW_FOLDER_BT_CREATE: "Create",
         LANG_LBL_ROOT_FOLDER: "Root",
         LANG_LBL_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
@@ -39,9 +39,9 @@ function Explorer(width, height, container, position, fileList){
         TEMP_VAR: undefined,
         EVENT_DROP: 1, EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1, DISABLED: 2,
-        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, DOWNLOAD_ALL: 0, UPLOAD: 0, UPLOAD_ALL: 0, MOVE: 0, MOVE_ALL: 0, 
+        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, DOWNLOAD_ALL: 0, UPLOAD: 0, UPLOAD_ALL: 0, MOVE: 0, MOVE_ALL: 0,
         DELETE: 0, DELETE_ALL: 0, SHARE: 0, SHARE_ALL: 0, RENAME: 0, NEW_FOLDER: 0, OPEN: 0},
-        DOWNLOAD: 0, DOWNLOAD_ALL: 1, UPLOAD : 2, UPLOAD_ALL: 3, MOVE: 4, MOVEL_ALL: 5, DELETE : 6, DELETE_ALL: 7, 
+        DOWNLOAD: 0, DOWNLOAD_ALL: 1, UPLOAD : 2, UPLOAD_ALL: 3, MOVE: 4, MOVEL_ALL: 5, DELETE : 6, DELETE_ALL: 7,
         SHARE : 8, SHARE_ALL: 9, RENAME : 10, NEW_FOLDER : 11, OPEN : 12,
         ROOT: 0,
         GO_UP_ID: -1,
@@ -100,11 +100,7 @@ function Explorer(width, height, container, position, fileList){
                 explorer.fields.fieldList = [];
                 explorer.fields.usedFields = 0;
                 //console.log($(".file, .field"));
-                $(".file, .field").each(function( index ) {
-                    if(this.id.substring(0,3) != "mv_"){//do not remove folders on the move dialog 
-                        this.remove();//Delete each file and field on the screen before add the new ones.
-                    } 
-                });
+                $(explorer.element).find(".file, .field").remove();
                 explorer.currentParent = parentId;
                 explorer.createQuickFolderAccess(parentId);
                 if(parentId !== 0){ //if it is not the root, create a link to go back to its parent
@@ -168,7 +164,6 @@ function Explorer(width, height, container, position, fileList){
                 index = explorer.checkIfExists(file.id);
                 explorer.fileList[index].placed = true; //field's index
                 if(explorer.fileList[index].uploading === true){
-                    console.log(file.name+" is uploading");
                     explorer.fileList[index].uploader.fileIndex = index;
                     explorer.fileList[index].uploader.createProgressStructure(file.id);
                     explorer.fileList[index].uploader.progressEvent({lengthComputable: null}, true);
@@ -248,6 +243,7 @@ function Explorer(width, height, container, position, fileList){
             });
             //Add click event
             fileElem.on("mousedown", function(e){
+                $(document).trigger( "contextMenuEvent", {event: e, file: file});
                 if((!$(e.target).is('._selected') && e.which == 3) || !explorer.multiSelect){//if it was not selected and it is a right click,
                     explorer.selectedFiles = [];//clean the list to add a new one
                     $("._selected").removeClass('_selected');
@@ -283,7 +279,7 @@ function Explorer(width, height, container, position, fileList){
             return -1;
         },
         createFields: function(numberFields, isGoUp){
-            const fileDivWidth = 130; 
+            const fileDivWidth = 130;
             const fileDivHeight = 150;
             var fieldListSize = explorer.fields.fieldList.length;
             var filePerLine = parseInt(explorer.getExplorerCurrentWidth() / fileDivWidth);
@@ -663,29 +659,45 @@ function Explorer(width, height, container, position, fileList){
                 contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
                 contextMenu4Files.fadeIn("fast");
                 contextMenu4Files.css("z-index", 9999);
-                $(".contextMenuOption").on("mousedown", function (){contextMenu4Files.fadeOut("fast");});
+                $(".contextMenuOption").on("click", function (){contextMenu4Files.fadeOut("fast");});
                 explorer.loadContextMenuOptionEvents(file);
             }
         },
         loadContextMenuOptionEvents: function (file){
-          $("#expOpen").on("mousedown", function (){
-              explorer.open(file);
+
+          $("#expOpen").on("click", function (e){
+              if(isNotDisabled(e.currentTarget)){
+                  explorer.open(file);
+              }
           });
-          $("#expMove").on("mousedown", function (){
-              explorer.move(file);
+          $("#expMove").on("click", function (e){
+            if(isNotDisabled(e.currentTarget)){
+                explorer.move(file);
+            }
           });
-          $("#expRename").on("mousedown", function (){
-              explorer.rename(file, false);
+          $("#expRename").on("click", function (e){
+            if(isNotDisabled(e.currentTarget)){
+                explorer.rename(file, false);
+            }
           });
-          $("#expDelete").on("mousedown", function (){
-              explorer.delete(file);
+          $("#expDelete").on("click", function (e){
+            if(isNotDisabled(e.currentTarget)){
+                explorer.delete(file);
+            }
           });
-          $("#expShare").on("mousedown", function (){
-              explorer.share(file);
+          $("#expShare").on("click", function (e){
+            if(isNotDisabled(e.currentTarget)){
+                explorer.share(file);
+            }
           });
-          $("#expDownload").on("mousedown", function (){
-              explorer.download(file);
+          $("#expDownload").on("click", function (e){
+            if(isNotDisabled(e.currentTarget)){
+                explorer.download(file);
+            }
           });
+          function isNotDisabled(element){
+              return !$(element).hasClass("disabledContextMenuOption");
+          }
         },
         loadContextMenuOption: function(option, optionMenuState, all){
             var str;
@@ -820,13 +832,13 @@ function Explorer(width, height, container, position, fileList){
             }
             $(explorer.baseDialogId).remove();
             $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
-				"<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
+                "<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
             $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
         },
         loadBaseDialog: function(content, def) {
             var baseDialog = $(explorer.baseDialogId);
             baseDialog.append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
-                "title='Close' alt='Close'/>");
+                "title='Close' alt='Close'/> <br />");
             $(".closeBaseDialog").on("click", function (){
               explorer.closeBaseDialog();
             });
@@ -881,26 +893,26 @@ function Explorer(width, height, container, position, fileList){
           });
           baseDialog.trigger( "closeDialogEvent");
         },
-		repositionBaseDialog: function (){
-		  var baseDialog = $(explorer.baseDialogId);
-			if($("#baseDialogContent").length){//if base dialog is visible, reposition it
-				var baseDialogWidth = baseDialog.outerWidth();
-				var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
-				var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
-				var windowWidth = $(window).width();
-				if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
-					baseDialog.css("width", (windowWidth - 10) + "px");
-				}
-				var baseDialogHeight = baseDialog.outerHeight();
-				var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
-				var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
-				var windowHeight = $(window).height();
-				if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
-					baseDialog.css("height", (windowHeight - 10) + "px");
-				}
+        repositionBaseDialog: function (){
+          var baseDialog = $(explorer.baseDialogId);
+            if($("#baseDialogContent").length){//if base dialog is visible, reposition it
+                var baseDialogWidth = baseDialog.outerWidth();
+                var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
+                var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
+                var windowWidth = $(window).width();
+                if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
+                    baseDialog.css("width", (windowWidth - 10) + "px");
+                }
+                var baseDialogHeight = baseDialog.outerHeight();
+                var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
+                var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
+                var windowHeight = $(window).height();
+                if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
+                    baseDialog.css("height", (windowHeight - 10) + "px");
+                }
                 explorer.centralize(explorer.baseDialogId);
             }
-		},
+        },
         centralize: function (id) {
             var width = $(id).outerWidth() / 2;
             var windowWidth = $(window).width() / 2;
@@ -1069,7 +1081,7 @@ function Explorer(width, height, container, position, fileList){
                             file.getElement().css("z-index",999).animate({
                                 top: destFolder.getElement().css("top"),
                                 left: destFolder.getElement().css("left")
-                            }, 1000, function () {
+                            }, 1000 + (x * 500) , function () {
                                 $(this).hide("scale", {percent: 0}, 700, function (){
                                   file.getElement().css("z-index",1);
                                 });
@@ -1077,7 +1089,10 @@ function Explorer(width, height, container, position, fileList){
                         }else if(goUp){//if it was dropped on the goUp 'file'
                           file.getElement().hide("slide", {direction: "up"}, 500);
                         }else{
-                            let destFolderParent = explorer.getFileById(explorer.currentParent).parent;
+                            let destFolderParent = null;
+                            if(explorer.currentParent !== explorer.ROOT){
+                                destFolderParent = explorer.getFileById(explorer.currentParent).parent;
+                            }
                             if(destFolderId == destFolderParent){
                                 file.getElement().css("z-index",999).animate({
                                     top: explorer.fields.fieldList[0].element.css("top"),
@@ -1107,7 +1122,7 @@ function Explorer(width, height, container, position, fileList){
             explorer.fields.usedFields = 0;
             $(".quickAccessLink").css("text-decoration", "line-through");
             if(explorer.currentParent != -1){//ao pesquisar, todos os arquivos que estavam sendo exibidos no momento, devem perder seus lugares na tela
-                //Assim, quando o usu?rio clicar no link de acesso r?pido, ele ser? renderizado novamente.
+                //Assim, quando o usuário clicar no link de acesso r?pido, ele ser? renderizado novamente.
                 for(let x = 0; x < explorer.fileList.length; x++){
                     explorer.fileList[x].placed = false;
                 }
@@ -1254,7 +1269,7 @@ function Explorer(width, height, container, position, fileList){
             return def.resolve(Math.floor((Math.random() * 500) + 200));
         },
         upload: function() {
-          
+
         },
         customMenuOption: function (file){
           return "";
@@ -1263,7 +1278,7 @@ function Explorer(width, height, container, position, fileList){
             return "<p class='contextMenuOption handCursor' onmousedown='"+callback+"()'>"+label+"</p>";
         },
         preview: function (file){
-            
+
         },
         getAvailableIconExtensions: function (){
             var files = document.styleSheets;

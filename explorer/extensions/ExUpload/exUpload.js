@@ -80,13 +80,12 @@ function ExUpload(explorer, url, params) {
             var ext = file.name.substr(file.name.lastIndexOf('.')+1);
             var fakeId = exUpload.generateFakeId();
             var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
-            var uploader = null;
+            var uploader = new exUpload.Uploader(file, fakeFile);
             if(exUpload.validadeExtension(fakeFile.ext) === false){
                 var msg = {message: exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
-                uploader.createProgressStructure(fakeFile.id);
+                uploader.createProgressStructure(fakeFile.id, true);
                 exUpload.error(msg, fakeFile);
             }else{
-                uploader = new exUpload.Uploader(file, fakeFile);
                 exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
                 uploader.fileIndex = exUpload.explorer.checkIfExists(fakeFile.id);
                 uploader.upload();
@@ -214,10 +213,10 @@ function ExUpload(explorer, url, params) {
                         dataType: 'json'
                     });
                 },
-                createProgressStructure: function (id) {
+                createProgressStructure: function (id, invalidExtension) {
                     var resizeInterval = null;
                     var item = {id: $("#" + id), abortStyle: null};
-                    var hide = exUpload.explorer.fileList[object.fileIndex].uploadFailed === true || exUpload.explorer.fileList[object.fileIndex].uploading === false? " displayNone " : "";
+                    var hide = invalidExtension === true || exUpload.explorer.fileList[object.fileIndex].uploadFailed === true || exUpload.explorer.fileList[object.fileIndex].uploading === false? " displayNone " : "";
                     if (!item.id.hasClass("uploading")) {
                         item.id.addClass("uploading");
                     }
@@ -247,7 +246,7 @@ function ExUpload(explorer, url, params) {
                         });
                         $( window ).resize(function() {
                             clearTimeout(resizeInterval);//little trick to resize Explorer only after resizing get done.
-                            resizeInterval = setTimeout(function () {object.progressEvent({lengthComputable: null}, true);}, 20);
+                            resizeInterval = setTimeout(function () {object.progressEvent({lengthComputable: null}, true);}, 5);
                             //object.progressEvent({lengthComputable: null}, true);
                         });
                     }
@@ -273,7 +272,7 @@ function ExUpload(explorer, url, params) {
                         }
                         if (percentLoaded >= 100) {
                             item.find(".uploadSpeed").css("color", "white");
-                            item.find("#" + object.fakeFile.id).removeClass("uploading");
+                            item.removeClass("uploading");
                         } else if (percentLoaded >= 50) {
                             item.find(".percentCounterContainer").css("color", "white");
                         } else if (percentLoaded >= 10) {
