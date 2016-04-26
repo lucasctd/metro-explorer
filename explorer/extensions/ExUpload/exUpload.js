@@ -17,6 +17,7 @@ function ExUpload(explorer, url, params) {
                 exUpload.validate();
                 exUpload.explorerContainer = exUpload.explorer.container;
                 exUpload.handleEvents();
+                exUpload.explorer.exUpload = exUpload;
             }catch(e){
                 exUpload.log(e);
             }
@@ -80,13 +81,14 @@ function ExUpload(explorer, url, params) {
             var fakeId = exUpload.generateFakeId();
             var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
             var uploader = new exUpload.Uploader(file, fakeFile);
-            exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
             if(exUpload.validadeExtension(fakeFile.ext) === false){
-                var msg = {message:  exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
-                uploader.createProgressStructure(fakeFile.id);
+                var msg = {message: exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
+                uploader.createProgressStructure(fakeFile.id, true);
                 exUpload.error(msg, fakeFile);
             }else{
-                uploader.upload(file, fakeFile);
+                exUpload.explorer.addFiles(fakeFile); // adding the file to Explorer
+                uploader.fileIndex = exUpload.explorer.checkIfExists(fakeFile.id);
+                uploader.upload();
             }
         },
         generateFakeId: function(){
@@ -135,6 +137,7 @@ function ExUpload(explorer, url, params) {
             var object = {
                 fakeFile: fakeFile,
                 file: file,
+                fileIndex: null,
                 myXhr: undefined,
                 upload: function () {
                     //var XHR = new window.XMLHttpRequest();
@@ -160,7 +163,10 @@ function ExUpload(explorer, url, params) {
                         },
                         beforeSend: function (xhr) {
                             exUpload.beforeSend(xhr);
+                            //it will be usefull to restore file state
+                            object.updateFileState(true, 0, false, 0);
                             object.fakeFile.date = Math.round(new Date() / 1000);
+                            exUpload.explorer.fileList[object.fileIndex].uploader = object;
                         },
                         success: function (data) {//retorno do servidor
                             var def = $.Deferred();
@@ -181,6 +187,7 @@ function ExUpload(explorer, url, params) {
                                 this.error(msg, object.fakeFile);
                                 return;
                             }
+                            object.updateFileState(false, 100, false);
                             def.resolve();
                             $.when(def).then(function () {
                                 var item = $("#" + data.id);
@@ -206,27 +213,30 @@ function ExUpload(explorer, url, params) {
                         dataType: 'json'
                     });
                 },
-                createProgressStructure: function (id) {
+                createProgressStructure: function (id, invalidExtension) {
+                    var resizeInterval = null;
                     var item = {id: $("#" + id), abortStyle: null};
+                    var hide = invalidExtension === true || exUpload.explorer.fileList[object.fileIndex].uploadFailed === true || exUpload.explorer.fileList[object.fileIndex].uploading === false? " displayNone " : "";
                     if (!item.id.hasClass("uploading")) {
                         item.id.addClass("uploading");
                     }
                     if (!item.id.find("#progressBar").length) {
-                        item.id.append('<div id="progressBar" class="progressBar exUpload"></div>'
+                        item.id.append('<div id="progressBar" class="progressBar exUpload'+hide+'"></div>'
                             + '<div id="errorStyle" class="errorStyle"><p class="errorFont">Upload has Failed</p></div>'
-                            + '<div id="abortStyle" class="abortStyle"><p class="abortFont">Abort?</p></div>'
-                            + '<div style="position:absolute; left:50%; top:0;" class="exUpload">'
-                            + '<div class="percentCounterContainer">'
+                            + '<div id="abortStyle" class="abortStyle'+hide+'"><p class="abortFont">Abort?</p></div>'
+                            + '<div style="position:absolute; left:50%; top:0;" class="exUpload'+hide+'">'
+                            + '<div class="percentCounterContainer'+hide+'">'
                             + '<span class="percentConcluido" ></span>'
                             + '</div>'
-                            + '<span class="uploadSpeed">0 Kbps</span>'
+                            + '<span class="uploadSpeed'+hide+'">0 Kbps</span>'
                             + '</div>');
                         item.abortStyle = $("#" + id).find(".abortStyle");
                         item.abortStyle.find("p").prop("title", "Abort the upload of "+this.file.name);
-                        item.abortStyle.find(".abortFont").on("mouseup", function () {
+                        item.abortStyle.find(".abortFont").on("click", function () {
                             item.abortStyle.unbind("mouseover");
                             item.abortStyle.css("display", "none");
                             object.myXhr.abort();
+                            exUpload.explorer.fileList[object.fileIndex].uploadFailed = true;//update file state
                         });
                         item.abortStyle.on("mouseover", function () {
                             item.abortStyle.css("opacity", 0.8);
@@ -234,26 +244,58 @@ function ExUpload(explorer, url, params) {
                         item.abortStyle.on("mouseout", function () {
                             item.abortStyle.css("opacity", 0);
                         });
+                        $( window ).resize(function() {
+                            clearTimeout(resizeInterval);//little trick to resize Explorer only after resizing get done.
+                            resizeInterval = setTimeout(function () {object.progressEvent({lengthComputable: null}, true);}, 5);
+                            //object.progressEvent({lengthComputable: null}, true);
+                        });
                     }
                 },
-                progressEvent: function (e) {
-                    if (e.lengthComputable) {
+                progressEvent: function (e, resizing) {
+                    if (e.lengthComputable || resizing) {
                         var item = $("#" + object.fakeFile.id);
+                        var percentLoaded = null, speed = null;
                         var spentTime = Math.round(new Date() / 1000) - object.fakeFile.date;
                         object.createProgressStructure(object.fakeFile.id);
-                        var percentLoaded = Math.round((e.loaded * 100) / e.total);
+                        if(resizing){
+                            percentLoaded = exUpload.explorer.fileList[object.fileIndex].progress;
+                            speed = exUpload.explorer.fileList[object.fileIndex].speed;
+                            if(exUpload.explorer.fileList[object.fileIndex].uploadFailed){
+                                item.abortStyle = $("#" + object.fakeFile.id).find(".abortStyle");
+                                item.abortStyle.unbind("mouseover");
+                                item.abortStyle.css("display", "none");
+                                exUpload.error("error", object.fakeFile);
+                            }
+                        }else{
+                            speed = Math.floor((e.loaded / 1024) / spentTime);
+                            percentLoaded = Math.round((e.loaded * 100) / e.total);
+                        }
                         if (percentLoaded >= 100) {
                             item.find(".uploadSpeed").css("color", "white");
-                            item.find("#" + object.fakeFile.id).removeClass("uploading");
+                            item.removeClass("uploading");
                         } else if (percentLoaded >= 50) {
                             item.find(".percentCounterContainer").css("color", "white");
                         } else if (percentLoaded >= 10) {
                             item.find(".uploadSpeed").css("color", "white");
                         }
-
+                        object.updateFileState(percentLoaded != 100, percentLoaded, null, speed);
                         item.find(".percentConcluido").html(percentLoaded + "<span class=\"percentSymbol\">%</span>");
                         item.find(".progressBar").css("height", percentLoaded + "%");
-                        item.find(".uploadSpeed").html("^ " + Math.floor((e.loaded / 1024) / spentTime) + " Kbps");
+                        item.find(".uploadSpeed").html("^ " + speed + " Kbps");
+                    }
+                },
+                updateFileState: function(uploading, progress, uploadFailed, speed){
+                    if(notNull(uploading)){
+                        exUpload.explorer.fileList[object.fileIndex].uploading = uploading;
+                    }
+                    if(notNull(uploadFailed)){
+                        exUpload.explorer.fileList[object.fileIndex].uploadFailed = uploadFailed;
+                    }
+                    if(notNull(progress)){
+                        exUpload.explorer.fileList[object.fileIndex].progress = progress;
+                    }
+                    if(notNull(progress)){
+                        exUpload.explorer.fileList[object.fileIndex].speed = speed;
                     }
                 }
             };

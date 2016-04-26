@@ -5,9 +5,9 @@
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<title>MetroUI</title>
-	<link type='text/css' href="/explorer-/dev/explorer/css/reset.css" rel="stylesheet">
-  <link type='text/css' href="/explorer-/dev/explorer/css/explorer.css" rel="stylesheet">
-	<link type='text/css' href="/explorer-/dev/explorer/css/explorerIcons.css" rel="stylesheet">
+	<link type='text/css' href="/css/reset.css" rel="stylesheet">
+  <link type='text/css' href="/css/explorer.css" rel="stylesheet">
+	<link type='text/css' href="/css/explorerIcons.css" rel="stylesheet">
 	<style>
 	  
 	</style>
@@ -15,14 +15,14 @@
 <body>
 </body>
   <footer>
-  	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/jquery-1.11.0.js"></script>
-  	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/jquery-ui-1.11.4.min.js"></script>
-  	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/js/explorer.js"></script>
-  	<script type="text/javascript" charset="UTF-8" src="/explorer-/dev/explorer/extensions/ExUpload/exUpload.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/js/jquery-1.11.0.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/js/jquery-ui-1.11.4.min.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="http://explorer.dev/js/explorer.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="/extensions/ExUpload/exUpload.js"></script>
   	<script>
   	  var exp = new Explorer(600, 400);
   	  exp.debugMode = true;
-  	  exp.multiSelect = false;
+  	  exp.multiSelect = true;
   	  /*exp.CONTEXT_MENU_OPTIONS.DELETE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.MOVE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.UPLOAD_ALL = exp.HIDDEN;
@@ -37,8 +37,11 @@
       exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;*/
   	  exp.createExplorer();
-  	  exp.addFiles(new File(1, "Lucia", "png"));
-  	  exp.addFiles(new File(2, "Picture", "dir"));
+  	  exp.addFiles(new File(1, "Lucia", "png", 3));
+  	  exp.addFiles(new File(2, "Picture", "dir", 3));
+  	  exp.addFiles(new File(4, "Picture", "dir", 3));
+  	  exp.addFiles(new File(5, "Picture", "dir", 3));
+  	  exp.addFiles(new File(6, "Picture", "dir", 3));
   	  exp.addFiles(new File(3, "Music", "dir"));
   	  exp.setIconsBackgroundColor("#1A9ADA");
   	  exp.border = "5px dashed gray";
