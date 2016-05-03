@@ -17,11 +17,11 @@
   <footer>
   	<script type="text/javascript" charset="UTF-8" src="/js/jquery-1.11.0.js"></script>
   	<script type="text/javascript" charset="UTF-8" src="/js/jquery-ui-1.11.4.min.js"></script>
-  	<script type="text/javascript" charset="UTF-8" src="/js/explorer.js"></script>
+  	<script type="text/javascript" charset="UTF-8" src="http://explorer.dev/js/explorer.js"></script>
   	<script type="text/javascript" charset="UTF-8" src="/extensions/ExUpload/exUpload.js"></script>
   	<script>
   	  var exp = new Explorer(600, 400);
-  	  exp.debugMode = false;
+  	  exp.debugMode = true;
   	  exp.multiSelect = true;
   	  /*exp.CONTEXT_MENU_OPTIONS.DELETE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.MOVE_ALL = exp.HIDDEN;
@@ -44,12 +44,15 @@
 			exp.open(file);
 		}
 	  };
-  	  exp.addFiles(new File(1, "Lucia", "png"));
-  	  exp.addFiles(new File(2, "Picture", "dir"));
+  	  exp.addFiles(new File(1, "Lucia", "png", 3));
+  	  exp.addFiles(new File(2, "Picture", "dir", 3));
+  	  exp.addFiles(new File(4, "Picture", "dir", 3));
+  	  exp.addFiles(new File(5, "Picture", "dir", 3));
+  	  exp.addFiles(new File(6, "Picture", "dir", 3));
   	  exp.addFiles(new File(3, "Music", "dir"));
   	  exp.setIconsBackgroundColor("#1A9ADA");
   	  exp.border = "5px dashed gray";
-  	  exp.upload = function (){console.info("upload")};
+  	 /* exp.upload = function (){console.info("upload")};
   	  exp.open = function (file){console.info("open "+file.name)};
   	  exp.newFolder = function (){console.info("newFolder")};
   	  exp.share = function (file){console.info("share "+file.name)};
