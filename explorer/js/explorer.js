@@ -39,9 +39,9 @@ function Explorer(width, height, container, position, fileList){
         TEMP_VAR: undefined,
         EVENT_DROP: 1, EVENT_RENAME: 2,
         ENABLED: 0, HIDDEN: 1, DISABLED: 2,
-        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, DOWNLOAD_ALL: 0, UPLOAD: 0, UPLOAD_ALL: 0, MOVE: 0, MOVE_ALL: 0, 
+        CONTEXT_MENU_OPTIONS: {DOWNLOAD: 0, DOWNLOAD_ALL: 0, UPLOAD: 0, UPLOAD_ALL: 0, MOVE: 0, MOVE_ALL: 0,
         DELETE: 0, DELETE_ALL: 0, SHARE: 0, SHARE_ALL: 0, RENAME: 0, NEW_FOLDER: 0, OPEN: 0},
-        DOWNLOAD: 0, DOWNLOAD_ALL: 1, UPLOAD : 2, UPLOAD_ALL: 3, MOVE: 4, MOVEL_ALL: 5, DELETE : 6, DELETE_ALL: 7, 
+        DOWNLOAD: 0, DOWNLOAD_ALL: 1, UPLOAD : 2, UPLOAD_ALL: 3, MOVE: 4, MOVEL_ALL: 5, DELETE : 6, DELETE_ALL: 7,
         SHARE : 8, SHARE_ALL: 9, RENAME : 10, NEW_FOLDER : 11, OPEN : 12,
         ROOT: 0,
         GO_UP_ID: -1,
@@ -279,7 +279,7 @@ function Explorer(width, height, container, position, fileList){
             return -1;
         },
         createFields: function(numberFields, isGoUp){
-            const fileDivWidth = 130; 
+            const fileDivWidth = 130;
             const fileDivHeight = 150;
             var fieldListSize = explorer.fields.fieldList.length;
             var filePerLine = parseInt(explorer.getExplorerCurrentWidth() / fileDivWidth);
@@ -664,7 +664,7 @@ function Explorer(width, height, container, position, fileList){
             }
         },
         loadContextMenuOptionEvents: function (file){
-          
+
           $("#expOpen").on("click", function (e){
               if(isNotDisabled(e.currentTarget)){
                   explorer.open(file);
@@ -832,7 +832,7 @@ function Explorer(width, height, container, position, fileList){
             }
             $(explorer.baseDialogId).remove();
             $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
-				"<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
+                "<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
             $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
         },
         loadBaseDialog: function(content, def) {
@@ -893,26 +893,26 @@ function Explorer(width, height, container, position, fileList){
           });
           baseDialog.trigger( "closeDialogEvent");
         },
-		repositionBaseDialog: function (){
-		  var baseDialog = $(explorer.baseDialogId);
-			if($("#baseDialogContent").length){//if base dialog is visible, reposition it
-				var baseDialogWidth = baseDialog.outerWidth();
-				var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
-				var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
-				var windowWidth = $(window).width();
-				if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
-					baseDialog.css("width", (windowWidth - 10) + "px");
-				}
-				var baseDialogHeight = baseDialog.outerHeight();
-				var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
-				var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
-				var windowHeight = $(window).height();
-				if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
-					baseDialog.css("height", (windowHeight - 10) + "px");
-				}
+        repositionBaseDialog: function (){
+          var baseDialog = $(explorer.baseDialogId);
+            if($("#baseDialogContent").length){//if base dialog is visible, reposition it
+                var baseDialogWidth = baseDialog.outerWidth();
+                var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
+                var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
+                var windowWidth = $(window).width();
+                if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
+                    baseDialog.css("width", (windowWidth - 10) + "px");
+                }
+                var baseDialogHeight = baseDialog.outerHeight();
+                var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
+                var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
+                var windowHeight = $(window).height();
+                if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
+                    baseDialog.css("height", (windowHeight - 10) + "px");
+                }
                 explorer.centralize(explorer.baseDialogId);
             }
-		},
+        },
         centralize: function (id) {
             var width = $(id).outerWidth() / 2;
             var windowWidth = $(window).width() / 2;
@@ -1269,7 +1269,7 @@ function Explorer(width, height, container, position, fileList){
             return def.resolve(Math.floor((Math.random() * 500) + 200));
         },
         upload: function() {
-          
+
         },
         customMenuOption: function (file){
           return "";
@@ -1278,7 +1278,7 @@ function Explorer(width, height, container, position, fileList){
             return "<p class='contextMenuOption handCursor' onmousedown='"+callback+"()'>"+label+"</p>";
         },
         preview: function (file){
-            
+
         },
         getAvailableIconExtensions: function (){
             var files = document.styleSheets;
