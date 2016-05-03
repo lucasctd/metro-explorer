@@ -13,7 +13,7 @@
     z-index: 20;
 }
 .moveToTooltip{
-    background-color:none;
+    background-color:white;
     left: 103%;
     top: -192%;
     display: none;
