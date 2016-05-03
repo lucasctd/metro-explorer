@@ -22,7 +22,7 @@
   	<script>
   	  var exp = new Explorer(600, 400);
   	  exp.debugMode = false;
-  	  exp.multiSelect = false;
+  	  exp.multiSelect = true;
   	  /*exp.CONTEXT_MENU_OPTIONS.DELETE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.MOVE_ALL = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.UPLOAD_ALL = exp.HIDDEN;
@@ -37,6 +37,13 @@
       exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;*/
   	  exp.createExplorer();
+	  exp.dbclick = function (file){
+	  	if(file.ext !== "dir"){
+			exp.share(file);
+		}else{
+			exp.open(file);
+		}
+	  };
   	  exp.addFiles(new File(1, "Lucia", "png"));
   	  exp.addFiles(new File(2, "Picture", "dir"));
   	  exp.addFiles(new File(3, "Music", "dir"));
