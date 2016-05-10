@@ -829,13 +829,17 @@ function Explorer(width, height, container, position, fileList){
                 if(options["min-height"] === undefined){
                     options["min-height"] = $.isNumeric(height) ? height : 0;
                 }
+                if(options["style"] === undefined){
+                    options["style"] = "";
+                }
+                if(options["class"] === undefined){
+                    options["class"] = "";
+                }
             }
             $(explorer.baseDialogId).remove();
-            $("body").append("<div class='baseDialog radius10 opacity98' ><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
+            $("body").append("<div class='baseDialog radius10 opacity98 "+options["class"]+"' style='"+options["style"]+"'><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
                 "<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
             $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
-        },
-        loadBaseDialog: function(content, def) {
             var baseDialog = $(explorer.baseDialogId);
             baseDialog.append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
                 "title='Close' alt='Close'/> <br />");
@@ -843,6 +847,8 @@ function Explorer(width, height, container, position, fileList){
               explorer.closeBaseDialog();
             });
             baseDialog.append("<div id='baseDialogContent' class='baseDialogContent'> </div>");
+        },
+        loadBaseDialog: function(content, def) {
             var baseDialogContent = $("#baseDialogContent");
             var patt = /\.tmp$|\.html/i;
             if(patt.test(content) === true){//if it is a template file, load it
