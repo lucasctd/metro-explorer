@@ -37,6 +37,13 @@
       exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;*/
   	  exp.createExplorer();
+	  exp.dbclick = function (file){
+	  	if(file.ext !== "dir"){
+			exp.share(file);
+		}else{
+			exp.open(file);
+		}
+	  };
   	  exp.addFiles(new File(1, "Lucia", "png", 3));
   	  exp.addFiles(new File(2, "Picture", "dir", 3));
   	  exp.addFiles(new File(4, "Picture", "dir", 3));
