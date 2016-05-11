@@ -1315,8 +1315,14 @@ function Explorer(width, height, container, position, fileList){
                     clearInterval(interval);
                 }
             }, 50);
-            clazz = options["disabled"] ? "disabledContextMenuOption" : "";
-            title = options["title"] ? options["title"]  : "";
+            if(options){
+              if(options.disabled){
+                  clazz = "disabledContextMenuOption";
+              }
+              if(options.title){
+                  title = options.title;
+              }
+            }
             return "<p title='"+title+"' id='contextMenuOption"+id+"'class='contextMenuOption handCursor "+clazz+"'>"+label+"</p>";
         },
         preview: function (file){
