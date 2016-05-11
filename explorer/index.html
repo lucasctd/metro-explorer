@@ -34,8 +34,8 @@
       exp.CONTEXT_MENU_OPTIONS.SHARE = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.DOWNLOAD = exp.HIDDEN;
       exp.CONTEXT_MENU_OPTIONS.RENAME = exp.HIDDEN;
-      exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;
-      exp.CONTEXT_MENU_OPTIONS.OPEN = exp.HIDDEN;*/
+      exp.CONTEXT_MENU_OPTIONS.NEW_FOLDER = exp.HIDDEN;*/
+      exp.CONTEXT_MENU_OPTIONS.OPEN = exp.DISABLED;
   	  exp.createExplorer();
 	  exp.dbclick = function (file){
 	  	if(file.ext !== "dir"){
@@ -44,11 +44,11 @@
 			exp.open(file);
 		}
 	  };
-  	  exp.addFiles(new File(1, "Lucia", "png", 3));
-  	  exp.addFiles(new File(2, "Picture", "dir", 3));
-  	  exp.addFiles(new File(4, "Picture", "dir", 3));
-  	  exp.addFiles(new File(5, "Picture", "dir", 3));
-  	  exp.addFiles(new File(6, "Picture", "dir", 3));
+  	  exp.addFiles(new File(1, "Lucia", "png"));
+  	  exp.addFiles(new File(2, "T", "dir"));
+  	  exp.addFiles(new File(4, "Picture", "pic", 3));
+  	  exp.addFiles(new File(5, "Sorry", "mp3", 3));
+  	  exp.addFiles(new File(6, "HW", "docx", 3));
   	  exp.addFiles(new File(3, "Music", "dir"));
   	  exp.setIconsBackgroundColor("#1A9ADA");
   	  exp.border = "5px dashed gray";
@@ -61,7 +61,7 @@
   	  exp.delete = function (file){console.info("delete "+file.name)};
   	  exp.move = function (file){console.info("move "+file.name)};*/
   	  exp.customMenuOption = function(file){
-        return exp.buildCustomMenuOption("Office", "openOffice");
+          return exp.buildCustomMenuOption("Office", function (file) {console.log(file)}, {title: "Office", disabled: true});
       };
       function openOffice(){
               exp.createBaseDialog(window.innerWidth * .85, window.innerHeight * .85, {"min-width": 300, "min-height": 300, "style" : true});

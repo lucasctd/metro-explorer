@@ -10,8 +10,8 @@
     "metro",
     "metro ui"
   ],
-  "tags": [],
-  "version": "1.0.41",
+  "tags": ["Explorer", "metro", "metro ui", "JS", "LucasReis"],
+  "version": "1.1.0",
   "author": {
     "name": "Lucas Reis",
     "email": "lucas@programmer.com.br",
@@ -22,10 +22,7 @@
     "url": "https://www.assembla.com/spaces/explorer-/git/source"
   },
   "dependencies": {},
-  "license": "MIT",
-  "engines": {
-    "node": ">=0.8.0"
-  },
+  "license": "MIT",  
   "main": "js/explorer.js",
   "_id": "metro-explorer@1.0.7",
   "_shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",

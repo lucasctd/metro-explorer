@@ -73,6 +73,7 @@ function Explorer(width, height, container, position, fileList){
         multiSelect: true,
         exUpload: null,
         addFiles: function (param, resize, def) {
+            var listfilesWithField = [], listfilesWithoutAField = [];
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
             }
@@ -122,6 +123,7 @@ function Explorer(width, height, container, position, fileList){
                     return;
                 }
             }
+            
             $.each(explorer.fileList, function(i, file) {
                 var index = explorer.checkIfExists(file.id);
                 if(file.parent != explorer.currentParent){ //If it is not in the same folder that the file was uploaded to,
@@ -137,30 +139,16 @@ function Explorer(width, height, container, position, fileList){
                     explorer.log(file.name+"'s field does not exist. It will be placed on an existing free field. "+
                         "Make sure you are running createFields(number_of_fields); with enough number of fields to place '"+file.name+"' on.");
                 }
-                if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
-                    let top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
-                    let left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
-                    $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
-                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
-                        "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
-                        "<input class='txtcenter ft11 inputFileName'"+
-                        "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/>"+
-                        "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id"+file.id+"' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>"+
-                        "</div>");
-                    explorer.fields.fieldList[file.field].filesOn.push(file.id);
-                    let field = explorer.fields.fieldList[file.field];
-                    file.getElement().css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
-                    file.getElement().css("left", (field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5) + "px");
-                    if(resize === true){
-                        file.getElement().css("display", "block");
-                    }else{
-                        file.getElement().fadeIn(300);
-                    }
-                    explorer.fields.usedFields++;
-                    explorer.loadFileEvents(file);
+                if(file.field != -1){//load files on each list
+                    listfilesWithField.push(file);
                 }else{
-                    explorer.placeFileAutomatically(file);
+                    listfilesWithoutAField.push(file);
                 }
+               // if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
+                   
+              //  }else{
+              //      explorer.placeFileAutomatically(file);
+              //  }
                 index = explorer.checkIfExists(file.id);
                 explorer.fileList[index].placed = true; //field's index
                 if(explorer.fileList[index].uploading === true){
@@ -169,10 +157,38 @@ function Explorer(width, height, container, position, fileList){
                     explorer.fileList[index].uploader.progressEvent({lengthComputable: null}, true);
                 }
             });
+            $.each(listfilesWithField, function(i, file) {//first load files that already has a field
+              explorer.placeFileWithField(file, resize);
+            });
+            $.each(listfilesWithoutAField, function(i, file) {//then, load files which does not have a field (-1)
+              explorer.placeFileAutomatically(file);
+            });
             explorer.initMouseOverEvent();
             if(def !== undefined){
               def.resolve();
             }
+        },
+        placeFileWithField: function (file, resize){
+            let top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
+            let left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
+            $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
+                "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
+                "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
+                "<input class='txtcenter ft11 inputFileName'"+
+                "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/>"+
+                "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id"+file.id+"' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>"+
+                "</div>");
+            explorer.fields.fieldList[file.field].filesOn.push(file.id);
+            let field = explorer.fields.fieldList[file.field];
+            file.getElement().css("top", (field.filesOn.length > 1 ? field.top + 5 - ((field.filesOn.length-1)*3)  : field.top + 5) +"px");
+            file.getElement().css("left", (field.filesOn.length > 1 ? field.left + 5 + ((field.filesOn.length-1)*3) : field.left + 5) + "px");
+            if(resize === true){
+                file.getElement().css("display", "block");
+            }else{
+                file.getElement().fadeIn(300);
+            }
+            explorer.fields.usedFields++;
+            explorer.loadFileEvents(file);
         },
         placeFileAutomatically: function (file, resize){
             for(let x=0; x < explorer.fields.fieldList.length; x++){
@@ -463,10 +479,10 @@ function Explorer(width, height, container, position, fileList){
                 explorer.loadContextMenuOption(explorer.UPLOAD, explorer.CONTEXT_MENU_OPTIONS.UPLOAD, false) +
                 explorer.customMenuOption() +
                 "</div>");
-            $("#expNewFolder").on("mousedown", function (){
+            $("#expNewFolder").on("click", function (){
                 explorer.newFolder();
             });
-            $("#expUpload").on("mousedown", function (){
+            $("#expUpload").on("click", function (){
                 explorer.upload();
             });
             //If the user clicks on the void
@@ -485,7 +501,11 @@ function Explorer(width, height, container, position, fileList){
                     }
                 }
             });
-            $(".contextMenuOption").on("mousedown", function (){$("#contextIdTools").fadeOut("fast");});
+            $(".contextMenuOption").on("click", function (){
+              if(isNotDisabled(this)){
+                  $("#contextIdTools").fadeOut("fast");
+              }
+            });
             //create contextMenu for files
             $("body").append("<div id='contextMenu4Files' style='position:absolute;' class='displayNone'> </div>");
         },
@@ -659,45 +679,47 @@ function Explorer(width, height, container, position, fileList){
                 contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
                 contextMenu4Files.fadeIn("fast");
                 contextMenu4Files.css("z-index", 9999);
-                $(".contextMenuOption").on("click", function (){contextMenu4Files.fadeOut("fast");});
+                $(".contextMenuOption").on("click", function (){
+                    if(isNotDisabled(this)){
+                        contextMenu4Files.fadeOut("fast");
+                    }
+                });    
                 explorer.loadContextMenuOptionEvents(file);
             }
         },
         loadContextMenuOptionEvents: function (file){
 
           $("#expOpen").on("click", function (e){
-              if(isNotDisabled(e.currentTarget)){
+              if(isNotDisabled(this)){
                   explorer.open(file);
               }
           });
           $("#expMove").on("click", function (e){
-            if(isNotDisabled(e.currentTarget)){
+            if(isNotDisabled(this)){
                 explorer.move(file);
             }
           });
           $("#expRename").on("click", function (e){
-            if(isNotDisabled(e.currentTarget)){
+            if(isNotDisabled(this)){
                 explorer.rename(file, false);
             }
           });
           $("#expDelete").on("click", function (e){
-            if(isNotDisabled(e.currentTarget)){
+            if(isNotDisabled(this)){
                 explorer.delete(file);
             }
           });
           $("#expShare").on("click", function (e){
-            if(isNotDisabled(e.currentTarget)){
+            if(isNotDisabled(this)){
                 explorer.share(file);
             }
           });
           $("#expDownload").on("click", function (e){
-            if(isNotDisabled(e.currentTarget)){
+            if(isNotDisabled(this)){
                 explorer.download(file);
             }
           });
-          function isNotDisabled(element){
-              return !$(element).hasClass("disabledContextMenuOption");
-          }
+          
         },
         loadContextMenuOption: function(option, optionMenuState, all){
             var str;
@@ -708,7 +730,7 @@ function Explorer(width, height, container, position, fileList){
                             str = "<p id='expMove' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expMove' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
+                            str = "<p id='expMove' class='contextMenuOption disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_MOVE_ALL : explorer.LANG_LBL_MOVE) + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -721,7 +743,7 @@ function Explorer(width, height, container, position, fileList){
                             str = "<p id='expDelete' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expDelete' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL)+ "</p>";
+                            str = "<p id='expDelete' class='contextMenuOption disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DEL_ALL : explorer.LANG_LBL_DEL)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -734,7 +756,7 @@ function Explorer(width, height, container, position, fileList){
                             str = "<p id='expShare' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expShare' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE)+ "</p>";
+                            str = "<p id='expShare' class='contextMenuOption disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_SHARE_ALL : explorer.LANG_LBL_SHARE)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -747,7 +769,7 @@ function Explorer(width, height, container, position, fileList){
                             str = "<p id='expDownload' class='contextMenuOption handCursor'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD) + "</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expDownload' class='disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD)+ "</p>";
+                            str = "<p id='expDownload' class='contextMenuOption disabledContextMenuOption'>" + (all ? explorer.LANG_LBL_DOWNLOAD_ALL : explorer.LANG_LBL_DOWNLOAD)+ "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -760,7 +782,7 @@ function Explorer(width, height, container, position, fileList){
                             str =  "<p id='expNewFolder' class='contextMenuOption handCursor' style='margin-top:10px;'>"+explorer.LANG_LBL_NEW_FOLDER+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expNewFolder' class='disabledContextMenuOption' style='margin-top:10px;'>" + explorer.LANG_LBL_NEW_FOLDER + "</p>";
+                            str = "<p id='expNewFolder' class='contextMenuOption disabledContextMenuOption' style='margin-top:10px;'>" + explorer.LANG_LBL_NEW_FOLDER + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -773,7 +795,7 @@ function Explorer(width, height, container, position, fileList){
                             str =  "<p id='expUpload' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_UPLOAD+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expUpload' class='disabledContextMenuOption'>" + explorer.LANG_LBL_UPLOAD + "</p>";
+                            str = "<p id='expUpload' class='contextMenuOption disabledContextMenuOption'>" + explorer.LANG_LBL_UPLOAD + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -786,7 +808,7 @@ function Explorer(width, height, container, position, fileList){
                             str =  "<p id='expRename' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_RENAME+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expRename' class='disabledContextMenuOption'>" + explorer.LANG_LBL_RENAME + "</p>";
+                            str = "<p id='expRename' class='contextMenuOption disabledContextMenuOption'>" + explorer.LANG_LBL_RENAME + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -799,7 +821,7 @@ function Explorer(width, height, container, position, fileList){
                             str =  "<p id='expOpen' class='contextMenuOption handCursor'>"+explorer.LANG_LBL_OPEN+"</p>";
                             break;
                         case explorer.DISABLED:
-                            str = "<p id='expOpen' class='disabledContextMenuOption'>" + explorer.LANG_LBL_OPEN + "</p>";
+                            str = "<p id='expOpen' class='contextMenuOption disabledContextMenuOption'>" + explorer.LANG_LBL_OPEN + "</p>";
                             break;
                         case explorer.HIDDEN:
                             str = "";
@@ -1280,8 +1302,22 @@ function Explorer(width, height, container, position, fileList){
         customMenuOption: function (file){
           return "";
         },
-        buildCustomMenuOption: function (label, callback){
-            return "<p class='contextMenuOption handCursor' onmousedown='"+callback+"()'>"+label+"</p>";
+        buildCustomMenuOption: function (label, callback, options){
+            var id = 0, interval = null, clazz = null, title;
+            while($("#contextMenuOption"+id).length) id++;
+            interval = setInterval(function () {
+                if($("#contextMenuOption"+id).length){
+                    $("#contextMenuOption"+id).on("click", function (e) {
+                      if(isNotDisabled(this)){
+                          callback(explorer.selectedFiles);
+                      }
+                    });
+                    clearInterval(interval);
+                }
+            }, 50);
+            clazz = options["disabled"] ? "disabledContextMenuOption" : "";
+            title = options["title"] ? options["title"]  : "";
+            return "<p title='"+title+"' id='contextMenuOption"+id+"'class='contextMenuOption handCursor "+clazz+"'>"+label+"</p>";
         },
         preview: function (file){
 
@@ -1411,6 +1447,10 @@ function getValueBetweenQuotes(str){
         ret = str;
     }
     return ret;
+}
+
+function isNotDisabled(element){
+    return !$(element).hasClass("disabledContextMenuOption");
 }
 
 function inArray(array, obj, fieldstoCompare){
