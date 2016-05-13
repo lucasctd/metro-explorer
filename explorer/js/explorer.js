@@ -72,6 +72,7 @@ function Explorer(width, height, container, position, fileList){
         preloadIcons: true,
         multiSelect: true,
         exUpload: null,
+        customOptionId: 0,
         addFiles: function (param, resize, def) {
             var listfilesWithField = [], listfilesWithoutAField = [];
             if($("#emptyMessage").length){
@@ -1303,8 +1304,8 @@ function Explorer(width, height, container, position, fileList){
           return "";
         },
         buildCustomMenuOption: function (label, callback, options){
-            var id = 0, interval = null, clazz = null, title;
-            while($("#contextMenuOption"+id).length) id++;
+            var id = null, interval = null, clazz = "", title = "";
+            id = explorer.customOptionId++;
             interval = setInterval(function () {
                 if($("#contextMenuOption"+id).length){
                     $("#contextMenuOption"+id).on("click", function (e) {
