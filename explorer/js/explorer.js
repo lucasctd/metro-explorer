@@ -639,7 +639,7 @@ function Explorer(width, height, container, position, fileList){
         resizeExplorer: function(){
             explorer.setExplorerPosition(); //resize Explorer
             explorer.addFiles(explorer.currentParent, true); //reorganize files' position.
-            explorer.repositionBaseDialog();
+            explorer.resizeBaseDialog();
         },
         showEmptyMessage: function (){
             if(explorer.fileList.length === 0) {
@@ -899,19 +899,34 @@ function Explorer(width, height, container, position, fileList){
                 }
             });
             if(baseDialog.find("#defaultHeight").val() != "auto" && baseDialog.find("#defaultWidth").val() != "auto"){
-              explorer.centralize(explorer.baseDialogId);
-              explorer.repositionBaseDialog();
+              //explorer.centralize(explorer.baseDialogId);
+              explorer.resizeBaseDialog();
             }else{
               baseDialog.css("opacity", 0);
             }
             baseDialog.show(explorer.baseDialogEffect, {}, 500, function (){
               if(baseDialog.find("#defaultHeight").val() == "auto" || baseDialog.find("#defaultWidth").val() == "auto"){
-                explorer.centralize(explorer.baseDialogId);
-                explorer.repositionBaseDialog();
+                //explorer.centralize(explorer.baseDialogId);
+                explorer.resizeBaseDialog();
                 baseDialog.animate({
                   opacity: 1
                 }, 300);
               }
+            });
+            var height = baseDialog.height(), width = baseDialog.width();
+            var counter = 0;
+            var interval = setInterval(function (){
+                if(height != baseDialog.height() || width !=  baseDialog.width()){
+                    height = baseDialog.height();
+                    width =  baseDialog.width();
+                    baseDialog.trigger($.Event('resize'));
+                }else if(counter > 40){
+                    clearInterval(interval);
+                }
+                counter++;
+            }, 500);
+            baseDialog.resize(function() {
+                explorer.resizeBaseDialog();
             });
         },
         closeBaseDialog: function() {
@@ -922,7 +937,7 @@ function Explorer(width, height, container, position, fileList){
           });
           baseDialog.trigger( "closeDialogEvent");
         },
-        repositionBaseDialog: function (){
+        resizeBaseDialog: function (){
           var baseDialog = $(explorer.baseDialogId);
             if($("#baseDialogContent").length){//if base dialog is visible, reposition it
                 var baseDialogWidth = baseDialog.outerWidth();

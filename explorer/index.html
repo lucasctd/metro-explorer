@@ -61,13 +61,19 @@
   	  exp.delete = function (file){console.info("delete "+file.name)};
   	  exp.move = function (file){console.info("move "+file.name)};*/
   	  exp.customMenuOption = function(file){
-          return exp.buildCustomMenuOption("Office", function (file) {console.log(file)}, {title: "Office", disabled: true});
+          return exp.buildCustomMenuOption("Office", openOffice, {title: "Office", disabled: false});
       };
       function openOffice(){
-              exp.createBaseDialog(window.innerWidth * .85, window.innerHeight * .85, {"min-width": 300, "min-height": 300, "style" : true});
+              exp.createBaseDialog(window.innerWidth * .85, "auto", {"min-width": 300, "min-height": 300, "style" : true});
               //explorer.loadBaseDialog("<p class='gray bold txtcenter ft14'> "+explorer.TEMP_VAR.name+" </p><center><iframe src='https://docs.google.com/gview?url="+APP_URL+"/download/"+explorer.TEMP_VAR.id+"?officeAccessKey="+data.key+"' style='width:"+window.innerWidth * 0.8+"px; height:"+window.innerHeight * 0.7+"px; border: 1px solid gray;'> </iframe></center>");
               exp.loadBaseDialog("<p class='gray bold txtcenter ft14'> Titulo </p><center><iframe src='https://docs.google.com/gview?url=http://infolab.stanford.edu/pub/papers/google.pdf&embedded=true' style='width:"+window.innerWidth * 0.7+"px; height:"+window.innerHeight * 0.7+"px; border: 1px solid gray;'> </iframe></center>");
               exp.showBaseDialog();
+              setTimeout(function (){
+                console.log(exp.baseDialogId);
+                 console.log($(exp.baseDialogId).height());
+                  $(exp.baseDialogId).append("<br><br><br><br><p>qweqweqwewqeqwewqeqwp</p>");
+                  console.log($(exp.baseDialogId).height());
+              }, 3000);
       }
   	  exp.start();
   	</script>
