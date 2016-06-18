@@ -128,7 +128,7 @@
     width: 170px;
 }
 .explorerButton:hover {
-    background-color: #00abf3;
+    opacity: 0.7;
 }
 .explorerButtonDisabled {
     background-color: darkgray !important;

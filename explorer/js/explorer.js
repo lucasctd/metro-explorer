@@ -859,11 +859,11 @@ function Explorer(width, height, container, position, fileList){
                     options["class"] = "";
                 }
             }
-            $(explorer.baseDialogId).remove();
+            explorer.getBaseDialog().remove();
             $("body").append("<div class='baseDialog radius10 opacity98 "+options["class"]+"' style='"+options["style"]+"'><input id='defaultWidth' type='hidden' value='"+options["width"]+"'/>"+
                 "<input id='defaultHeight' type='hidden' value='"+options["height"]+"'/></div>");
-            $(explorer.baseDialogId).css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
-            var baseDialog = $(explorer.baseDialogId);
+            explorer.getBaseDialog().css({width: options["width"], height: options["height"], "min-width": options["min-width"], "min-height" : options["min-height"]});
+            var baseDialog = explorer.getBaseDialog();
             baseDialog.append("<div class='closeBaseDialog handCursor displayNone' style='top: 10px; margin-right: 10px; float: right;'" +
                 "title='Close' alt='Close'/> <br />");
             $(".closeBaseDialog").on("click", function (){
@@ -885,7 +885,7 @@ function Explorer(width, height, container, position, fileList){
             }
         },
         showBaseDialog: function(hideCloseButton, def) {
-            var baseDialog = $(explorer.baseDialogId);
+            var baseDialog = explorer.getBaseDialog();
             if(!baseDialog.ready()){
                 this.showBaseDialog(hideCloseButton, def);
                 return;
@@ -914,48 +914,50 @@ function Explorer(width, height, container, position, fileList){
               }
             });
             var height = baseDialog.height(), width = baseDialog.width();
-            var counter = 0;
             var interval = setInterval(function (){
                 if(height != baseDialog.height() || width !=  baseDialog.width()){
                     height = baseDialog.height();
                     width =  baseDialog.width();
                     baseDialog.trigger($.Event('resize'));
-                }else if(counter > 40){
-                    clearInterval(interval);
                 }
-                counter++;
-            }, 500);
+            }, 5);
             baseDialog.resize(function() {
                 explorer.resizeBaseDialog();
             });
+            baseDialog.on("closeDialogEvent", function (){
+                clearInterval(interval);
+            });
         },
         closeBaseDialog: function() {
-          var baseDialog = $(explorer.baseDialogId);
+          var baseDialog = explorer.getBaseDialog();
           $(".closeBaseDialog").fadeOut(100);
             baseDialog.hide( explorer.baseDialogEffect, {}, 300, function (){
               baseDialog.empty();
           });
-          baseDialog.trigger( "closeDialogEvent");
+          baseDialog.trigger("closeDialogEvent");
         },
         resizeBaseDialog: function (){
-          var baseDialog = $(explorer.baseDialogId);
+          var baseDialog = explorer.getBaseDialog();
             if($("#baseDialogContent").length){//if base dialog is visible, reposition it
                 var baseDialogWidth = baseDialog.outerWidth();
                 var baseDialogMinWidth = Number(baseDialog.css("min-width").replace("px", ""));
                 var baseDialogDefaultWidth = Number(baseDialog.find("#defaultWidth").val().replace("px", ""));
                 var windowWidth = $(window).width();
-                if(isNaN(baseDialogDefaultWidth) === false && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
+                if($.isNumeric(baseDialogDefaultWidth) && (baseDialogWidth != baseDialogMinWidth && baseDialogWidth > windowWidth && baseDialogMinWidth < windowWidth) || (baseDialogWidth < windowWidth && baseDialogWidth < baseDialogDefaultWidth)){
                     baseDialog.css("width", (windowWidth - 10) + "px");
                 }
                 var baseDialogHeight = baseDialog.outerHeight();
                 var baseDialogMinHeight = Number(baseDialog.css("min-height").replace("px", ""));
                 var baseDialogDefaultHeight = Number(baseDialog.find("#defaultHeight").val().replace("px", ""));
                 var windowHeight = $(window).height();
-                if(isNaN(baseDialogDefaultHeight) === false && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
+                if($.isNumeric(baseDialogDefaultHeight) && (baseDialogHeight != baseDialogMinHeight && baseDialogHeight > windowHeight && baseDialogMinHeight < windowHeight) || (baseDialogHeight < windowHeight && baseDialogHeight < baseDialogDefaultHeight)){
                     baseDialog.css("height", (windowHeight - 10) + "px");
                 }
                 explorer.centralize(explorer.baseDialogId);
             }
+        },
+        getBaseDialog: function (){
+            return $(explorer.baseDialogId);
         },
         centralize: function (id) {
             var width = $(id).outerWidth() / 2;
