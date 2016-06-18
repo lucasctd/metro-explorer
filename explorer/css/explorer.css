@@ -136,6 +136,7 @@
 }
 .explorerButtonDisabled:hover {
     background-color: darkgray !important;
+	opacity: 1 !important;
 }
 .explorerInput {
     height: 30px;
