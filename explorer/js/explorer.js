@@ -73,6 +73,7 @@ function Explorer(width, height, container, position, fileList){
         multiSelect: true,
         exUpload: null,
         customOptionId: 0,
+        closeBaseDialogOnEsc: true,
         addFiles: function (param, resize, def) {
             var listfilesWithField = [], listfilesWithoutAField = [];
             if($("#emptyMessage").length){
@@ -926,6 +927,11 @@ function Explorer(width, height, container, position, fileList){
             });
             baseDialog.on("closeDialogEvent", function (){
                 clearInterval(interval);
+            });
+            $(document).on("keyup", function (e){
+                if(e.keyCode == 27 && explorer.closeBaseDialogOnEsc === true && $(explorer.baseDialogId).length){//ESC
+                    explorer.closeBaseDialog();
+                }
             });
         },
         closeBaseDialog: function() {
