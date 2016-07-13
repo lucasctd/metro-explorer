@@ -27,6 +27,10 @@ function ExUpload(explorer, url, params) {
                 exUpload.params =  {"fileParam": "file"};
                 exUpload.info("uploadParam was not defined, so its default value ('file') will be set.");
             }
+			if(exUpload.params.fileParam === undefined){
+				exUpload.params.fileParam = "file";
+				exUpload.info("uploadParam was not defined, so its default value ('file') will be set.");
+			}
             if(exUpload.explorer === undefined || exUpload.explorer.ROOT === undefined){
                 throw "ExUpload will not work if you do not set Explorer's instance.";
             }
