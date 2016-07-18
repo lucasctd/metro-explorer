@@ -20,21 +20,12 @@ function Explorer(width, height, container, position, fileList){
         LANG_LBL_MOVE_HEADER: "Which folder would like to move your files to?",
         LANG_LBL_MOVE_BT_MOVE: "Move",
         LANG_LBL_MOVE_BT_MOVE_TITLE: "It will move your file(s)/folder(s) to the selected folder.",
-        LANG_LBL_MOVE_FOLDER_ERROR_TITLE: "Moving Error",
         LANG_LBL_MOVE_FOLDER_ERROR_MSG: "You cannot move {folderName} to its sub folder.",
-        LANG_LBL_DELETE_FOLDER_WARNING_MSG: "You selected a folder and/or other files. The folder have you selected and" +
-        " its files and subfolders will be deleted. Are you sure you want to delete them?",
-        LANG_LBL_DELETE_FOLDER_WARNING_TITLE: "Attention",
-        LANG_LBL_DELETE_FOLDER_WARNING_BT_YES:"Yes",
-        LANG_LBL_DELETE_FOLDER_WARNING_BT_NO:"No",
-        LANG_LBL_PREVIEW_HEADER:"Title",
-        LANG_LBL_PREVIEW_ENLARGE: "Click to Enlarge",
-        LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT:"Your browser does not support the video tag.",
         LANG_LBL_NEW_FOLDER_HEADER: "Create a new Folder",
         LANG_LBL_NEW_FOLDER_FOLDER_NAME: "Folder:",
         LANG_LBL_NEW_FOLDER_BT_CREATE: "Create",
         LANG_LBL_ROOT_FOLDER: "Root",
-        LANG_LBL_EMPTY_MESSAGE: "Oh gosh, you've no files yet, try dragging and dropping a file over here :)",
+        LANG_LBL_EMPTY_MESSAGE: "Drag and drop a file over here to start uploading. :)",
         LANG_LBL_NO_FOLDERS_FOUND: "There are no folders where you can move your files to. :/",
         TEMP_VAR: undefined,
         EVENT_DROP: 1, EVENT_RENAME: 2,
@@ -524,7 +515,7 @@ function Explorer(width, height, container, position, fileList){
         },
         loadLanguage: function (){
             var patt = /\.json$/i;
-            var language = explorer.getExplorerRootFolder()+"/lang/" + explorer.language;
+            var language = explorer.language;
             if(patt.test(language) === true){//if it is a json file, load it
                 $.get(language, function(data){
                     explorer.LANG_LBL_NEW_FOLDER = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_NEW_FOLDER, explorer.LANG_LBL_NEW_FOLDER);
@@ -543,13 +534,6 @@ function Explorer(width, height, container, position, fileList){
                     explorer.LANG_LBL_MOVE_HEADER = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_MOVE_HEADER, explorer.LANG_LBL_MOVE_HEADER);
                     explorer.LANG_LBL_MOVE_BT_MOVE = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_MOVE_BT_MOVE, explorer.LANG_LBL_MOVE_BT_MOVE);
                     explorer.LANG_LBL_MOVE_BT_MOVE_TITLE = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_MOVE_BT_MOVE_TITLE, explorer.LANG_LBL_MOVE_BT_MOVE_TITLE);
-                    explorer.LANG_LBL_DELETE_FOLDER_WARNING_MSG = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_DELETE_FOLDER_WARNING_MSG, explorer.LANG_LBL_DELETE_FOLDER_WARNING_MSG);
-                    explorer.LANG_LBL_DELETE_FOLDER_WARNING_TITLE = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_DELETE_FOLDER_WARNING_TITLE, explorer.LANG_LBL_DELETE_FOLDER_WARNING_TITLE);
-                    explorer.LANG_LBL_DELETE_FOLDER_WARNING_BT_YES = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_DELETE_FOLDER_WARNING_BT_YES, explorer.LANG_LBL_DELETE_FOLDER_WARNING_BT_YES);
-                    explorer.LANG_LBL_DELETE_FOLDER_WARNING_BT_NO = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_DELETE_FOLDER_WARNING_BT_NO, explorer.LANG_LBL_DELETE_FOLDER_WARNING_BT_NO);
-                    explorer.LANG_LBL_PREVIEW_HEADER = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_PREVIEW_HEADER, explorer.LANG_LBL_PREVIEW_HEADER);
-                    explorer.LANG_LBL_PREVIEW_ENLARGE = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_PREVIEW_ENLARGE, explorer.LANG_LBL_PREVIEW_ENLARGE);
-                    explorer.LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT, explorer.LANG_LBL_PREVIEW_NO_VIDEO_SUPPORT);
                     explorer.LANG_LBL_NEW_FOLDER_HEADER = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_NEW_FOLDER_HEADER, explorer.LANG_LBL_NEW_FOLDER_HEADER);
                     explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_NEW_FOLDER_FOLDER_NAME, explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME);
                     explorer.LANG_LBL_NEW_FOLDER_BT_CREATE = explorer.loadLanguageCheckIfDefined(data.LANG_LBL_NEW_FOLDER_BT_CREATE, explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
@@ -586,6 +570,9 @@ function Explorer(width, height, container, position, fileList){
             return true;
         },
         start: function (){
+            //setting default language
+            this.language = this.language === undefined ? explorer.getExplorerRootFolder()+"/lang/en-US.json": this.language;
+            this.loadLanguage();
             var resizeId = null, preload = null;
             if(explorer.checkIfContainerExist() === false) {
                 return;
@@ -626,6 +613,7 @@ function Explorer(width, height, container, position, fileList){
                     $(document).trigger( "droppedWhenSearching", ["While searching dropped files will be uploaded at the root."]);
                 }
             });
+
         },
         setIconsBackgroundColor: function (color){
             var id = $("#iconsBackgroundColor");

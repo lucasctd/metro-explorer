@@ -1,7 +1,7 @@
 function ExUpload(explorer, url, params) {
     "use strict";
     var exUpload = {
-        explorerContainer: explorerContainer,
+        explorerContainer: null,
         useAutomaticId: false,
         url: url,
         params: params,
@@ -9,9 +9,12 @@ function ExUpload(explorer, url, params) {
         callback: undefined,
         explorer: explorer,
         allowedExtensions: undefined,
-        MSG_INVALID_EXT: "{ext} files are not allowed.",
+		enabled: true,
+        MSG_EXUPLOAD_NOT_ENABLED: "ExUpload is not enabled, thus, you can't upload any file right now.",
+		MSG_INVALID_FILE: "{ext} files are not allowed.",
         ERROR_INVALID_FILE: 1,
         ERROR_NO_ID_FOUND: 2,
+		ERROR_EXUPLOAD_NOT_ENABLED: 3,
         start: function () {
             try{
                 exUpload.validate();
@@ -81,12 +84,18 @@ function ExUpload(explorer, url, params) {
         beforeSend: function (xhr) {
         },
         upload: function (file){
-            var ext = file.name.substr(file.name.lastIndexOf('.')+1);
+			var ext = file.name.substr(file.name.lastIndexOf('.')+1);
             var fakeId = exUpload.generateFakeId();
             var fakeFile = new File(fakeId, file.name, ext, exUpload.explorer.currentParent == -1 ? 0 : exUpload.explorer.currentParent);
             var uploader = new exUpload.Uploader(file, fakeFile);
+			if(!this.enabled){
+				var msg = {message: exUpload.MSG_EXUPLOAD_NOT_ENABLED, error: exUpload.ERROR_EXUPLOAD_NOT_ENABLED};
+                uploader.createProgressStructure(fakeFile.id, true);
+                exUpload.error(msg, fakeFile);
+				return;
+			}            
             if(exUpload.validadeExtension(fakeFile.ext) === false){
-                var msg = {message: exUpload.MSG_INVALID_EXT.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
+                var msg = {message: exUpload.MSG_INVALID_FILE.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
                 uploader.createProgressStructure(fakeFile.id, true);
                 exUpload.error(msg, fakeFile);
             }else{
@@ -113,7 +122,7 @@ function ExUpload(explorer, url, params) {
                 item.find(".errorFont").text("Remove?");
             })
                 .on("mouseout", function () {
-                    item.find(".errorFont").text("Upload has Failed");
+                    item.find(".errorFont").text("Upload has Failed!");
                 })
                 .on("mousedown", function () {
                     item.fadeOut("slow", function (){

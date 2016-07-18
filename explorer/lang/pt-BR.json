@@ -15,8 +15,11 @@
 	"LANG_LBL_MOVE_HEADER": "Selecione a pasta para qual seus arquivos ser\u00E3o movidos",
 	"LANG_LBL_MOVE_BT_MOVE": "Mover",
 	"LANG_LBL_MOVE_BT_MOVE_TITLE": "Isso mover\u00E1 todos os arquivos selecionados para a pasta escolhida.",
-	"LANG_LBL_DELETE_FOLDER_WARNING_MSG": "Voc\u00EA selecionou uma pasta e/ou outros arquivos. Todos os arquivos que estiverem dentro da(s) pasta(s) selecionada(s) ser\u00E3o tamb\u00E9m exclu\u00EDdos. Deseja continuar?",
-	"LANG_LBL_DELETE_FOLDER_WARNING_TITLE": "Aten\u00E7\u00E3o",
-	"LANG_LBL_DELETE_FOLDER_WARNING_BT_YES":"Sim",
-	"LANG_LBL_DELETE_FOLDER_WARNING_BT_NO":"N\u00E3o"
+	"LANG_LBL_MOVE_FOLDER_ERROR_MSG": "Voce não pode mover {folderName} para uma de suas sub pastas.",
+	"LANG_LBL_NEW_FOLDER_HEADER": "Criar Nova Pasta",
+	"LANG_LBL_NEW_FOLDER_FOLDER_NAME": "Pasta: ",
+	"LANG_LBL_NEW_FOLDER_BT_CREATE": "Criar",
+	"LANG_LBL_ROOT_FOLDER": "Root",
+	"LANG_LBL_EMPTY_MESSAGE": "Arraste e solte seus arquivos aqui para começar a fazer o upload.",
+	"LANG_LBL_NO_FOLDERS_FOUND": "Não há nenhuma pasta disponível para onde está pasta possa ser movida. :/"
 }
