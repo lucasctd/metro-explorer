@@ -31,7 +31,7 @@ exp.dbclick = function (file){
         exp.open(file);
     }
 };
-exp.addFiles(new File(1, "Lucia", "wqewq"));
+exp.addFiles(new File(1, "Lucia", "ps"));
 exp.addFiles(new File(2, "T", "dir"));
 exp.addFiles(new File(4, "Picture", "pic", 3));
 exp.addFiles(new File(5, "Sorry", "mp3", 3));

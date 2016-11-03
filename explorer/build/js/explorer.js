@@ -10663,6 +10663,9 @@ function Explorer(width, height, container, position, fileList) {
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
         addFiles: function addFiles(param, resize, def) {
+            if (!window.AVAILABLE_ICON_EXTENSIONS) {
+                window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
+            }
             var listfilesWithField = [],
                 listfilesWithoutAField = [];
             if ($("#emptyMessage").length) {
@@ -10769,7 +10772,7 @@ function Explorer(width, height, container, position, fileList) {
         placeFileWithField: function placeFileWithField(file, resize) {
             var top = explorer.fields.fieldList[file.field].top + 5 + "px;";
             var left = explorer.fields.fieldList[file.field].left + 5 + "px;";
-            $(explorer.element).append("<div id='" + file.id + "' class='file fileButton draggable displayNone' style='position: absolute; top:" + top + "left:" + left + "'> <div class='center iconBorder'><div class='" + file.ext + " center'></div></div> " + "<div id='input" + file.id + "' style='display:inline-block; position:relative;' title='" + file.name + "'> " + "<input class='txtcenter ft11 inputFileName'" + "maxlength='30' readonly='readonly' title='" + file.name + "' value='" + file.getName().replace(/'/g, "&apos;") + "'/>" + "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id" + file.id + "' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>" + "</div>");
+            $(explorer.element).append("<div id='" + file.id + "' class='file fileButton draggable displayNone' style='position: absolute; top:" + top + "left:" + left + "'> <div class='center iconBorder'><div class='" + file.getIcon() + " center'></div></div> " + "<div id='input" + file.id + "' style='display:inline-block; position:relative;' title='" + file.name + "'> " + "<input class='txtcenter ft11 inputFileName'" + "maxlength='30' readonly='readonly' title='" + file.name + "' value='" + file.getName().replace(/'/g, "&apos;") + "'/>" + "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id" + file.id + "' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>" + "</div>");
             explorer.fields.fieldList[file.field].filesOn.push(file.id);
             var field = explorer.fields.fieldList[file.field];
             file.getElement().css("top", (field.filesOn.length > 1 ? field.top + 5 - (field.filesOn.length - 1) * 3 : field.top + 5) + "px");
@@ -10787,7 +10790,7 @@ function Explorer(width, height, container, position, fileList) {
                 if (explorer.fields.fieldList[x].filesOn.length === 0) {
                     var top = explorer.fields.fieldList[x].top + 5 + "px;";
                     var left = explorer.fields.fieldList[x].left + 5 + "px;";
-                    $(explorer.element).append("<div id='" + file.id + "' class='file fileButton draggable displayNone' style='position: absolute; top:" + top + "left:" + left + "'> <div class='center iconBorder'><div class='" + file.ext + " center'></div></div>" + "<div id='input" + file.id + "' style='display:inline-block; position:relative;' title='" + file.name + "'> " + "<input class='txtcenter ft11 inputFileName' " + "maxlength='30' readonly='readonly' title='" + file.name + "' value='" + file.getName().replace(/'/g, "&apos;") + "' />" + "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id" + file.id + "' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>" + "</div>");
+                    $(explorer.element).append("<div id='" + file.id + "' class='file fileButton draggable displayNone' style='position: absolute; top:" + top + "left:" + left + "'> <div class='center iconBorder'><div class='" + file.getIcon() + " center'></div></div>" + "<div id='input" + file.id + "' style='display:inline-block; position:relative;' title='" + file.name + "'> " + "<input class='txtcenter ft11 inputFileName' " + "maxlength='30' readonly='readonly' title='" + file.name + "' value='" + file.getName().replace(/'/g, "&apos;") + "' />" + "<div style='position:absolute; left:0; right:0; top:0; bottom:0;'></div></div> <div id='selec_id" + file.id + "' class='opacity4'> </div> <div class=\"moveToTooltip\">Move to</div>" + "</div>");
                     if (resize === true) {
                         file.getElement().css("display", "block");
                     } else {
@@ -12111,8 +12114,8 @@ var File = function File(id, name, ext, parent, field) {
     this.field = field === undefined || field === null ? -1 : field;
     this.placed = false;
     this.name = name;
-    this.checkIcon = function (ext) {
-        ext = ext !== undefined ? ext : this.ext !== undefined ? this.ext : "";
+    this.getIcon = function (ext) {
+        ext = this.ext !== undefined ? this.ext : "";
         if (window.AVAILABLE_ICON_EXTENSIONS) {
             var extIndex = window.AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
             if (extIndex == -1 || window.AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1) {
@@ -13437,7 +13440,7 @@ exp.dbclick = function (file) {
         exp.open(file);
     }
 };
-exp.addFiles(new File(1, "Lucia", "wqewq"));
+exp.addFiles(new File(1, "Lucia", "ps"));
 exp.addFiles(new File(2, "T", "dir"));
 exp.addFiles(new File(4, "Picture", "pic", 3));
 exp.addFiles(new File(5, "Sorry", "mp3", 3));

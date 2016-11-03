@@ -20,7 +20,9 @@
   "scripts": {
     "build": "gulp",
     "prod": "gulp --production",
-    "watch": "gulp watch"
+    "watch": "gulp watch",
+    "install-server": "npm i webpack -g && npm i webpack-dev-server -g",
+    "server": "webpack-dev-server"
   },
   "version": "1.1.9",
   "author": {
@@ -33,13 +35,11 @@
     "url": "https://www.assembla.com/spaces/explorer-/git/source"
   },
   "dependencies": {
-    "jquery": "^3.1.1",
-    "jquery-ui": "^1.12.1"
+    "jquery": "^3.1.1"
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "laravel-elixir": "^5.0.0",
-    "webpack": "^1.13.2"
+    "laravel-elixir": "^5.0.0"
   },
   "license": "MIT",
   "main": "index.js",

@@ -68,6 +68,9 @@ function Explorer(width, height, container, position, fileList){
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
         addFiles: function (param, resize, def) {
+            if(!window.AVAILABLE_ICON_EXTENSIONS){
+                window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
+            }
             var listfilesWithField = [], listfilesWithoutAField = [];
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -167,7 +170,7 @@ function Explorer(width, height, container, position, fileList){
             let top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
             let left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
             $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
-                "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
+                "left:"+left+"'> <div class='center iconBorder'><div class='"+file.getIcon()+" center'></div></div> "+
                 "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
                 "<input class='txtcenter ft11 inputFileName'"+
                 "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/>"+
@@ -191,7 +194,7 @@ function Explorer(width, height, container, position, fileList){
                     let top = (explorer.fields.fieldList[x].top + 5)+"px;";
                     let left = (explorer.fields.fieldList[x].left + 5)+"px;";
                     $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
-                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div>"+
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.getIcon()+" center'></div></div>"+
                         "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
                         "<input class='txtcenter ft11 inputFileName' "+
                         "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' />"+

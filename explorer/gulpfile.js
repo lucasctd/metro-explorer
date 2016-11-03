@@ -17,5 +17,6 @@ elixir(function(mix) {
                 './resources/assets/css/explorer.css', './resources/assets/extensions/exUpload/exUpload.css'], 'build/css/explorer.css')
         .copy('./resources/assets/icons', 'build/icons')
         .copy('./resources/assets/templates', 'build/templates')
-        .copy('./resources/lang', 'build/lang');
+        .copy('./resources/lang', 'build/lang')
+        .browserSync({proxy: 'http://localhost:8080'});
 });

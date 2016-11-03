@@ -8,8 +8,8 @@ var File = function(id, name, ext, parent, field) {
     this.field = field === undefined || field === null ? -1 : field;
     this.placed = false;
     this.name = name;
-    this.checkIcon = function (ext) {
-        ext = ext !== undefined ? ext : this.ext !== undefined ? this.ext : "";
+    this.getIcon = function (ext) {
+        ext = this.ext !== undefined ? this.ext : "";
         if (window.AVAILABLE_ICON_EXTENSIONS) {
             var extIndex = window.AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
             if (extIndex == -1 || window.AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1) {
