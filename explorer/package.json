@@ -17,6 +17,11 @@
     "JS",
     "LucasReis"
   ],
+  "scripts": {
+    "build": "gulp",
+    "prod": "gulp --production",
+    "watch": "gulp watch"
+  },
   "version": "1.1.9",
   "author": {
     "name": "Lucas Reis",
@@ -27,9 +32,17 @@
     "type": "git",
     "url": "https://www.assembla.com/spaces/explorer-/git/source"
   },
-  "dependencies": {},
+  "dependencies": {
+    "jquery": "^3.1.1",
+    "jquery-ui": "^1.12.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "laravel-elixir": "^5.0.0",
+    "webpack": "^1.13.2"
+  },
   "license": "MIT",
-  "main": "js/explorer.js",
+  "main": "index.js",
   "_id": "metro-explorer@1.0.7",
   "_shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",
   "_from": "metro-explorer@latest",

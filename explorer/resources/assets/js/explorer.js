@@ -1,3 +1,5 @@
+import File from './file.js';
+
 function Explorer(width, height, container, position, fileList){
    "use strict";
   var explorer = {
@@ -579,11 +581,11 @@ function Explorer(width, height, container, position, fileList){
             }
             window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
             if(window.AVAILABLE_ICON_EXTENSIONS === null){
-                explorer.log("It looks like you have not include 'explorerIcons.css' on your html document. Explorer will not start without it. :/");
+                explorer.log("It looks like you have not include 'explorer.css' on your html document. Explorer will not start without it. :/");
                 return;
             }
             if(typeof Preload != "undefined"){
-              if(preloadIcons){
+              if(this.preloadIcons){
                  preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
               }
             }else{
@@ -1340,30 +1342,42 @@ function Explorer(width, height, container, position, fileList){
         preview: function (file){
 
         },
-        getAvailableIconExtensions: function (){
-            var files = document.styleSheets;
-            var extensions = [];
-            var path = null;
-            for(var x = 0; x < files.length; x++){
-                if(files[x].href === null || files[x].href === undefined){
-                    continue;
-                }
-                if(files[x].href.indexOf("explorerIcons") != -1){
-                    for(var y = 0; y < files[x].cssRules.length; y++){
-                        path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
-                        if($.inArray(path, explorer.iconPaths) == -1){
-                            explorer.iconPaths.push(path);
-                        }
-                        extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                    }
-                    break;
-                }
-            }
-            return extensions.length === 0 ? null : extensions;
-        },
+      getAvailableIconExtensions: function getAvailableIconExtensions() {
+          var startCollecting = false, stopCollecting = false;
+          var files = document.styleSheets;
+          var extensions = [];
+          var path = null;
+          for (var x = 0; x < files.length; x++) {
+              if (files[x].href === null || files[x].href === undefined) {
+                  continue;
+              }
+              if (files[x].href.indexOf("explorer") != -1) {
+                  for (var y = 0; y < files[x].cssRules.length; y++) {
+                      if(!startCollecting){
+                          startCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
+                          continue;
+                      }
+                      if(startCollecting && !stopCollecting){
+                          path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
+                          if ($.inArray(path, explorer.iconPaths) == -1) {
+                              explorer.iconPaths.push(path);
+                          }
+                          stopCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
+                          if(stopCollecting){
+                              continue;
+                          }
+                          extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
+                      }
+                  }
+                  break;
+              }
+          }
+          return extensions.length === 0 ? null : extensions;
+      },
     };
     return explorer;
 }
+
 function removeClass(objs,classes){
     $.each(objs, function(i, obj) {
         $.each(classes, function(i, clasS) {
@@ -1377,62 +1391,6 @@ function addClass(objs,classes){
             $(obj).addClass(clasS);
         });
     });
-}
-
-function File(id, name, ext, parent, field){
-    this.id = id;
-    this.parent = parent === undefined || parent === null ? 0 : parent;
-    this.field = field === undefined || field === null ? -1 : field;
-    this.placed = false;
-    this.name = name;
-    this.getAvailableIconExtensions = function (){
-        var files = document.styleSheets;
-        var extensions = [];
-        for(var x = 0; x < files.length; x++){
-            if(files[x].href === null || files[x].href === undefined ){
-                continue;
-            }
-            if(files[x].href.indexOf("explorerIcons") != -1){
-                for(var y = 0; y < files[x].cssRules.length; y++){
-                    extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                }
-                break;
-            }
-        }
-        return extensions.length === 0 ? null : extensions;
-    };
-    this.checkIcon = function(){
-        ext = ext === undefined ? "" : ext;
-        if(typeof window.AVAILABLE_ICON_EXTENSIONS == 'undefined' || window.AVAILABLE_ICON_EXTENSIONS === null){
-            window.AVAILABLE_ICON_EXTENSIONS = this.getAvailableIconExtensions();
-            if(window.AVAILABLE_ICON_EXTENSIONS === null){
-                return;
-            }
-        }
-        var extIndex = window.AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
-        if(extIndex == -1 || window.AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1){
-            return "noIcon";
-        }else{
-            return ext.toLowerCase();
-        }
-    };
-    this.getName = function(){
-        var name = this.name;
-        if(name.length > 12){
-            name = name.substring(0, 12) + "...";
-        }
-        return name;
-    };
-    this.getExtension = function (file){
-        file = file === undefined ? this.ext : file;
-        var str = file.split(".");
-        var ext = str[str.length - 1];
-        return ext;
-    };
-    this.getElement = function (){
-      return $("#"+this.id);
-    };
-    this.ext = this.checkIcon();
 }
 
 function Field(id, element, filesOn, top, left){
@@ -1510,3 +1468,6 @@ function inArray(array, obj, fieldstoCompare){
     return equals;
   }
 }
+
+//adding CommonJS Support
+export default Explorer;
