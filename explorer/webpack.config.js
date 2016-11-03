@@ -1,10 +1,10 @@
 // webpack.config.js
 module.exports = {
   // entry point of our application
-  entry: './teste.js',
+  entry: './resources/standalone/explorer.js',
   // where to place the compiled bundle
   output: {
-    path: './build/',
-    filename: 'app.js'
+    path: './build/js/',
+    filename: 'exp_standalone.js'
   }
 }

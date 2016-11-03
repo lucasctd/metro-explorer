@@ -121,7 +121,7 @@ function Explorer(width, height, container, position, fileList){
                     return;
                 }
             }
-            
+
             $.each(explorer.fileList, function(i, file) {
                 var index = explorer.checkIfExists(file.id);
                 if(file.parent != explorer.currentParent){ //If it is not in the same folder that the file was uploaded to,
@@ -143,7 +143,7 @@ function Explorer(width, height, container, position, fileList){
                     listfilesWithoutAField.push(file);
                 }
                // if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
-                   
+
               //  }else{
               //      explorer.placeFileAutomatically(file);
               //  }
@@ -155,7 +155,7 @@ function Explorer(width, height, container, position, fileList){
                     explorer.fileList[index].uploader.progressEvent({lengthComputable: null}, true);
                 }
             });
-            $.each(listfilesWithField, function(i, file) {//first load files that already has a field
+            $.each(listfilesWithField, function(i, file) {//first load files that already have a field
               explorer.placeFileWithField(file, resize);
             });
             $.each(listfilesWithoutAField, function(i, file) {//then, load files which does not have a field (-1)
@@ -585,7 +585,7 @@ function Explorer(width, height, container, position, fileList){
             window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
             if(window.AVAILABLE_ICON_EXTENSIONS === null){
                 explorer.log("It looks like you have not include 'explorer.css' on your html document. Explorer will not start without it. :/");
-                return;
+                return null;
             }
             if(typeof Preload != "undefined"){
               if(this.preloadIcons){
@@ -614,8 +614,8 @@ function Explorer(width, height, container, position, fileList){
             explorer.setIconsBackgroundColor(explorer.iconsBackgroundColor);
             $(explorer.container).on("drop", function (){
                 if(explorer.currentParent == -1){
-                    explorer.log("While searching dropped files will be uploaded at the root.", 1);
-                    $(document).trigger( "droppedWhenSearching", ["While searching dropped files will be uploaded at the root."]);
+                    explorer.log("While searching, dropped files will be uploaded at the root.", 1);
+                    $(document).trigger( "droppedWhenSearching", ["While searching, dropped files will be uploaded at the root."]);
                 }
             });
 
@@ -678,7 +678,7 @@ function Explorer(width, height, container, position, fileList){
                     if(isNotDisabled(this)){
                         contextMenu4Files.fadeOut("fast");
                     }
-                });    
+                });
                 explorer.loadContextMenuOptionEvents(file);
             }
         },
@@ -714,7 +714,7 @@ function Explorer(width, height, container, position, fileList){
                 explorer.download(file);
             }
           });
-          
+
         },
         loadContextMenuOption: function(option, optionMenuState, all){
             var str;
@@ -980,12 +980,19 @@ function Explorer(width, height, container, position, fileList){
             var scripts = document.getElementsByTagName("script");
             var index;
             for(index=0; index < scripts.length; index++){
-                if(scripts[index].outerHTML.indexOf("explorer.js") != -1){
+                if(scripts[index].outerHTML.indexOf("explorer.js") != -1 || scripts[index].outerHTML.indexOf("exp_standalone.js") != -1){
                     break;
                 }
             }
-            //scripts[index].attributes.src.nodeValue deprecated
-            return scripts[index].attributes.src.value.replace("js/explorer.js","");
+            try{
+                //scripts[index].attributes.src.nodeValue deprecated
+                return scripts[index].attributes.src.value.replace("js/explorer.js","").replace("js/exp_standalone.js","");
+            }catch(e){
+                this.log("We could not find out Explorer's root folder. Have you changed Explorer's file name? (it should be explorer.js or exp_standalone.js)" +
+                "Have you changed its folder? (It should be 'js' like 'js/explorer.js' or 'js/exp_standalone.js')");
+                return null;
+            }
+
         },
         destroy: function (element, explode){
             if(element === undefined || element === null){
