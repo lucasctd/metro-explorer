@@ -8,4 +8,9 @@ I am also using it on my own cloud storage web site. Check this out -> www.heyup
 
 If you guys have any suggestion, feel free to contact me. Email: lucas@programmer.com.br
 
+<p style="color: red;">Update: I have updated Explorer's code in order to make it totally compatible with
+ ECMA6 import stuff. However, it is not working propely after minification, I am still trying to figure out why.
+ If you got interested, you can clone it from <a href="https://app.assembla.com/spaces/explorer-/git/source/explorer-module?type=branch">"explorer-module"</a> branch.
+ I gonna put it in the master branch as soon as I got it fully working.
+
 I hope you like it :)
