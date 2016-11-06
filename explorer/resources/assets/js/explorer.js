@@ -193,7 +193,8 @@ function Explorer(width, height, container, position, fileList){
                 if(explorer.fields.fieldList[x].filesOn.length === 0){
                     let top = (explorer.fields.fieldList[x].top + 5)+"px;";
                     let left = (explorer.fields.fieldList[x].left + 5)+"px;";
-                    $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
+                    $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"
+                        +top+
                         "left:"+left+"'> <div class='center iconBorder'><div class='"+file.getIcon()+" center'></div></div>"+
                         "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
                         "<input class='txtcenter ft11 inputFileName' "+
