@@ -1096,8 +1096,9 @@ function Explorer(width, height, container, position, fileList){
                 $(".mvFolderItem").css("border", "1px solid gray");
                 $(this).append("<div id='selec_mv_id"+id+"' class='opacity4 _selected movFolderSelect'> </div>");
                 $(this).css("border", "1px solid blue");
-                $("#buttonMoveFiles").removeProp("disabled");
-                $("#buttonMoveFiles").removeClass("explorerButtonDisabled");
+                var buttonMoveFiles = $("#buttonMoveFiles");
+                buttonMoveFiles.prop("disabled", false);
+                buttonMoveFiles.removeClass("explorerButtonDisabled");
                 explorer.TEMP_VAR = this.id.replace("mv_", "");
             });
             explorer.initMouseOverEvent();
