@@ -38,6 +38,4 @@ var File = function(id, name, ext, parent, field) {
     this.ext = ext;
 };
 
-if(typeof module === "object" && module.exports){
-    module.exports = File;
-}
+module.exports = File;

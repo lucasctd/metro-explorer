@@ -1,42 +1,22 @@
 (function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
 'use strict';
 
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports.ExUpload = exports.File = undefined;
-
-var _explorer = require('./resources/assets/js/explorer.js');
-
-var _explorer2 = _interopRequireDefault(_explorer);
-
-var _exUpload = require('./resources/assets/extensions/ExUpload/exUpload.js');
-
-var _exUpload2 = _interopRequireDefault(_exUpload);
-
-var _file = require('./resources/assets/js/file.js');
-
-var _file2 = _interopRequireDefault(_file);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
 /**
  * Created by lucas on 11/2/2016.
  */
 
 require('./resources/assets/js/jquery-ui-1.11.4.min.js');
 
-exports.default = _explorer2.default;
-var File = exports.File = _file2.default;
-var ExUpload = exports.ExUpload = _exUpload2.default;
+var Explorer = require('./resources/assets/js/explorer.js');
+var ExUpload = require('./resources/assets/extensions/ExUpload/exUpload.js');
+var File = require('./resources/assets/js/file.js');
+
+module.exports = { Explorer: Explorer, ExUpload: ExUpload, File: File };
 
 },{"./resources/assets/extensions/ExUpload/exUpload.js":2,"./resources/assets/js/explorer.js":3,"./resources/assets/js/file.js":4,"./resources/assets/js/jquery-ui-1.11.4.min.js":5}],2:[function(require,module,exports){
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
-function ExUpload(explorer, url, params) {
+var ExUpload = function ExUpload(explorer, url, params) {
     "use strict";
 
     var exUpload = {
@@ -351,25 +331,20 @@ function ExUpload(explorer, url, params) {
         }
     };
     return exUpload;
-}
-
-//adding CommonJS Support
-exports.default = ExUpload;
+};
+module.exports = ExUpload;
 
 },{}],3:[function(require,module,exports){
 "use strict";
 
-Object.defineProperty(exports, "__esModule", {
-    value: true
-});
+var _file4 = require("./file.js");
 
-var _file3 = require("./file.js");
-
-var _file4 = _interopRequireDefault(_file3);
+var _file5 = _interopRequireDefault(_file4);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-function Explorer(width, height, container, position, fileList) {
+//METRO-EXPLORER_CODE
+var Explorer = function Explorer(width, height, container, position, fileList) {
     "use strict";
 
     var explorer = {
@@ -437,6 +412,7 @@ function Explorer(width, height, container, position, fileList) {
         exUpload: null,
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
+        styleFile: null,
         addFiles: function addFiles(param, resize, def) {
             if (!window.AVAILABLE_ICON_EXTENSIONS) {
                 window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
@@ -1354,19 +1330,73 @@ function Explorer(width, height, container, position, fileList) {
         },
         getExplorerRootFolder: function getExplorerRootFolder() {
             var scripts = document.getElementsByTagName("script");
-            var index;
-            for (index = 0; index < scripts.length; index++) {
-                if (scripts[index].outerHTML.indexOf("explorer.js") != -1 || scripts[index].outerHTML.indexOf("exp_standalone.js") != -1) {
-                    break;
+            var root = "";
+            var _iteratorNormalCompletion = true;
+            var _didIteratorError = false;
+            var _iteratorError = undefined;
+
+            try {
+                for (var _iterator = scripts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
+                    var script = _step.value;
+                    var _iteratorNormalCompletion2 = true;
+                    var _didIteratorError2 = false;
+                    var _iteratorError2 = undefined;
+
+                    try {
+                        var _loop2 = function _loop2() {
+                            var attr = _step2.value;
+
+                            if (attr.name == 'src') {
+                                $.get(attr.value, function (data) {
+                                    if (data.indexOf("//METRO-EXPLORER_CODE") != -1) {
+                                        console.log(attr.value);
+                                        var splPath = attr.value.split("/");
+                                        console.log(splPath);
+                                        //for(let x = 0; x < splPath.length - 2; x++ ){
+                                        root.concat(splPath[0]);
+                                        //}
+                                        console.log(root);
+                                        return root;
+                                    }
+                                });
+                            }
+                        };
+
+                        for (var _iterator2 = script.attributes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                            _loop2();
+                        }
+                    } catch (err) {
+                        _didIteratorError2 = true;
+                        _iteratorError2 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                                _iterator2.return();
+                            }
+                        } finally {
+                            if (_didIteratorError2) {
+                                throw _iteratorError2;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                _didIteratorError = true;
+                _iteratorError = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion && _iterator.return) {
+                        _iterator.return();
+                    }
+                } finally {
+                    if (_didIteratorError) {
+                        throw _iteratorError;
+                    }
                 }
             }
-            try {
-                //scripts[index].attributes.src.nodeValue deprecated
-                return scripts[index].attributes.src.value.replace("js/explorer.js", "").replace("js/exp_standalone.js", "");
-            } catch (e) {
-                this.log("We could not find out Explorer's root folder. Have you changed Explorer's file name? (it should be explorer.js or exp_standalone.js)" + "Have you changed its folder? (It should be 'js' like 'js/explorer.js' or 'js/exp_standalone.js')");
-                return null;
-            }
+
+            this.log("We could not find Explorer's root folder. Are you sure you have included it in your page?");
+            return null;
         },
         destroy: function destroy(element, explode) {
             if (element === undefined || element === null) {
@@ -1513,7 +1543,7 @@ function Explorer(width, height, container, position, fileList) {
                 if (response === true) {
                     explorer.closeBaseDialog();
 
-                    var _loop2 = function _loop2(_x) {
+                    var _loop3 = function _loop3(_x) {
                         var file = explorer.getFileById(explorer.selectedFiles[_x].id);
                         destFolder = explorer.getFileById(destFolderId);
                         //if it's in the same folder of the new folder
@@ -1553,7 +1583,7 @@ function Explorer(width, height, container, position, fileList) {
                     };
 
                     for (var _x = 0; _x < explorer.selectedFiles.length; _x++) {
-                        _loop2(_x);
+                        _loop3(_x);
                     }
                 }
             });
@@ -1616,7 +1646,7 @@ function Explorer(width, height, container, position, fileList) {
             explorer.serverDelete(def);
             $.when(def).then(function (success) {
                 if (success === true) {
-                    var _loop3 = function _loop3(x) {
+                    var _loop4 = function _loop4(x) {
                         if (explorer.selectedFiles[x].ext == "dir") {
                             explorer.deleteFolderRecursively(explorer.selectedFiles[x].id);
                         }
@@ -1635,7 +1665,7 @@ function Explorer(width, height, container, position, fileList) {
                     };
 
                     for (var x = 0; x < explorer.selectedFiles.length; x++) {
-                        _loop3(x);
+                        _loop4(x);
                     }
                     explorer.selectedFiles = [];
                     explorer.showEmptyMessage();
@@ -1707,7 +1737,7 @@ function Explorer(width, height, container, position, fileList) {
             explorer.serverNewFolder(folderName, def);
             $.when(def).then(function (folderId) {
                 if ($.isNumeric(folderId)) {
-                    explorer.addFiles(new _file4.default(folderId, folderName, "dir", explorer.currentParent));
+                    explorer.addFiles(new _file5.default(folderId, folderName, "dir", explorer.currentParent));
                     explorer.closeBaseDialog();
                 } else {
                     explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: " + folderId);
@@ -1751,39 +1781,90 @@ function Explorer(width, height, container, position, fileList) {
         getAvailableIconExtensions: function getAvailableIconExtensions() {
             var startCollecting = false,
                 stopCollecting = false;
-            var files = document.styleSheets;
             var extensions = [];
             var path = null;
-            for (var x = 0; x < files.length; x++) {
-                if (files[x].href === null || files[x].href === undefined) {
+            var file = this.getExplorerStyleFile();
+            for (var y = 0; y < file.cssRules.length; y++) {
+                if (!startCollecting) {
+                    startCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
                     continue;
                 }
-                if (files[x].href.indexOf("explorer") != -1) {
-                    for (var y = 0; y < files[x].cssRules.length; y++) {
-                        if (!startCollecting) {
-                            startCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
-                            continue;
-                        }
-                        if (startCollecting && !stopCollecting) {
-                            path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
-                            if ($.inArray(path, explorer.iconPaths) == -1) {
-                                explorer.iconPaths.push(path);
-                            }
-                            stopCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
-                            if (stopCollecting) {
-                                continue;
-                            }
-                            extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                        }
+                if (startCollecting && !stopCollecting) {
+                    path = getValueBetweenQuotes(file.cssRules[y].style.background).replace("..", "");
+                    if ($.inArray(path, explorer.iconPaths) == -1) {
+                        explorer.iconPaths.push(path);
                     }
-                    break;
+                    stopCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
+                    if (stopCollecting) {
+                        break;
+                    }
+                    extensions.push(file.cssRules[y].selectorText.replace(".", ""));
                 }
             }
             return extensions.length === 0 ? null : extensions;
+        },
+        getExplorerStyleFile: function getExplorerStyleFile() {
+            if (this.styleFile !== null) {
+                return this.styleFile;
+            }
+            var files = document.styleSheets;
+            var _iteratorNormalCompletion3 = true;
+            var _didIteratorError3 = false;
+            var _iteratorError3 = undefined;
+
+            try {
+                for (var _iterator3 = files[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                    var _file3 = _step3.value;
+
+                    if (_file3.href === null || _file3.href === undefined) {
+                        continue;
+                    }
+                    var _iteratorNormalCompletion4 = true;
+                    var _didIteratorError4 = false;
+                    var _iteratorError4 = undefined;
+
+                    try {
+                        for (var _iterator4 = _file3.cssRules[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
+                            var rule = _step4.value;
+
+                            if (rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN") {
+                                this.styleFile = _file3;
+                                return this.styleFile;
+                            }
+                        }
+                    } catch (err) {
+                        _didIteratorError4 = true;
+                        _iteratorError4 = err;
+                    } finally {
+                        try {
+                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
+                                _iterator4.return();
+                            }
+                        } finally {
+                            if (_didIteratorError4) {
+                                throw _iteratorError4;
+                            }
+                        }
+                    }
+                }
+            } catch (err) {
+                _didIteratorError3 = true;
+                _iteratorError3 = err;
+            } finally {
+                try {
+                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                        _iterator3.return();
+                    }
+                } finally {
+                    if (_didIteratorError3) {
+                        throw _iteratorError3;
+                    }
+                }
+            }
         }
     };
     return explorer;
-}
+};
 
 function removeClass(objs, classes) {
     $.each(objs, function (i, obj) {
@@ -1876,14 +1957,10 @@ function inArray(array, obj, fieldstoCompare) {
         return equals;
     }
 }
-
-//adding CommonJS Support
-exports.default = Explorer;
+module.exports = Explorer;
 
 },{"./file.js":4}],4:[function(require,module,exports){
 "use strict";
-
-var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) { return typeof obj; } : function (obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; };
 
 /**
  * Created by lucas on 11/2/2016.
@@ -1925,9 +2002,7 @@ var File = function File(id, name, ext, parent, field) {
     this.ext = ext;
 };
 
-if ((typeof module === "undefined" ? "undefined" : _typeof(module)) === "object" && module.exports) {
-    module.exports = File;
-}
+module.exports = File;
 
 },{}],5:[function(require,module,exports){
 "use strict";
@@ -3191,9 +3266,9 @@ var _index2 = _interopRequireDefault(_index);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-window.Explorer = _index2.default;
-window.File = _index.File;
-window.ExUpload = _index.ExUpload;
+window.Explorer = _index2.default.Explorer;
+window.File = _index2.default.File;
+window.ExUpload = _index2.default.ExUpload;
 
 },{"../../index.js":1}]},{},[6]);
 

@@ -1,6 +1,6 @@
 import File from './file.js';
-
-function Explorer(width, height, container, position, fileList){
+//METRO-EXPLORER_CODE
+var Explorer = function(width, height, container, position, fileList){
    "use strict";
   var explorer = {
         POSITION_LEFT: 1,
@@ -67,6 +67,7 @@ function Explorer(width, height, container, position, fileList){
         exUpload: null,
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
+        styleFile: null,
         addFiles: function (param, resize, def) {
             if(!window.AVAILABLE_ICON_EXTENSIONS){
                 window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
@@ -589,11 +590,11 @@ function Explorer(width, height, container, position, fileList){
                 return null;
             }
             if(typeof Preload != "undefined"){
-              if(this.preloadIcons){
-                 preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
-              }
+                if(this.preloadIcons){
+                   preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
+                }
             }else{
-              explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
+                explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
             }
            // preload.run();
             explorer.started = true;
@@ -977,23 +978,29 @@ function Explorer(width, height, container, position, fileList){
                 }
             }
         },
-        getExplorerRootFolder: function (){
+        getExplorerRootFolder: function getExplorerRootFolder() {
             var scripts = document.getElementsByTagName("script");
-            var index;
-            for(index=0; index < scripts.length; index++){
-                if(scripts[index].outerHTML.indexOf("explorer.js") != -1 || scripts[index].outerHTML.indexOf("exp_standalone.js") != -1){
-                    break;
+            var root = "";
+            for (let script of scripts) {
+                for(let attr of script.attributes){
+                    if(attr.name == 'src'){
+                        $.get( attr.value, function( data ) {
+                            if(data.indexOf("//METRO-EXPLORER_CODE") != -1){
+                                console.log(attr.value);
+                                var splPath = attr.value.split("/");
+                                console.log(splPath);
+                                //for(let x = 0; x < splPath.length - 2; x++ ){
+                                    root.concat(splPath[0]);
+                                //}
+                                console.log(root);
+                                return root;
+                            }
+                        });
+                    }
                 }
             }
-            try{
-                //scripts[index].attributes.src.nodeValue deprecated
-                return scripts[index].attributes.src.value.replace("js/explorer.js","").replace("js/exp_standalone.js","");
-            }catch(e){
-                this.log("We could not find out Explorer's root folder. Have you changed Explorer's file name? (it should be explorer.js or exp_standalone.js)" +
-                "Have you changed its folder? (It should be 'js' like 'js/explorer.js' or 'js/exp_standalone.js')");
-                return null;
-            }
-
+            this.log("We could not find Explorer's root folder. Are you sure you have included it in your page?");
+            return null;
         },
         destroy: function (element, explode){
             if(element === undefined || element === null){
@@ -1354,38 +1361,47 @@ function Explorer(width, height, container, position, fileList){
         preview: function (file){
 
         },
-      getAvailableIconExtensions: function getAvailableIconExtensions() {
-          var startCollecting = false, stopCollecting = false;
-          var files = document.styleSheets;
-          var extensions = [];
-          var path = null;
-          for (var x = 0; x < files.length; x++) {
-              if (files[x].href === null || files[x].href === undefined) {
-                  continue;
-              }
-              if (files[x].href.indexOf("explorer") != -1) {
-                  for (var y = 0; y < files[x].cssRules.length; y++) {
-                      if(!startCollecting){
-                          startCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
-                          continue;
-                      }
-                      if(startCollecting && !stopCollecting){
-                          path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
-                          if ($.inArray(path, explorer.iconPaths) == -1) {
-                              explorer.iconPaths.push(path);
-                          }
-                          stopCollecting = files[x].cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
-                          if(stopCollecting){
-                              continue;
-                          }
-                          extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                      }
-                  }
-                  break;
-              }
-          }
-          return extensions.length === 0 ? null : extensions;
-      },
+        getAvailableIconExtensions: function getAvailableIconExtensions() {
+            var startCollecting = false, stopCollecting = false;
+            var extensions = [];
+            var path = null;
+            var file = this.getExplorerStyleFile();
+            for (let y = 0; y < file.cssRules.length; y++) {
+                if(!startCollecting){
+                    startCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
+                    continue;
+                }
+                if(startCollecting && !stopCollecting){
+                    path = getValueBetweenQuotes(file.cssRules[y].style.background).replace("..", "");
+                    if ($.inArray(path, explorer.iconPaths) == -1) {
+                        explorer.iconPaths.push(path);
+                    }
+                    stopCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
+                    if(stopCollecting){
+                        break;
+                    }
+                    extensions.push(file.cssRules[y].selectorText.replace(".", ""));
+                }
+            }
+            return extensions.length === 0 ? null : extensions;
+        },
+        getExplorerStyleFile: function(){
+            if(this.styleFile !== null){
+                return this.styleFile;
+            }
+            var files = document.styleSheets;
+            for (let file of files) {
+                if (file.href === null || file.href === undefined) {
+                    continue;
+                }
+                for(let rule of file.cssRules){
+                    if(rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN"){
+                        this.styleFile = file;
+                        return this.styleFile;
+                    }
+                }
+            }
+        }
     };
     return explorer;
 }
@@ -1480,6 +1496,4 @@ function inArray(array, obj, fieldstoCompare){
     return equals;
   }
 }
-
-//adding CommonJS Support
-export default Explorer;
+module.exports = Explorer;
