@@ -413,6 +413,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
         styleFile: null,
+        explorerRootFolder: null,
         addFiles: function addFiles(param, resize, def) {
             if (!window.AVAILABLE_ICON_EXTENSIONS) {
                 window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
@@ -656,7 +657,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 field.element.droppable({
                     drop: function drop(event, ui) {
                         field.element.css("border-width", "0px");
-                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var file = explorer.getFileById(ui.draggable[0].id);
                         var topFile = field.filesOn[field.filesOn.length - 1];
                         file.getElement().find(".moveToTooltip").fadeOut();
                         if (topFile == explorer.GO_UP_ID) {
@@ -694,7 +695,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                     out: function out(event, ui) {
                         field.element.css("border-width", "0px");
                         field.filesOn = $.grep(field.filesOn, function (val, index) {
-                            return val != ui.draggable.context.id;
+                            return val != ui.draggable[0].id;
                         });
                         if (field.filesOn.length === 0) {
                             explorer.fields.usedFields -= 1;
@@ -703,9 +704,9 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                     over: function over(event, ui) {
                         field.element.css("border-width", "1px");
                         var topFile = field.filesOn[field.filesOn.length - 1];
-                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var file = explorer.getFileById(ui.draggable[0].id);
                         if (topFile == explorer.GO_UP_ID) {
-                            //if it is goUp, do not try to get the top file.
+                            //if it is goUp, do not try to get the most on top file.
                             var parent = explorer.getFileById(explorer.currentParent);
                             var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
                             //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
@@ -753,7 +754,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 cursor: "move",
                 revert: "invalid",
                 start: function start(event, ui) {
-                    $("#" + ui.helper.context.id).css("z-index", "9000");
+                    $("#" + ui.helper[0].id).css("z-index", "9000");
                 }
             });
         },
@@ -835,6 +836,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
         },
         initContextMenuEvent: function initContextMenuEvent(e) {
             //create contextMenuVoid
+            $("#contextIdTools").remove();
             $("body").append("<div id='contextIdTools'" + "class='opacity9 txtmargin contextMenuVoid gray ft12 bold displayNone'>" + explorer.loadContextMenuOption(explorer.NEW_FOLDER, explorer.CONTEXT_MENU_OPTIONS.NEW_FOLDER, false) + explorer.loadContextMenuOption(explorer.UPLOAD, explorer.CONTEXT_MENU_OPTIONS.UPLOAD, false) + explorer.customMenuOption() + "</div>");
             $("#expNewFolder").on("click", function () {
                 explorer.newFolder();
@@ -874,6 +876,10 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                     $(this).css("border", "1px solid darkgray");
                 }
             });
+        },
+        setLanguage: function setLanguage(language) {
+            this.language = language;
+            this.loadLanguage();
         },
         loadLanguage: function loadLanguage() {
             var patt = /\.json$/i;
@@ -929,9 +935,14 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
             return true;
         },
         start: function start() {
-            //setting default language
-            this.language = this.language === undefined ? explorer.getExplorerRootFolder() + "/lang/en-US.json" : this.language;
-            this.loadLanguage();
+            var that = this;
+            var defLang = $.Deferred();
+            explorer.loadExplorerRootFolder(defLang);
+            $.when(defLang).then(function () {
+                //setting default language
+                that.language = that.language === undefined ? that.getExplorerRootFolder() + "/lang/en-US.json" : that.language;
+                that.loadLanguage();
+            });
             var resizeId = null,
                 preload = null;
             if (explorer.checkIfContainerExist() === false) {
@@ -1328,9 +1339,10 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 }
             }
         },
-        getExplorerRootFolder: function getExplorerRootFolder() {
+        loadExplorerRootFolder: function loadExplorerRootFolder(def) {
             var scripts = document.getElementsByTagName("script");
             var root = "";
+            var that = this;
             var _iteratorNormalCompletion = true;
             var _didIteratorError = false;
             var _iteratorError = undefined;
@@ -1338,46 +1350,23 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
             try {
                 for (var _iterator = scripts[Symbol.iterator](), _step; !(_iteratorNormalCompletion = (_step = _iterator.next()).done); _iteratorNormalCompletion = true) {
                     var script = _step.value;
-                    var _iteratorNormalCompletion2 = true;
-                    var _didIteratorError2 = false;
-                    var _iteratorError2 = undefined;
 
                     try {
-                        var _loop2 = function _loop2() {
-                            var attr = _step2.value;
-
-                            if (attr.name == 'src') {
-                                $.get(attr.value, function (data) {
-                                    if (data.indexOf("//METRO-EXPLORER_CODE") != -1) {
-                                        console.log(attr.value);
-                                        var splPath = attr.value.split("/");
-                                        console.log(splPath);
-                                        //for(let x = 0; x < splPath.length - 2; x++ ){
-                                        root.concat(splPath[0]);
-                                        //}
-                                        console.log(root);
-                                        return root;
+                        (function () {
+                            var src = script.attributes.src.value;
+                            $.get(src, function (data) {
+                                if (data.indexOf("//METRO-EXPLORER_CODE") != -1) {
+                                    var splPath = src.split("/");
+                                    for (var x = 0; x < splPath.length - 2 || x == 0; x++) {
+                                        root = root.concat(splPath[0]).concat("\\");
                                     }
-                                });
-                            }
-                        };
-
-                        for (var _iterator2 = script.attributes[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
-                            _loop2();
-                        }
-                    } catch (err) {
-                        _didIteratorError2 = true;
-                        _iteratorError2 = err;
-                    } finally {
-                        try {
-                            if (!_iteratorNormalCompletion2 && _iterator2.return) {
-                                _iterator2.return();
-                            }
-                        } finally {
-                            if (_didIteratorError2) {
-                                throw _iteratorError2;
-                            }
-                        }
+                                    that.explorerRootFolder = root;
+                                    def.resolve();
+                                }
+                            });
+                        })();
+                    } catch (e) {
+                        continue;
                     }
                 }
             } catch (err) {
@@ -1395,8 +1384,15 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 }
             }
 
-            this.log("We could not find Explorer's root folder. Are you sure you have included it in your page?");
-            return null;
+            setTimeout(function () {
+                if (def.state() == 'pending') {
+                    that.log("We could not find Explorer's root folder. Explorer will not work well without it. Please, visit www.metroui.us/Explorer to know how to fix it.");
+                    def.resolve();
+                }
+            }, 10 * 1000);
+        },
+        getExplorerRootFolder: function getExplorerRootFolder() {
+            return this.explorerRootFolder;
         },
         destroy: function destroy(element, explode) {
             if (element === undefined || element === null) {
@@ -1543,7 +1539,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 if (response === true) {
                     explorer.closeBaseDialog();
 
-                    var _loop3 = function _loop3(_x) {
+                    var _loop2 = function _loop2(_x) {
                         var file = explorer.getFileById(explorer.selectedFiles[_x].id);
                         destFolder = explorer.getFileById(destFolderId);
                         //if it's in the same folder of the new folder
@@ -1583,7 +1579,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                     };
 
                     for (var _x = 0; _x < explorer.selectedFiles.length; _x++) {
-                        _loop3(_x);
+                        _loop2(_x);
                     }
                 }
             });
@@ -1646,7 +1642,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
             explorer.serverDelete(def);
             $.when(def).then(function (success) {
                 if (success === true) {
-                    var _loop4 = function _loop4(x) {
+                    var _loop3 = function _loop3(x) {
                         if (explorer.selectedFiles[x].ext == "dir") {
                             explorer.deleteFolderRecursively(explorer.selectedFiles[x].id);
                         }
@@ -1665,7 +1661,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                     };
 
                     for (var x = 0; x < explorer.selectedFiles.length; x++) {
-                        _loop4(x);
+                        _loop3(x);
                     }
                     explorer.selectedFiles = [];
                     explorer.showEmptyMessage();
@@ -1808,24 +1804,24 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 return this.styleFile;
             }
             var files = document.styleSheets;
-            var _iteratorNormalCompletion3 = true;
-            var _didIteratorError3 = false;
-            var _iteratorError3 = undefined;
+            var _iteratorNormalCompletion2 = true;
+            var _didIteratorError2 = false;
+            var _iteratorError2 = undefined;
 
             try {
-                for (var _iterator3 = files[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
-                    var _file3 = _step3.value;
+                for (var _iterator2 = files[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+                    var _file3 = _step2.value;
 
                     if (_file3.href === null || _file3.href === undefined) {
                         continue;
                     }
-                    var _iteratorNormalCompletion4 = true;
-                    var _didIteratorError4 = false;
-                    var _iteratorError4 = undefined;
+                    var _iteratorNormalCompletion3 = true;
+                    var _didIteratorError3 = false;
+                    var _iteratorError3 = undefined;
 
                     try {
-                        for (var _iterator4 = _file3.cssRules[Symbol.iterator](), _step4; !(_iteratorNormalCompletion4 = (_step4 = _iterator4.next()).done); _iteratorNormalCompletion4 = true) {
-                            var rule = _step4.value;
+                        for (var _iterator3 = _file3.cssRules[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+                            var rule = _step3.value;
 
                             if (rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN") {
                                 this.styleFile = _file3;
@@ -1833,31 +1829,31 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                             }
                         }
                     } catch (err) {
-                        _didIteratorError4 = true;
-                        _iteratorError4 = err;
+                        _didIteratorError3 = true;
+                        _iteratorError3 = err;
                     } finally {
                         try {
-                            if (!_iteratorNormalCompletion4 && _iterator4.return) {
-                                _iterator4.return();
+                            if (!_iteratorNormalCompletion3 && _iterator3.return) {
+                                _iterator3.return();
                             }
                         } finally {
-                            if (_didIteratorError4) {
-                                throw _iteratorError4;
+                            if (_didIteratorError3) {
+                                throw _iteratorError3;
                             }
                         }
                     }
                 }
             } catch (err) {
-                _didIteratorError3 = true;
-                _iteratorError3 = err;
+                _didIteratorError2 = true;
+                _iteratorError2 = err;
             } finally {
                 try {
-                    if (!_iteratorNormalCompletion3 && _iterator3.return) {
-                        _iterator3.return();
+                    if (!_iteratorNormalCompletion2 && _iterator2.return) {
+                        _iterator2.return();
                     }
                 } finally {
-                    if (_didIteratorError3) {
-                        throw _iteratorError3;
+                    if (_didIteratorError2) {
+                        throw _iteratorError2;
                     }
                 }
             }

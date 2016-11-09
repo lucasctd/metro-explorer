@@ -68,6 +68,7 @@ var Explorer = function(width, height, container, position, fileList){
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
         styleFile: null,
+        explorerRootFolder: null,
         addFiles: function (param, resize, def) {
             if(!window.AVAILABLE_ICON_EXTENSIONS){
                 window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
@@ -307,7 +308,7 @@ var Explorer = function(width, height, container, position, fileList){
                 field.element.droppable({
                     drop: function( event, ui ) {
                         field.element.css("border-width","0px");
-                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var file = explorer.getFileById(ui.draggable[0].id);
                         var topFile = field.filesOn[field.filesOn.length - 1];
                         file.getElement().find(".moveToTooltip").fadeOut();
                         if(topFile == explorer.GO_UP_ID){//move to parent's folder
@@ -343,7 +344,7 @@ var Explorer = function(width, height, container, position, fileList){
                     out: function( event, ui ) {
                         field.element.css("border-width","0px");
                         field.filesOn = $.grep(field.filesOn, function(val, index) {
-                            return val != ui.draggable.context.id;
+                            return val != ui.draggable[0].id;
                         });
                         if(field.filesOn.length === 0){
                             explorer.fields.usedFields-=1;
@@ -352,19 +353,19 @@ var Explorer = function(width, height, container, position, fileList){
                     over: function( event, ui ) {
                         field.element.css("border-width","1px");
                         var topFile = field.filesOn[field.filesOn.length - 1];
-                        var file = explorer.getFileById(ui.draggable.context.id);
-                        if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
-                          var parent = explorer.getFileById(explorer.currentParent);
-                          var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
-                          //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
-                          file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to ".concat(parentName)).fadeIn();
+                        var file = explorer.getFileById(ui.draggable[0].id);
+                        if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the most on top file.
+                            var parent = explorer.getFileById(explorer.currentParent);
+                            var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
+                            //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
+                            file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to ".concat(parentName)).fadeIn();
                         }else{
-                          topFile = explorer.getFileById(topFile);
-                          if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
-                            file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
-                          }else{
-                            file.getElement().find(".moveToTooltip").fadeOut();
-                          }
+                            topFile = explorer.getFileById(topFile);
+                            if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
+                              file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
+                            }else{
+                              file.getElement().find(".moveToTooltip").fadeOut();
+                            }
                         }
                     }
                   });
@@ -396,7 +397,7 @@ var Explorer = function(width, height, container, position, fileList){
                 cursor: "move",
                 revert: "invalid",
                 start: function( event, ui ){
-                    $("#"+ui.helper.context.id).css("z-index", "9000");
+                    $("#"+ui.helper[0].id).css("z-index", "9000");
                 }
             });
         },
@@ -473,6 +474,7 @@ var Explorer = function(width, height, container, position, fileList){
         },
         initContextMenuEvent: function(e){
             //create contextMenuVoid
+            $("#contextIdTools").remove();
             $("body").append("<div id='contextIdTools'" +
                 "class='opacity9 txtmargin contextMenuVoid gray ft12 bold displayNone'>" +
                 explorer.loadContextMenuOption(explorer.NEW_FOLDER, explorer.CONTEXT_MENU_OPTIONS.NEW_FOLDER, false) +
@@ -519,6 +521,10 @@ var Explorer = function(width, height, container, position, fileList){
                     $(this).css("border", "1px solid darkgray");
                 }
             });
+        },
+        setLanguage: function(language){
+            this.language = language;
+            this.loadLanguage();
         },
         loadLanguage: function (){
             var patt = /\.json$/i;
@@ -577,9 +583,14 @@ var Explorer = function(width, height, container, position, fileList){
             return true;
         },
         start: function (){
-            //setting default language
-            this.language = this.language === undefined ? explorer.getExplorerRootFolder()+"/lang/en-US.json": this.language;
-            this.loadLanguage();
+            var that = this;
+            var defLang = $.Deferred();
+            explorer.loadExplorerRootFolder(defLang);
+            $.when(defLang).then(function(){
+                //setting default language
+                that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
+                that.loadLanguage();
+            });
             var resizeId = null, preload = null;
             if(explorer.checkIfContainerExist() === false) {
                 return;
@@ -978,29 +989,36 @@ var Explorer = function(width, height, container, position, fileList){
                 }
             }
         },
-        getExplorerRootFolder: function getExplorerRootFolder() {
+        loadExplorerRootFolder: function(def){
             var scripts = document.getElementsByTagName("script");
             var root = "";
+            var that = this;
             for (let script of scripts) {
-                for(let attr of script.attributes){
-                    if(attr.name == 'src'){
-                        $.get( attr.value, function( data ) {
-                            if(data.indexOf("//METRO-EXPLORER_CODE") != -1){
-                                console.log(attr.value);
-                                var splPath = attr.value.split("/");
-                                console.log(splPath);
-                                //for(let x = 0; x < splPath.length - 2; x++ ){
-                                    root.concat(splPath[0]);
-                                //}
-                                console.log(root);
-                                return root;
+                try{
+                    let src = script.attributes.src.value;
+                    $.get( src, function( data ) {
+                        if(data.indexOf("//METRO-EXPLORER_CODE") != -1){
+                            var splPath = src.split("/");
+                            for(let x = 0; x < splPath.length - 2 || x == 0; x++ ){
+                                root = root.concat(splPath[0]).concat("\\");
                             }
-                        });
-                    }
+                            that.explorerRootFolder = root;
+                            def.resolve();
+                        }
+                    });
+                }catch(e){
+                    continue;
                 }
             }
-            this.log("We could not find Explorer's root folder. Are you sure you have included it in your page?");
-            return null;
+            setTimeout(function(){
+                if(def.state() == 'pending'){
+                    that.log("We could not find Explorer's root folder. Explorer will not work well without it. Please, visit www.metroui.us/Explorer to know how to fix it.");
+                    def.resolve();
+                }
+            }, 10 * 1000);
+        },
+        getExplorerRootFolder: function() {
+            return this.explorerRootFolder;
         },
         destroy: function (element, explode){
             if(element === undefined || element === null){
