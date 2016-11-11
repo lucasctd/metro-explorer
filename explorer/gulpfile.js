@@ -12,10 +12,9 @@ var elixir = require('laravel-elixir');
  */
 
 elixir(function(mix) {
-    mix.browserify('./resources/test/test.js', 'build/js/explorer.js')
-       .browserify('./resources/standalone/explorer.js', 'build/js/exp_standalone.js')
+    mix.browserify('./resources/standalone/explorer.js', 'build/js/exp_standalone.js')
         .browserify('./resources/assets/js/jquery.js', 'build/js/jquery.js')
-       .styles(['./resources/assets/css/explorer.css', './resources/assets/css/explorerIcons.css',
+        .styles(['./resources/assets/css/explorer.css', './resources/assets/css/explorerIcons.css',
                 './resources/assets/css/reset.css', './resources/assets/extensions/exUpload/exUpload.css'], 'build/css/explorer.css')
         .copy('./resources/assets/icons', 'build/icons')
         .copy('./resources/assets/templates', 'build/templates')

@@ -337,12 +337,7 @@ module.exports = ExUpload;
 },{}],3:[function(require,module,exports){
 "use strict";
 
-var _file4 = require("./file.js");
-
-var _file5 = _interopRequireDefault(_file4);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
+var File = require('./file.js');
 //METRO-EXPLORER_CODE
 var Explorer = function Explorer(width, height, container, position, fileList) {
     "use strict";
@@ -1713,10 +1708,10 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
                 inpFolderName.on("keyup", function () {
                     if ($(this).val().length < 1) {
                         btCreateFolder.addClass("explorerButtonDisabled");
-                        btCreateFolder.prop("disabled", "disabled");
+                        btCreateFolder.prop("disabled", true);
                     } else {
                         btCreateFolder.removeClass("explorerButtonDisabled");
-                        btCreateFolder.removeProp("disabled");
+                        btCreateFolder.prop("disabled", false);
                     }
                 });
                 btCreateFolder.on("click", function () {
@@ -1733,7 +1728,7 @@ var Explorer = function Explorer(width, height, container, position, fileList) {
             explorer.serverNewFolder(folderName, def);
             $.when(def).then(function (folderId) {
                 if ($.isNumeric(folderId)) {
-                    explorer.addFiles(new _file5.default(folderId, folderName, "dir", explorer.currentParent));
+                    explorer.addFiles(new File(folderId, folderName, "dir", explorer.currentParent));
                     explorer.closeBaseDialog();
                 } else {
                     explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: " + folderId);

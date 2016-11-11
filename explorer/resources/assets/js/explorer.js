@@ -1,4 +1,4 @@
-import File from './file.js';
+const File = require('./file.js');
 //METRO-EXPLORER_CODE
 var Explorer = function(width, height, container, position, fileList){
    "use strict";
@@ -1317,10 +1317,10 @@ var Explorer = function(width, height, container, position, fileList){
                 inpFolderName.on("keyup", function () {
                     if ($(this).val().length < 1) {
                         btCreateFolder.addClass("explorerButtonDisabled");
-                        btCreateFolder.prop("disabled", "disabled");
+                        btCreateFolder.prop("disabled", true);
                     } else {
                         btCreateFolder.removeClass("explorerButtonDisabled");
-                        btCreateFolder.removeProp("disabled");
+                        btCreateFolder.prop("disabled", false);
                     }
                 });
                 btCreateFolder.on("click", function () {
