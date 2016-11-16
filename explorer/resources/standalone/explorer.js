@@ -1,5 +1,6 @@
-import All from '../../index.js';
+import Explorer from '../../index.js';
+import {File, ExUpload} from '../../index.js';
 
-window.Explorer = All.Explorer;
-window.File = All.File;
-window.ExUpload = All.ExUpload;
+window.Explorer = Explorer;
+window.File = File;
+window.ExUpload = ExUpload;

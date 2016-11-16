@@ -12,16 +12,15 @@
 
 	</body>
 	<script type="text/javascript" charset="UTF-8" src="build/js/jquery.js"></script>
-	<script type="text/javascript" charset="UTF-8" src="build/js/exp_standalone.js"></script>
+	<script type="text/javascript" charset="UTF-8" src="build/js/explorer.js"></script>
 	<script>
+        //use exp_standalone.js to run this piece of code
         start();
         function start(){
             if(typeof Explorer === "undefined"){
                 return "";
             }
-						console.log("started");
-            explorer = new Explorer(600, 400);
-					//	explorer.language = 'build/lang/pt-BR.json';
+            var explorer = new Explorer(600, 400);
             //enable debug (will show some warns if something get wrong)
             explorer.debugMode = true;
             //let the user select multiple files (default: false)

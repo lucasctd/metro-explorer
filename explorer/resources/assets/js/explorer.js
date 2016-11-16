@@ -1,6 +1,6 @@
-const File = require('./file.js');
-//METRO-EXPLORER_CODE
-var Explorer = function(width, height, container, position, fileList){
+import File from './file.js';
+
+function Explorer(width, height, container, position, fileList){
    "use strict";
   var explorer = {
         POSITION_LEFT: 1,
@@ -67,8 +67,8 @@ var Explorer = function(width, height, container, position, fileList){
         exUpload: null,
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
-        styleFile: null,
         explorerRootFolder: null,
+        styleFile: null,
         addFiles: function (param, resize, def) {
             if(!window.AVAILABLE_ICON_EXTENSIONS){
                 window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
@@ -354,18 +354,18 @@ var Explorer = function(width, height, container, position, fileList){
                         field.element.css("border-width","1px");
                         var topFile = field.filesOn[field.filesOn.length - 1];
                         var file = explorer.getFileById(ui.draggable[0].id);
-                        if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the most on top file.
-                            var parent = explorer.getFileById(explorer.currentParent);
-                            var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
-                            //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
-                            file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to ".concat(parentName)).fadeIn();
+                        if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
+                          var parent = explorer.getFileById(explorer.currentParent);
+                          var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
+                          //file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to <b>"+parent.name+"</b> parent folder</span> (".concat(parentName+")")).fadeIn();
+                          file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to ".concat(parentName)).fadeIn();
                         }else{
-                            topFile = explorer.getFileById(topFile);
-                            if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
-                              file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
-                            }else{
-                              file.getElement().find(".moveToTooltip").fadeOut();
-                            }
+                          topFile = explorer.getFileById(topFile);
+                          if(topFile && topFile.ext == "dir" && topFile.id != file.id){//if it is a folder
+                            file.getElement().find(".moveToTooltip").html("<span style='color: #101973'>Move to</span> ".concat(topFile.name)).fadeIn();
+                          }else{
+                            file.getElement().find(".moveToTooltip").fadeOut();
+                          }
                         }
                     }
                   });
@@ -474,7 +474,6 @@ var Explorer = function(width, height, container, position, fileList){
         },
         initContextMenuEvent: function(e){
             //create contextMenuVoid
-            $("#contextIdTools").remove();
             $("body").append("<div id='contextIdTools'" +
                 "class='opacity9 txtmargin contextMenuVoid gray ft12 bold displayNone'>" +
                 explorer.loadContextMenuOption(explorer.NEW_FOLDER, explorer.CONTEXT_MENU_OPTIONS.NEW_FOLDER, false) +
@@ -583,14 +582,22 @@ var Explorer = function(width, height, container, position, fileList){
             return true;
         },
         start: function (){
+            //setting default language
             var that = this;
             var defLang = $.Deferred();
-            explorer.loadExplorerRootFolder(defLang);
-            $.when(defLang).then(function(){
+            //explorer.loadExplorerRootFolder(defLang);
+            //$.when(defLang).then(function(){
                 //setting default language
-                that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
-                that.loadLanguage();
-            });
+             //   that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
+              //  that.loadLanguage();
+            //});
+            this.language = this.language === undefined ? explorer.getExplorerRootFolder()+"/lang/en-US.json": this.language;
+            if(explorer.language !== undefined){
+                explorer.loadLanguage();
+            }else{
+                console.log("language is undefined");
+                explorer.initContextMenuEvent();
+            }
             var resizeId = null, preload = null;
             if(explorer.checkIfContainerExist() === false) {
                 return;
@@ -601,11 +608,11 @@ var Explorer = function(width, height, container, position, fileList){
                 return null;
             }
             if(typeof Preload != "undefined"){
-                if(this.preloadIcons){
-                   preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
-                }
+              if(this.preloadIcons){
+                 preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
+              }
             }else{
-                explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
+              explorer.log("Looks like you have not include Preload class. Thus, icons preload will not be done.");
             }
            // preload.run();
             explorer.started = true;
@@ -617,11 +624,7 @@ var Explorer = function(width, height, container, position, fileList){
                 //resizeId = setTimeout(explorer.resizeExplorer, 50);
             });
             explorer.disableBrowserContextMenu();
-            if(explorer.language !== undefined){
-                explorer.loadLanguage();
-            }else{
-                explorer.initContextMenuEvent();
-            }
+
             $(explorer.element).fadeIn("fast");
             explorer.showEmptyMessage();
             explorer.setIconsBackgroundColor(explorer.iconsBackgroundColor);
@@ -993,7 +996,7 @@ var Explorer = function(width, height, container, position, fileList){
             var scripts = document.getElementsByTagName("script");
             var root = "";
             var that = this;
-            for (let script of scripts) {
+            $(scripts).each(function( i, script ) {
                 try{
                     let src = script.attributes.src.value;
                     $.get( src, function( data ) {
@@ -1007,18 +1010,18 @@ var Explorer = function(width, height, container, position, fileList){
                         }
                     });
                 }catch(e){
-                    continue;
+                    return;
                 }
-            }
+            });
             setTimeout(function(){
-                if(def.state() == 'pending'){
-                    that.log("We could not find Explorer's root folder. Explorer will not work well without it. Please, visit www.metroui.us/Explorer to know how to fix it.");
-                    def.resolve();
-                }
+              if(def.state() == 'pending'){
+                  that.log("We could not find Explorer's root folder. Explorer will not work well without it. Please, visit www.metroui.us/Explorer to know how to fix it.");
+                  def.resolve();
+              }
             }, 10 * 1000);
         },
         getExplorerRootFolder: function() {
-            return this.explorerRootFolder;
+          return this.explorerRootFolder;
         },
         destroy: function (element, explode){
             if(element === undefined || element === null){
@@ -1308,6 +1311,19 @@ var Explorer = function(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
+            explorer.serverNewFolder("", def);
+            $.when(def).then(function(folderId) {
+                if($.isNumeric(folderId)){
+                    var file = new File(folderId, "", "dir", explorer.currentParent);
+                    explorer.addFiles(file);
+                    explorer.rename(file, false);
+                   // explorer.closeBaseDialog();
+                }else{
+                    explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: "+folderId);
+                }
+            });
+            /*
+            var def = $.Deferred();
             explorer.createBaseDialog(400);
             explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.html", def);
             $.when(def).then(function () {
@@ -1330,7 +1346,7 @@ var Explorer = function(width, height, container, position, fileList){
                 $("#newFolderHeader").text(explorer.LANG_LBL_NEW_FOLDER_HEADER);
                 $("#folderName").text(explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME);
                 btCreateFolder.text(explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
-            });
+            });*/
         },
         clientNewFolder: function(folderName){
             var def = $.Deferred();
@@ -1380,45 +1396,46 @@ var Explorer = function(width, height, container, position, fileList){
 
         },
         getAvailableIconExtensions: function getAvailableIconExtensions() {
-            var startCollecting = false, stopCollecting = false;
-            var extensions = [];
-            var path = null;
-            var file = this.getExplorerStyleFile();
-            for (let y = 0; y < file.cssRules.length; y++) {
-                if(!startCollecting){
-                    startCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
-                    continue;
-                }
-                if(startCollecting && !stopCollecting){
-                    path = getValueBetweenQuotes(file.cssRules[y].style.background).replace("..", "");
-                    if ($.inArray(path, explorer.iconPaths) == -1) {
-                        explorer.iconPaths.push(path);
-                    }
-                    stopCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
-                    if(stopCollecting){
-                        break;
-                    }
-                    extensions.push(file.cssRules[y].selectorText.replace(".", ""));
-                }
-            }
-            return extensions.length === 0 ? null : extensions;
+          var startCollecting = false, stopCollecting = false;
+          var extensions = [];
+          var path = null;
+          var file = this.getExplorerStyleFile();
+          for (let y = 0; y < file.cssRules.length; y++) {
+              if(!startCollecting){
+                  startCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
+                  continue;
+              }
+              if(startCollecting && !stopCollecting){
+                  path = getValueBetweenQuotes(file.cssRules[y].style.background).replace("..", "");
+                  if ($.inArray(path, explorer.iconPaths) == -1) {
+                      explorer.iconPaths.push(path);
+                  }
+                  stopCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
+                  if(stopCollecting){
+                      break;
+                  }
+                  extensions.push(file.cssRules[y].selectorText.replace(".", ""));
+              }
+          }
+          return extensions.length === 0 ? null : extensions;
         },
         getExplorerStyleFile: function(){
+            var that = this;
             if(this.styleFile !== null){
-                return this.styleFile;
+              return this.styleFile;
             }
             var files = document.styleSheets;
-            for (let file of files) {
-                if (file.href === null || file.href === undefined) {
-                    continue;
+            $(files).each(function( i, file ) {
+                if (file.href !== null || file.href !== undefined) {
+                    $(file.cssRules).each(function (i, rule) {
+                        if(rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN"){
+                            that.styleFile = file;
+                            return false;
+                        }
+                    });
                 }
-                for(let rule of file.cssRules){
-                    if(rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN"){
-                        this.styleFile = file;
-                        return this.styleFile;
-                    }
-                }
-            }
+            });
+            return this.styleFile;
         }
     };
     return explorer;
@@ -1514,4 +1531,6 @@ function inArray(array, obj, fieldstoCompare){
     return equals;
   }
 }
-module.exports = Explorer;
+
+//adding CommonJS Support
+export default Explorer;

@@ -1,4 +1,4 @@
-var ExUpload = function(explorer, url, params) {
+function ExUpload(explorer, url, params) {
     "use strict";
     var exUpload = {
         explorerContainer: null,
@@ -9,12 +9,12 @@ var ExUpload = function(explorer, url, params) {
         callback: undefined,
         explorer: explorer,
         allowedExtensions: undefined,
-	      enabled: true,
+		enabled: true,
         MSG_EXUPLOAD_NOT_ENABLED: "ExUpload is not enabled, thus, you can't upload any file right now.",
-	      MSG_INVALID_FILE: "{ext} files are not allowed.",
+		MSG_INVALID_FILE: "{ext} files are not allowed.",
         ERROR_INVALID_FILE: 1,
         ERROR_NO_ID_FOUND: 2,
-	      ERROR_EXUPLOAD_NOT_ENABLED: 3,
+		ERROR_EXUPLOAD_NOT_ENABLED: 3,
         start: function () {
             try{
                 exUpload.validate();
@@ -93,7 +93,7 @@ var ExUpload = function(explorer, url, params) {
                 uploader.createProgressStructure(fakeFile.id, true);
                 exUpload.error(msg, fakeFile);
 				return;
-			}
+			}            
             if(exUpload.validadeExtension(fakeFile.ext) === false){
                 var msg = {message: exUpload.MSG_INVALID_FILE.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
                 uploader.createProgressStructure(fakeFile.id, true);
@@ -317,4 +317,6 @@ var ExUpload = function(explorer, url, params) {
     };
     return exUpload;
 }
-module.exports = ExUpload;
+
+//adding CommonJS Support
+export default ExUpload;
