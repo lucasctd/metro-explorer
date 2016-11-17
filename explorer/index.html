@@ -21,11 +21,14 @@
                 return "";
             }
             var explorer = new Explorer(600, 400);
+			explorer.setExplorerRootFolder("/build/");
             //enable debug (will show some warns if something get wrong)
             explorer.debugMode = true;
             //let the user select multiple files (default: false)
             explorer.multiSelect = true;
-
+            $(window).on("fileUpdateEvent", function(e, data){
+                console.log(data);
+            });
             /*
              I am sure you'll get it.
              explorer.CONTEXT_MENU_OPTIONS.DELETE_ALL = explorer.HIDDEN;

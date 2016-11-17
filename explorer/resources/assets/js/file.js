@@ -29,8 +29,7 @@ var File = function(id, name, ext, parent, field) {
         file = file === undefined ? this.ext : file;
         var str = file.split(".");
         var ext = str[str.length - 1];
-        console.log(this.checkIcon(ext));
-        return this.checkIcon(ext);
+        return this.getIcon(ext);
     };
     this.getElement = function () {
         return $("#" + this.id);
@@ -38,6 +37,4 @@ var File = function(id, name, ext, parent, field) {
     this.ext = ext;
 };
 
-if(typeof module === "object" && module.exports){
-    module.exports = File;
-}
+module.exports = File;

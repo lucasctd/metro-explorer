@@ -1,4 +1,4 @@
-import File from './file.js';
+const File = require('./file.js');
 
 function Explorer(width, height, container, position, fileList){
    "use strict";
@@ -144,11 +144,6 @@ function Explorer(width, height, container, position, fileList){
                 }else{
                     listfilesWithoutAField.push(file);
                 }
-               // if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
-
-              //  }else{
-              //      explorer.placeFileAutomatically(file);
-              //  }
                 index = explorer.checkIfExists(file.id);
                 explorer.fileList[index].placed = true; //field's index
                 if(explorer.fileList[index].uploading === true){
@@ -472,7 +467,7 @@ function Explorer(width, height, container, position, fileList){
             });
             explorer.currentPath = currentPath;
         },
-        initContextMenuEvent: function(e){
+        initContextMenuEvent: function(){
             //create contextMenuVoid
             $("body").append("<div id='contextIdTools'" +
                 "class='opacity9 txtmargin contextMenuVoid gray ft12 bold displayNone'>" +
@@ -583,14 +578,15 @@ function Explorer(width, height, container, position, fileList){
         },
         start: function (){
             //setting default language
-            var that = this;
+            /*var that = this;
             var defLang = $.Deferred();
-            //explorer.loadExplorerRootFolder(defLang);
-            //$.when(defLang).then(function(){
+            explorer.loadExplorerRootFolder(defLang);
+            $.when(defLang).then(function(){
                 //setting default language
-             //   that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
-              //  that.loadLanguage();
-            //});
+                that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
+                that.loadLanguage();
+            });*/
+
             this.language = this.language === undefined ? explorer.getExplorerRootFolder()+"/lang/en-US.json": this.language;
             if(explorer.language !== undefined){
                 explorer.loadLanguage();
@@ -700,32 +696,32 @@ function Explorer(width, height, container, position, fileList){
         },
         loadContextMenuOptionEvents: function (file){
 
-          $("#expOpen").on("click", function (e){
+          $("#expOpen").on("click", function (){
               if(isNotDisabled(this)){
                   explorer.open(file);
               }
           });
-          $("#expMove").on("click", function (e){
+          $("#expMove").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.move(file);
             }
           });
-          $("#expRename").on("click", function (e){
+          $("#expRename").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.rename(file, false);
             }
           });
-          $("#expDelete").on("click", function (e){
+          $("#expDelete").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.delete(file);
             }
           });
-          $("#expShare").on("click", function (e){
+          $("#expShare").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.share(file);
             }
           });
-          $("#expDownload").on("click", function (e){
+          $("#expDownload").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.download(file);
             }
@@ -1019,6 +1015,9 @@ function Explorer(width, height, container, position, fileList){
                   def.resolve();
               }
             }, 10 * 1000);
+        },
+        setExplorerRootFolder: function(path){
+            this.explorerRootFolder = path;
         },
         getExplorerRootFolder: function() {
           return this.explorerRootFolder;
@@ -1317,7 +1316,6 @@ function Explorer(width, height, container, position, fileList){
                     var file = new File(folderId, "", "dir", explorer.currentParent);
                     explorer.addFiles(file);
                     explorer.rename(file, false);
-                   // explorer.closeBaseDialog();
                 }else{
                     explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: "+folderId);
                 }
@@ -1533,4 +1531,4 @@ function inArray(array, obj, fieldstoCompare){
 }
 
 //adding CommonJS Support
-export default Explorer;
+module.exports = Explorer;
