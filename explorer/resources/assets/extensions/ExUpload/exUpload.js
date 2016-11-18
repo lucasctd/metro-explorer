@@ -317,6 +317,5 @@ function ExUpload(explorer, url, params) {
     };
     return exUpload;
 }
-
 //adding CommonJS Support
-export default ExUpload;
+module.exports = ExUpload;
