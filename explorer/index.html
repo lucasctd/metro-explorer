@@ -78,6 +78,17 @@
             explorer.customMenuOption = function(file){
                 return explorer.buildCustomMenuOption("Office", openOffice, {title: "Office", disabled: false});
             };
+						explorer.serverNewFolder = function(def){
+								console.log("serverNewFolder");
+								return def.resolve(Math.floor((Math.random() * 500) + 200));
+						};
+						explorer.serverRename = function(newName, def){
+								console.log("New Name: "+newName);
+								def.resolve(function(file){
+										console.log(file);
+										console.log("Rename callback;");
+								})
+						}
             //create a function to run when the context menu option is clicked
             function openOffice(){
                 explorer.createBaseDialog(window.innerWidth * .85, "auto", {"min-width": 300, "min-height": 300, "style" : true});

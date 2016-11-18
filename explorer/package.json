@@ -1,5 +1,5 @@
 {
-  "name": "metro-explorer-dev",
+  "name": "metro-explorer",
   "description": "File explorer in JS",
   "readmeFilename": "README.md",
   "keywords": [
@@ -22,9 +22,9 @@
     "prod": "gulp --production",
     "watch": "gulp watch",
     "install-server": "npm i webpack -g && npm i webpack-dev-server -g",
-    "start": "webpack-dev-server --port 9999"
+    "server": "webpack-dev-server --port 9999"
   },
-  "version": "1.1.9",
+  "version": "2.0.0",
   "author": {
     "name": "Lucas Reis",
     "email": "lucas@programmer.com.br",
@@ -39,7 +39,8 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "laravel-elixir": "^5.0.0"
+    "laravel-elixir": "^5.0.0",
+    "webpack-dev-server": "^1.16.2"
   },
   "license": "MIT",
   "main": "index.js",

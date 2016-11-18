@@ -681,7 +681,7 @@ function Explorer(width, height, container, position, fileList){
                 options = options.concat(explorer.customMenuOption(file));
                 contextMenu4Files.append(options);
                 if(contextMenu4Files.html().length < 1){
-                  return;
+                    return;
                 }
                 contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
                 contextMenu4Files.fadeIn("fast");
@@ -1053,30 +1053,41 @@ function Explorer(width, height, container, position, fileList){
         },
         rename: function(_file, save){
           var id = _file.id;
+          var def = $.Deferred();
           var file = {id:  $("#"+id), inputDiv: $("#"+id).find("#input"+id), input: $("#"+id).find("#input"+id).find("input"), cover:$("#"+id).find("#input"+id).find("div")};
-            if(save){//if the user has finished renaming this file.
-                var index = explorer.checkIfExists(id);
-                var newName = file.input.val();
-                if(newName.trim() === ""){
-                    newName = "none";
-                    file.input.val(newName);
-                }
-                explorer.fileList[index].name = newName;
-                file.input.attr({readonly: "readonly", title: newName });
-                file.input.val(explorer.fileList[index].getName());
-                file.input.css({border: "none", cursor: "default"});
-                file.inputDiv.prop("title", newName);
-                file.cover.css("display", "block");
-                file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
-            }else{
-                file.input.val(file.inputDiv.prop("title"));
-                file.cover.css("display", "none");
-                file.id.find("._selected").remove();
-                file.id.css("border", "1px solid darkgray");
-                file.input.removeAttr("readonly");
-                file.input.css({"border":"2px dashed gray", "cursor": "text"});
-                setTimeout( function () {moveCursorToEnd(file.input);}, 300);
-            }
+          if(save){//if the user has finished renaming this file.
+              var newName = file.input.val();
+              if(newName.trim() === ""){
+                  newName = "none";
+                  file.input.val(newName);
+              }
+              explorer.serverRename(newName, def);
+              $.when(def).then(function(callback){
+                  var index = explorer.checkIfExists(id);
+
+                  explorer.fileList[index].name = newName;
+                  file.input.attr({readonly: "readonly", title: newName });
+                  file.input.val(explorer.fileList[index].getName());
+                  file.input.css({border: "none", cursor: "default"});
+                  file.inputDiv.prop("title", newName);
+                  file.cover.css("display", "block");
+                  if(typeof callback == "function"){
+                      callback(explorer.fileList[index]);
+                  }
+                  //file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
+              })
+          }else{
+              file.input.val(file.inputDiv.prop("title"));
+              file.cover.css("display", "none");
+              file.id.find("._selected").remove();
+              file.id.css("border", "1px solid darkgray");
+              file.input.removeAttr("readonly");
+              file.input.css({"border":"2px dashed gray", "cursor": "text"});
+              setTimeout( function () {moveCursorToEnd(file.input);}, 300);
+          }
+        },
+        serverRename: function(newName, def){
+            def.resolve(true);
         },
         move: function() {
             var def = $.Deferred();
@@ -1310,7 +1321,7 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.serverNewFolder("", def);
+            explorer.serverNewFolder(def);
             $.when(def).then(function(folderId) {
                 if($.isNumeric(folderId)){
                     var file = new File(folderId, "", "dir", explorer.currentParent);
@@ -1320,45 +1331,8 @@ function Explorer(width, height, container, position, fileList){
                     explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: "+folderId);
                 }
             });
-            /*
-            var def = $.Deferred();
-            explorer.createBaseDialog(400);
-            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.html", def);
-            $.when(def).then(function () {
-                explorer.showBaseDialog();
-                var btCreateFolder = $("#buttonCreateFolder");
-                var inpFolderName =  $("#inpFolderName");
-                inpFolderName.on("keyup", function () {
-                    if ($(this).val().length < 1) {
-                        btCreateFolder.addClass("explorerButtonDisabled");
-                        btCreateFolder.prop("disabled", true);
-                    } else {
-                        btCreateFolder.removeClass("explorerButtonDisabled");
-                        btCreateFolder.prop("disabled", false);
-                    }
-                });
-                btCreateFolder.on("click", function () {
-                    explorer.clientNewFolder($("#inpFolderName").val());
-                });
-                inpFolderName.focus();
-                $("#newFolderHeader").text(explorer.LANG_LBL_NEW_FOLDER_HEADER);
-                $("#folderName").text(explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME);
-                btCreateFolder.text(explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
-            });*/
         },
-        clientNewFolder: function(folderName){
-            var def = $.Deferred();
-            explorer.serverNewFolder(folderName, def);
-            $.when(def).then(function(folderId) {
-                if($.isNumeric(folderId)){
-                    explorer.addFiles(new File(folderId, folderName, "dir", explorer.currentParent));
-                    explorer.closeBaseDialog();
-                }else{
-                    explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: "+folderId);
-                }
-            });
-        },
-        serverNewFolder: function(folderName, def) {
+        serverNewFolder: function(def) {
             return def.resolve(Math.floor((Math.random() * 500) + 200));
         },
         upload: function() {
