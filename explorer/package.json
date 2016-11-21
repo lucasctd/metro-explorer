@@ -1,0 +1,74 @@
+{
+  "name": "metro-explorer",
+  "description": "File explorer in JS",
+  "readmeFilename": "README.md",
+  "keywords": [
+    "js",
+    "explorer",
+    "file",
+    "file management",
+    "metro",
+    "metro ui"
+  ],
+  "tags": [
+    "Explorer",
+    "metro",
+    "metro ui",
+    "JS",
+    "LucasReis"
+  ],
+  "scripts": {
+    "build": "gulp",
+    "prod": "gulp --production",
+    "watch": "gulp watch",
+    "install-server": "npm i webpack -g && npm i webpack-dev-server -g",
+    "server": "webpack-dev-server --port 9999"
+  },
+  "version": "2.0.0",
+  "author": {
+    "name": "Lucas Reis",
+    "email": "lucas@programmer.com.br",
+    "homepage": "http://metroui.us"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lucasctd/metro-explorer"
+  },
+  "dependencies": {
+    "jquery": "^3.1.1"
+  },
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "laravel-elixir": "^6.0.0-14",
+    "laravel-elixir-browserify-official": "^0.1.3",
+    "laravel-elixir-stylus": "^2.0.3",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
+  },
+  "license": "MIT",
+  "main": "index.js",
+  "_id": "metro-explorer@1.0.7",
+  "_shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",
+  "_from": "metro-explorer@latest",
+  "_npmVersion": "1.4.9",
+  "_npmUser": {
+    "name": "lucasreis",
+    "email": "lucasmreis@outlook.com"
+  },
+  "maintainers": [
+    {
+      "name": "lucasreis",
+      "email": "lucasmreis@outlook.com"
+    }
+  ],
+  "dist": {
+    "shasum": "015e16d0af0ae5922e4a64b6995275d99117f15a",
+    "tarball": "http://registry.npmjs.org/metro-explorer/-/metro-explorer-1.0.7.tgz"
+  },
+  "_npmOperationalInternal": {
+    "host": "packages-9-west.internal.npmjs.com",
+    "tmp": "tmp/metro-explorer-1.0.7.tgz_1454610252769_0.1410689139738679"
+  },
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/metro-explorer/-/metro-explorer-1.0.7.tgz"
+}
