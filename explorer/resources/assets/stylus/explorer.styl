@@ -55,33 +55,27 @@
     height: 40px;
     width: 117px;
 }
+
+.contextMenu{
+  background-color: white;
+  border: 2px solid gray;
+  height: auto;
+  width: auto;
+  min-width: 130px;
+  max-width: 180px;
+  z-index: 9999;
+}
 .contextMenuFile {
-    background-color: white;
-    border: 2px solid gray;
-    height: auto;
-    position: relative;
-    width: auto;
-    min-width: 130px;
-    max-width: 180px;
+  @extend .contextMenu;
+  position: relative;
 }
 .contextMenuFolder {
-    background-color: white;
-    border: 2px solid gray;
-    height: auto;
+    @extend .contextMenu;
     position: relative;
-    width: auto;
-    min-width: 130px;
-    max-width: 180px;
 }
 .contextMenuVoid {
-    background-color: white;
-    border: 2px solid gray;
-    height: auto;
+    @extend .contextMenu;
     position: absolute;
-    width: auto;
-    min-width: 130px;
-    max-width: 180px;
-    z-index: 9999;
 }
 .baseDialog {
     background-color: white;
@@ -156,69 +150,24 @@
 .bold {
     font-weight: bold;
 }
-.opacity4 {
-    opacity: 0.4;
-}
-.opacity6 {
-    opacity: 0.6;
-}
-.opacity8 {
-    opacity: 0.8;
-}
-.opacity9 {
-    opacity: 0.9;
-}
-.opacity98 {
-    opacity: 0.98;
-}
+for $num in (4 6 8 9 98)
+    .opacity{$num}{
+        opacity: $num > 10 ? ($num / 100) : ($num / 10)
+    }
 .gray {
     color: gray;
 }
 .white {
     color: white;
 }
-.ft8 {
-    font-size: 8pt;
-}
-.ft10 {
-    font-size: 10pt;
-}
-.ft11 {
-    font-size: 11pt;
-}
-.ft12 {
-    font-size: 12pt;
-}
-.ft14 {
-    font-size: 14pt;
-}
-.ft16 {
-    font-size: 16pt;
-}
-.ft18 {
-    font-size: 18pt;
-}
-.ft30 {
-    font-size: 30pt;
-}
-.ft40 {
-    font-size: 40pt;
-}
-.ft45 {
-    font-size: 45pt;
-}
-.ft50 {
-    font-size: 50pt;
-}
-.txtcenter {
-    text-align: center;
-}
-.txtjustify {
-    text-align: justify;
-}
-.txtleft {
-    text-align: left;
-}
+for $num in (8 10 11 12 14 16 18 30 40 45 50)
+    .ft{$num}{
+        font-size: unit($num, 'pt');
+    }
+for $pos in (center justify left)
+    .txt{$pos}{
+        text-align: $pos;
+    }
 .txtmargin {
     padding: 2px 7px;
 }
@@ -228,12 +177,11 @@
 .center {
     margin: 0 auto !important;
 }
-.radius10 {
-    border-radius: 10px;
-}
-.radius20 {
-    border-radius: 20px;
-}
+for $radius in (10 20)
+    .radius$radius{
+        border-radius: unit($radius, 'px');
+    }
+
 .closeBaseDialog {
     background: rgba(0, 0, 0, 0) url("../icons/close-base-dialog.png") no-repeat scroll 0 0;
     height: 32px;

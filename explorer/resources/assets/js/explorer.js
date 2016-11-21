@@ -1,3 +1,5 @@
+const File = require('./file.js');
+
 function Explorer(width, height, container, position, fileList){
    "use strict";
   var explorer = {
@@ -65,7 +67,12 @@ function Explorer(width, height, container, position, fileList){
         exUpload: null,
         customOptionId: 0,
         closeBaseDialogOnEsc: true,
+        explorerRootFolder: null,
+        styleFile: null,
         addFiles: function (param, resize, def) {
+            if(!window.AVAILABLE_ICON_EXTENSIONS){
+                window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
+            }
             var listfilesWithField = [], listfilesWithoutAField = [];
             if($("#emptyMessage").length){
                 $("#emptyMessage").fadeOut("fast");
@@ -116,7 +123,7 @@ function Explorer(width, height, container, position, fileList){
                     return;
                 }
             }
-            
+
             $.each(explorer.fileList, function(i, file) {
                 var index = explorer.checkIfExists(file.id);
                 if(file.parent != explorer.currentParent){ //If it is not in the same folder that the file was uploaded to,
@@ -137,11 +144,6 @@ function Explorer(width, height, container, position, fileList){
                 }else{
                     listfilesWithoutAField.push(file);
                 }
-               // if(file.field !== undefined && file.field != -1 && explorer.fields.fieldList[file.field] !== undefined){
-                   
-              //  }else{
-              //      explorer.placeFileAutomatically(file);
-              //  }
                 index = explorer.checkIfExists(file.id);
                 explorer.fileList[index].placed = true; //field's index
                 if(explorer.fileList[index].uploading === true){
@@ -150,7 +152,7 @@ function Explorer(width, height, container, position, fileList){
                     explorer.fileList[index].uploader.progressEvent({lengthComputable: null}, true);
                 }
             });
-            $.each(listfilesWithField, function(i, file) {//first load files that already has a field
+            $.each(listfilesWithField, function(i, file) {//first load files that already have a field
               explorer.placeFileWithField(file, resize);
             });
             $.each(listfilesWithoutAField, function(i, file) {//then, load files which does not have a field (-1)
@@ -165,7 +167,7 @@ function Explorer(width, height, container, position, fileList){
             let top = (explorer.fields.fieldList[file.field].top + 5)+"px;";
             let left = (explorer.fields.fieldList[file.field].left + 5)+"px;";
             $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+ top +
-                "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div> "+
+                "left:"+left+"'> <div class='center iconBorder'><div class='"+file.getIcon()+" center'></div></div> "+
                 "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
                 "<input class='txtcenter ft11 inputFileName'"+
                 "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"'/>"+
@@ -188,8 +190,9 @@ function Explorer(width, height, container, position, fileList){
                 if(explorer.fields.fieldList[x].filesOn.length === 0){
                     let top = (explorer.fields.fieldList[x].top + 5)+"px;";
                     let left = (explorer.fields.fieldList[x].left + 5)+"px;";
-                    $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"+top+
-                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.ext+" center'></div></div>"+
+                    $(explorer.element).append("<div id='"+file.id+"' class='file fileButton draggable displayNone' style='position: absolute; top:"
+                        +top+
+                        "left:"+left+"'> <div class='center iconBorder'><div class='"+file.getIcon()+" center'></div></div>"+
                         "<div id='input"+file.id+"' style='display:inline-block; position:relative;' title='"+file.name+"'> "+
                         "<input class='txtcenter ft11 inputFileName' "+
                         "maxlength='30' readonly='readonly' title='"+file.name+"' value='"+file.getName().replace(/'/g,"&apos;")+"' />"+
@@ -300,7 +303,7 @@ function Explorer(width, height, container, position, fileList){
                 field.element.droppable({
                     drop: function( event, ui ) {
                         field.element.css("border-width","0px");
-                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var file = explorer.getFileById(ui.draggable[0].id);
                         var topFile = field.filesOn[field.filesOn.length - 1];
                         file.getElement().find(".moveToTooltip").fadeOut();
                         if(topFile == explorer.GO_UP_ID){//move to parent's folder
@@ -336,7 +339,7 @@ function Explorer(width, height, container, position, fileList){
                     out: function( event, ui ) {
                         field.element.css("border-width","0px");
                         field.filesOn = $.grep(field.filesOn, function(val, index) {
-                            return val != ui.draggable.context.id;
+                            return val != ui.draggable[0].id;
                         });
                         if(field.filesOn.length === 0){
                             explorer.fields.usedFields-=1;
@@ -345,7 +348,7 @@ function Explorer(width, height, container, position, fileList){
                     over: function( event, ui ) {
                         field.element.css("border-width","1px");
                         var topFile = field.filesOn[field.filesOn.length - 1];
-                        var file = explorer.getFileById(ui.draggable.context.id);
+                        var file = explorer.getFileById(ui.draggable[0].id);
                         if(topFile == explorer.GO_UP_ID){//if it is goUp, do not try to get the top file.
                           var parent = explorer.getFileById(explorer.currentParent);
                           var parentName = parent.parent == explorer.ROOT ? "Root" : explorer.getFileById(parent.parent).name;
@@ -389,7 +392,7 @@ function Explorer(width, height, container, position, fileList){
                 cursor: "move",
                 revert: "invalid",
                 start: function( event, ui ){
-                    $("#"+ui.helper.context.id).css("z-index", "9000");
+                    $("#"+ui.helper[0].id).css("z-index", "9000");
                 }
             });
         },
@@ -464,7 +467,7 @@ function Explorer(width, height, container, position, fileList){
             });
             explorer.currentPath = currentPath;
         },
-        initContextMenuEvent: function(e){
+        initContextMenuEvent: function(){
             //create contextMenuVoid
             $("body").append("<div id='contextIdTools'" +
                 "class='opacity9 txtmargin contextMenuVoid gray ft12 bold displayNone'>" +
@@ -512,6 +515,10 @@ function Explorer(width, height, container, position, fileList){
                     $(this).css("border", "1px solid darkgray");
                 }
             });
+        },
+        setLanguage: function(language){
+            this.language = language;
+            this.loadLanguage();
         },
         loadLanguage: function (){
             var patt = /\.json$/i;
@@ -571,19 +578,33 @@ function Explorer(width, height, container, position, fileList){
         },
         start: function (){
             //setting default language
+            /*var that = this;
+            var defLang = $.Deferred();
+            explorer.loadExplorerRootFolder(defLang);
+            $.when(defLang).then(function(){
+                //setting default language
+                that.language = that.language === undefined ? that.getExplorerRootFolder()+"/lang/en-US.json": that.language;
+                that.loadLanguage();
+            });*/
+
             this.language = this.language === undefined ? explorer.getExplorerRootFolder()+"/lang/en-US.json": this.language;
-            this.loadLanguage();
+            if(explorer.language !== undefined){
+                explorer.loadLanguage();
+            }else{
+                console.log("language is undefined");
+                explorer.initContextMenuEvent();
+            }
             var resizeId = null, preload = null;
             if(explorer.checkIfContainerExist() === false) {
                 return;
             }
             window.AVAILABLE_ICON_EXTENSIONS = explorer.getAvailableIconExtensions();
             if(window.AVAILABLE_ICON_EXTENSIONS === null){
-                explorer.log("It looks like you have not include 'explorerIcons.css' on your html document. Explorer will not start without it. :/");
-                return;
+                explorer.log("It looks like you have not include 'explorer.css' on your html document. Explorer will not start without it. :/");
+                return null;
             }
             if(typeof Preload != "undefined"){
-              if(preloadIcons){
+              if(this.preloadIcons){
                  preload = new Preload(explorer.iconPaths, LoadType.ASYNC).run();
               }
             }else{
@@ -599,18 +620,14 @@ function Explorer(width, height, container, position, fileList){
                 //resizeId = setTimeout(explorer.resizeExplorer, 50);
             });
             explorer.disableBrowserContextMenu();
-            if(explorer.language !== undefined){
-                explorer.loadLanguage();
-            }else{
-                explorer.initContextMenuEvent();
-            }
+
             $(explorer.element).fadeIn("fast");
             explorer.showEmptyMessage();
             explorer.setIconsBackgroundColor(explorer.iconsBackgroundColor);
             $(explorer.container).on("drop", function (){
                 if(explorer.currentParent == -1){
-                    explorer.log("While searching dropped files will be uploaded at the root.", 1);
-                    $(document).trigger( "droppedWhenSearching", ["While searching dropped files will be uploaded at the root."]);
+                    explorer.log("While searching, dropped files will be uploaded at the root.", 1);
+                    $(document).trigger( "droppedWhenSearching", ["While searching, dropped files will be uploaded at the root."]);
                 }
             });
 
@@ -664,7 +681,7 @@ function Explorer(width, height, container, position, fileList){
                 options = options.concat(explorer.customMenuOption(file));
                 contextMenu4Files.append(options);
                 if(contextMenu4Files.html().length < 1){
-                  return;
+                    return;
                 }
                 contextMenu4Files.addClass("opacity9 gray ft12 txtmargin bold");
                 contextMenu4Files.fadeIn("fast");
@@ -673,43 +690,43 @@ function Explorer(width, height, container, position, fileList){
                     if(isNotDisabled(this)){
                         contextMenu4Files.fadeOut("fast");
                     }
-                });    
+                });
                 explorer.loadContextMenuOptionEvents(file);
             }
         },
         loadContextMenuOptionEvents: function (file){
 
-          $("#expOpen").on("click", function (e){
+          $("#expOpen").on("click", function (){
               if(isNotDisabled(this)){
                   explorer.open(file);
               }
           });
-          $("#expMove").on("click", function (e){
+          $("#expMove").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.move(file);
             }
           });
-          $("#expRename").on("click", function (e){
+          $("#expRename").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.rename(file, false);
             }
           });
-          $("#expDelete").on("click", function (e){
+          $("#expDelete").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.delete(file);
             }
           });
-          $("#expShare").on("click", function (e){
+          $("#expShare").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.share(file);
             }
           });
-          $("#expDownload").on("click", function (e){
+          $("#expDownload").on("click", function (){
             if(isNotDisabled(this)){
                 explorer.download(file);
             }
           });
-          
+
         },
         loadContextMenuOption: function(option, optionMenuState, all){
             var str;
@@ -971,16 +988,39 @@ function Explorer(width, height, container, position, fileList){
                 }
             }
         },
-        getExplorerRootFolder: function (){
+        loadExplorerRootFolder: function(def){
             var scripts = document.getElementsByTagName("script");
-            var index;
-            for(index=0; index < scripts.length; index++){
-                if(scripts[index].outerHTML.indexOf("explorer.js") != -1){
-                    break;
+            var root = "";
+            var that = this;
+            $(scripts).each(function( i, script ) {
+                try{
+                    let src = script.attributes.src.value;
+                    $.get( src, function( data ) {
+                        if(data.indexOf("//METRO-EXPLORER_CODE") != -1){
+                            var splPath = src.split("/");
+                            for(let x = 0; x < splPath.length - 2 || x == 0; x++ ){
+                                root = root.concat(splPath[0]).concat("\\");
+                            }
+                            that.explorerRootFolder = root;
+                            def.resolve();
+                        }
+                    });
+                }catch(e){
+                    return;
                 }
-            }
-            //scripts[index].attributes.src.nodeValue deprecated
-            return scripts[index].attributes.src.value.replace("js/explorer.js","");
+            });
+            setTimeout(function(){
+              if(def.state() == 'pending'){
+                  that.log("We could not find Explorer's root folder. Explorer will not work well without it. Please, visit www.metroui.us/Explorer to know how to fix it.");
+                  def.resolve();
+              }
+            }, 10 * 1000);
+        },
+        setExplorerRootFolder: function(path){
+            this.explorerRootFolder = path;
+        },
+        getExplorerRootFolder: function() {
+          return this.explorerRootFolder;
         },
         destroy: function (element, explode){
             if(element === undefined || element === null){
@@ -1013,30 +1053,41 @@ function Explorer(width, height, container, position, fileList){
         },
         rename: function(_file, save){
           var id = _file.id;
+          var def = $.Deferred();
           var file = {id:  $("#"+id), inputDiv: $("#"+id).find("#input"+id), input: $("#"+id).find("#input"+id).find("input"), cover:$("#"+id).find("#input"+id).find("div")};
-            if(save){//if the user has finished renaming this file.
-                var index = explorer.checkIfExists(id);
-                var newName = file.input.val();
-                if(newName.trim() === ""){
-                    newName = "none";
-                    file.input.val(newName);
-                }
-                explorer.fileList[index].name = newName;
-                file.input.attr({readonly: "readonly", title: newName });
-                file.input.val(explorer.fileList[index].getName());
-                file.input.css({border: "none", cursor: "default"});
-                file.inputDiv.prop("title", newName);
-                file.cover.css("display", "block");
-                file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
-            }else{
-                file.input.val(file.inputDiv.prop("title"));
-                file.cover.css("display", "none");
-                file.id.find("._selected").remove();
-                file.id.css("border", "1px solid darkgray");
-                file.input.removeAttr("readonly");
-                file.input.css({"border":"2px dashed gray", "cursor": "text"});
-                setTimeout( function () {moveCursorToEnd(file.input);}, 300);
-            }
+          if(save){//if the user has finished renaming this file.
+              var newName = file.input.val();
+              if(newName.trim() === ""){
+                  newName = "none";
+                  file.input.val(newName);
+              }
+              explorer.serverRename(newName, def);
+              $.when(def).then(function(callback){
+                  var index = explorer.checkIfExists(id);
+
+                  explorer.fileList[index].name = newName;
+                  file.input.attr({readonly: "readonly", title: newName });
+                  file.input.val(explorer.fileList[index].getName());
+                  file.input.css({border: "none", cursor: "default"});
+                  file.inputDiv.prop("title", newName);
+                  file.cover.css("display", "block");
+                  if(typeof callback == "function"){
+                      callback(explorer.fileList[index]);
+                  }
+                  //file.id.trigger( "fileUpdateEvent", [{"file": explorer.fileList[index]}, explorer.EVENT_RENAME]);
+              })
+          }else{
+              file.input.val(file.inputDiv.prop("title"));
+              file.cover.css("display", "none");
+              file.id.find("._selected").remove();
+              file.id.css("border", "1px solid darkgray");
+              file.input.removeAttr("readonly");
+              file.input.css({"border":"2px dashed gray", "cursor": "text"});
+              setTimeout( function () {moveCursorToEnd(file.input);}, 300);
+          }
+        },
+        serverRename: function(newName, def){
+            def.resolve(true);
         },
         move: function() {
             var def = $.Deferred();
@@ -1083,8 +1134,9 @@ function Explorer(width, height, container, position, fileList){
                 $(".mvFolderItem").css("border", "1px solid gray");
                 $(this).append("<div id='selec_mv_id"+id+"' class='opacity4 _selected movFolderSelect'> </div>");
                 $(this).css("border", "1px solid blue");
-                $("#buttonMoveFiles").removeProp("disabled");
-                $("#buttonMoveFiles").removeClass("explorerButtonDisabled");
+                var buttonMoveFiles = $("#buttonMoveFiles");
+                buttonMoveFiles.prop("disabled", false);
+                buttonMoveFiles.removeClass("explorerButtonDisabled");
                 explorer.TEMP_VAR = this.id.replace("mv_", "");
             });
             explorer.initMouseOverEvent();
@@ -1269,43 +1321,18 @@ function Explorer(width, height, container, position, fileList){
         },
         newFolder: function() {
             var def = $.Deferred();
-            explorer.createBaseDialog(400);
-            explorer.loadBaseDialog(explorer.getExplorerRootFolder()+"/templates/newFolder.html", def);
-            $.when(def).then(function () {
-                explorer.showBaseDialog();
-                var btCreateFolder = $("#buttonCreateFolder");
-                var inpFolderName =  $("#inpFolderName");
-                inpFolderName.on("keyup", function () {
-                    if ($(this).val().length < 1) {
-                        btCreateFolder.addClass("explorerButtonDisabled");
-                        btCreateFolder.prop("disabled", "disabled");
-                    } else {
-                        btCreateFolder.removeClass("explorerButtonDisabled");
-                        btCreateFolder.removeProp("disabled");
-                    }
-                });
-                btCreateFolder.on("click", function () {
-                    explorer.clientNewFolder($("#inpFolderName").val());
-                });
-                inpFolderName.focus();
-                $("#newFolderHeader").text(explorer.LANG_LBL_NEW_FOLDER_HEADER);
-                $("#folderName").text(explorer.LANG_LBL_NEW_FOLDER_FOLDER_NAME);
-                btCreateFolder.text(explorer.LANG_LBL_NEW_FOLDER_BT_CREATE);
-            });
-        },
-        clientNewFolder: function(folderName){
-            var def = $.Deferred();
-            explorer.serverNewFolder(folderName, def);
+            explorer.serverNewFolder(def);
             $.when(def).then(function(folderId) {
                 if($.isNumeric(folderId)){
-                    explorer.addFiles(new File(folderId, folderName, "dir", explorer.currentParent));
-                    explorer.closeBaseDialog();
+                    var file = new File(folderId, "", "dir", explorer.currentParent);
+                    explorer.addFiles(file);
+                    explorer.rename(file, false);
                 }else{
                     explorer.log("explorer.serverNewFolder() either did not return the folder ID or its result is not a number. Result: "+folderId);
                 }
             });
         },
-        serverNewFolder: function(folderName, def) {
+        serverNewFolder: function(def) {
             return def.resolve(Math.floor((Math.random() * 500) + 200));
         },
         upload: function() {
@@ -1340,30 +1367,52 @@ function Explorer(width, height, container, position, fileList){
         preview: function (file){
 
         },
-        getAvailableIconExtensions: function (){
-            var files = document.styleSheets;
-            var extensions = [];
-            var path = null;
-            for(var x = 0; x < files.length; x++){
-                if(files[x].href === null || files[x].href === undefined){
-                    continue;
-                }
-                if(files[x].href.indexOf("explorerIcons") != -1){
-                    for(var y = 0; y < files[x].cssRules.length; y++){
-                        path = getValueBetweenQuotes(files[x].cssRules[y].style.background).replace("..", "");
-                        if($.inArray(path, explorer.iconPaths) == -1){
-                            explorer.iconPaths.push(path);
-                        }
-                        extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                    }
-                    break;
-                }
-            }
-            return extensions.length === 0 ? null : extensions;
+        getAvailableIconExtensions: function getAvailableIconExtensions() {
+          var startCollecting = false, stopCollecting = false;
+          var extensions = [];
+          var path = null;
+          var file = this.getExplorerStyleFile();
+          for (let y = 0; y < file.cssRules.length; y++) {
+              if(!startCollecting){
+                  startCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_BEGIN";
+                  continue;
+              }
+              if(startCollecting && !stopCollecting){
+                  path = getValueBetweenQuotes(file.cssRules[y].style.background).replace("..", "");
+                  if ($.inArray(path, explorer.iconPaths) == -1) {
+                      explorer.iconPaths.push(path);
+                  }
+                  stopCollecting = file.cssRules[y].selectorText == ".EXPLORER_EXTENSIONS_END";
+                  if(stopCollecting){
+                      break;
+                  }
+                  extensions.push(file.cssRules[y].selectorText.replace(".", ""));
+              }
+          }
+          return extensions.length === 0 ? null : extensions;
         },
+        getExplorerStyleFile: function(){
+            var that = this;
+            if(this.styleFile !== null){
+              return this.styleFile;
+            }
+            var files = document.styleSheets;
+            $(files).each(function( i, file ) {
+                if (file.href !== null || file.href !== undefined) {
+                    $(file.cssRules).each(function (i, rule) {
+                        if(rule.selectorText == ".EXPLORER_EXTENSIONS_BEGIN"){
+                            that.styleFile = file;
+                            return false;
+                        }
+                    });
+                }
+            });
+            return this.styleFile;
+        }
     };
     return explorer;
 }
+
 function removeClass(objs,classes){
     $.each(objs, function(i, obj) {
         $.each(classes, function(i, clasS) {
@@ -1377,62 +1426,6 @@ function addClass(objs,classes){
             $(obj).addClass(clasS);
         });
     });
-}
-
-function File(id, name, ext, parent, field){
-    this.id = id;
-    this.parent = parent === undefined || parent === null ? 0 : parent;
-    this.field = field === undefined || field === null ? -1 : field;
-    this.placed = false;
-    this.name = name;
-    this.getAvailableIconExtensions = function (){
-        var files = document.styleSheets;
-        var extensions = [];
-        for(var x = 0; x < files.length; x++){
-            if(files[x].href === null || files[x].href === undefined ){
-                continue;
-            }
-            if(files[x].href.indexOf("explorerIcons") != -1){
-                for(var y = 0; y < files[x].cssRules.length; y++){
-                    extensions.push(files[x].cssRules[y].selectorText.replace(".", ""));
-                }
-                break;
-            }
-        }
-        return extensions.length === 0 ? null : extensions;
-    };
-    this.checkIcon = function(){
-        ext = ext === undefined ? "" : ext;
-        if(typeof window.AVAILABLE_ICON_EXTENSIONS == 'undefined' || window.AVAILABLE_ICON_EXTENSIONS === null){
-            window.AVAILABLE_ICON_EXTENSIONS = this.getAvailableIconExtensions();
-            if(window.AVAILABLE_ICON_EXTENSIONS === null){
-                return;
-            }
-        }
-        var extIndex = window.AVAILABLE_ICON_EXTENSIONS.indexOf(ext.toLowerCase());
-        if(extIndex == -1 || window.AVAILABLE_ICON_EXTENSIONS.indexOf("_".concat(ext.toLowerCase())) != -1){
-            return "noIcon";
-        }else{
-            return ext.toLowerCase();
-        }
-    };
-    this.getName = function(){
-        var name = this.name;
-        if(name.length > 12){
-            name = name.substring(0, 12) + "...";
-        }
-        return name;
-    };
-    this.getExtension = function (file){
-        file = file === undefined ? this.ext : file;
-        var str = file.split(".");
-        var ext = str[str.length - 1];
-        return ext;
-    };
-    this.getElement = function (){
-      return $("#"+this.id);
-    };
-    this.ext = this.checkIcon();
 }
 
 function Field(id, element, filesOn, top, left){
@@ -1510,3 +1503,6 @@ function inArray(array, obj, fieldstoCompare){
     return equals;
   }
 }
+
+//adding CommonJS Support
+module.exports = Explorer;

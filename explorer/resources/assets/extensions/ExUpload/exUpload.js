@@ -93,7 +93,7 @@ function ExUpload(explorer, url, params) {
                 uploader.createProgressStructure(fakeFile.id, true);
                 exUpload.error(msg, fakeFile);
 				return;
-			}            
+			}
             if(exUpload.validadeExtension(fakeFile.ext) === false){
                 var msg = {message: exUpload.MSG_INVALID_FILE.replace("{ext}", "."+ext), error: exUpload.ERROR_INVALID_FILE};
                 uploader.createProgressStructure(fakeFile.id, true);
@@ -127,7 +127,7 @@ function ExUpload(explorer, url, params) {
                 .on("mousedown", function () {
                     item.fadeOut("slow", function (){
                         var field = exUpload.explorer.getFileById(fakeFile.id).field;
-                        let list = exUpload.explorer.fields.fieldList[field].filesOn;
+                        var list = exUpload.explorer.fields.fieldList[field].filesOn;
                         exUpload.explorer.fields.fieldList[field].filesOn = $.grep(list, function (val) {
                             return val != fakeFile.id; //remove file from field
                         });
@@ -186,7 +186,7 @@ function ExUpload(explorer, url, params) {
                             var fakeFileIndex = exUpload.explorer.checkIfExists(object.fakeFile.id);
                             if (data.id !== undefined && data.id !== null) {//caso o servidor tenha retornado o id do arquivo upado
                                 //altera o id fake para o id retornado do banco no html e na lista de Explorer
-                                let fakeId = object.fakeFile.id;
+                                var fakeId = object.fakeFile.id;
                                 $("#" + fakeId).find("#selec_id".concat(fakeId)).attr("id", "selec_id".concat(data.id));
                                 $("#" + fakeId).attr("id", data.id);
                                 exUpload.explorer.fileList[fakeFileIndex].id = data.id;
@@ -317,3 +317,5 @@ function ExUpload(explorer, url, params) {
     };
     return exUpload;
 }
+//adding CommonJS Support
+module.exports = ExUpload;
