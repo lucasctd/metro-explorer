@@ -1,4 +1,6 @@
 var elixir = require('laravel-elixir');
+require('laravel-elixir-browserify-official');
+require('laravel-elixir-stylus');
 
 /*
  |--------------------------------------------------------------------------
@@ -13,11 +15,11 @@ var elixir = require('laravel-elixir');
 
 elixir(function(mix) {
     mix.browserify('./resources/standalone/explorer.js', 'build/js/explorer.js')
-        .browserify('./resources/assets/js/jquery.js', 'build/js/jquery.js')
-       .styles(['./resources/assets/css/explorer.css', './resources/assets/css/explorerIcons.css',
-                './resources/assets/css/reset.css', './resources/assets/extensions/exUpload/exUpload.css'], 'build/css/explorer.css')
+        .browserify('jquery.js', 'build/js/jquery.js')
+        .stylus(['explorerIcons.styl', 'explorer.styl'], './resources/assets/css/explorer.css')
+       .styles(['reset.css', 'explorer.css', '../extensions/exUpload/exUpload.css'], 'build/css/explorer.css')
         .copy('./resources/assets/icons', 'build/icons')
         .copy('./resources/assets/templates', 'build/templates')
-        .copy('./resources/lang', 'build/lang')
-        .browserSync({proxy: 'http://localhost:9999'});
+        .copy('./resources/lang', 'build/lang');
+      //  .browserSync({proxy: 'http://localhost:9999'});
 });

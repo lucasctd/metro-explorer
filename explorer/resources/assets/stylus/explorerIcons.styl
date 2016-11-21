@@ -1,0 +1,41 @@
+icons = {
+    ps: 'adobe.photoshop.png',
+    pdf: 'adobe.acrobat.png',
+    dir: 'folder.png',
+    mp3: 'music.png',
+    wma: 'music.png',
+    wav: 'music.png',
+    mp4: 'movie.clapper.png',
+    mkv: 'movie.clapper.png',
+    avi: 'film.png',
+    mpeg: 'film.png',
+    flv: 'film.png',
+    doc: 'office.word.png',
+    docx: 'office.word.png',
+    xls: 'office.excel.png',
+    xlsx: 'office.excel.png',
+    ppt: 'office.powerpoint.png',
+    pptx: 'office.powerpoint.png',
+    txt:  'text.align.justify.png',
+    rar: 'archive.png',
+    zip: 'archive.png',
+    jpg: 'image.macro.png',
+    jpeg: 'image.macro.png',
+    png: 'image.macro.png',
+    gif: 'image.macro.png',
+    goUp: 'arrow.up.png',
+    noIcon: 'page.png'
+}
+/*DO NOT REMOVE IT*/
+.EXPLORER_EXTENSIONS_BEGIN{width: 0px;}
+/*Add your icon classes below*/
+for key, $icon in icons
+    .{key}{
+        background: transparent url('../icons/'$icon) no-repeat;
+        width: 76px;
+        height: 76px;
+    }
+
+/*Add your icons classes above*/
+/*DO NOT REMOVE IT*/
+.EXPLORER_EXTENSIONS_END{width: 0px;}

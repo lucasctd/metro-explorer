@@ -24,7 +24,7 @@
     "install-server": "npm i webpack -g && npm i webpack-dev-server -g",
     "server": "webpack-dev-server --port 9999"
   },
-  "version": "1.1.9",
+  "version": "2.0.0",
   "author": {
     "name": "Lucas Reis",
     "email": "lucas@programmer.com.br",
@@ -39,7 +39,11 @@
   },
   "devDependencies": {
     "gulp": "^3.9.1",
-    "laravel-elixir": "^5.0.0"
+    "laravel-elixir": "^6.0.0-14",
+    "laravel-elixir-browserify-official": "^0.1.3",
+    "laravel-elixir-stylus": "^2.0.3",
+    "webpack": "^1.13.3",
+    "webpack-dev-server": "^1.16.2"
   },
   "license": "MIT",
   "main": "index.js",
