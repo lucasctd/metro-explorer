@@ -1,3 +1,5 @@
+const File = require('../../js/file.js');
+
 function ExUpload(explorer, url, params) {
     "use strict";
     var exUpload = {
@@ -298,19 +300,22 @@ function ExUpload(explorer, url, params) {
                     }
                 },
                 updateFileState: function(uploading, progress, uploadFailed, speed){
-                    if(notNull(uploading)){
+                    if(this.notNull(uploading)){
                         exUpload.explorer.fileList[object.fileIndex].uploading = uploading;
                     }
-                    if(notNull(uploadFailed)){
+                    if(this.notNull(uploadFailed)){
                         exUpload.explorer.fileList[object.fileIndex].uploadFailed = uploadFailed;
                     }
-                    if(notNull(progress)){
+                    if(this.notNull(progress)){
                         exUpload.explorer.fileList[object.fileIndex].progress = progress;
                     }
-                    if(notNull(progress)){
+                    if(this.notNull(progress)){
                         exUpload.explorer.fileList[object.fileIndex].speed = speed;
                     }
-                }
+                },
+				notNull: function (obj){
+					return obj !== null && obj !== undefined;
+				}
             };
             return object;
         }
