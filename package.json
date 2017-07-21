@@ -8,7 +8,8 @@
     "file",
     "file management",
     "metro",
-    "metro ui"
+    "metro ui",
+	"typescript"
   ],
   "tags": [
     "Explorer",
@@ -18,11 +19,13 @@
     "LucasReis"
   ],
   "scripts": {
-    "build": "gulp",
-    "prod": "gulp --production",
-    "watch": "gulp watch",
-    "install-server": "npm i webpack -g && npm i webpack-dev-server -g",
-    "server": "webpack-dev-server --port 9999"
+    "dev": "npm run development",
+    "development": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch": "cross-env NODE_ENV=development node_modules/webpack/bin/webpack.js --watch --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "watch-poll": "npm run watch -- --watch-poll",
+    "hot": "cross-env NODE_ENV=development node_modules/webpack-dev-server/bin/webpack-dev-server.js --inline --hot --config=node_modules/laravel-mix/setup/webpack.config.js",
+    "prod": "npm run production",
+    "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
   "version": "2.0.0",
   "author": {
@@ -38,12 +41,14 @@
     "jquery": "^3.1.1"
   },
   "devDependencies": {
-    "gulp": "^3.9.1",
-    "laravel-elixir": "^6.0.0-14",
-    "laravel-elixir-browserify-official": "^0.1.3",
-    "laravel-elixir-stylus": "^2.0.3",
-    "webpack": "^1.13.3",
-    "webpack-dev-server": "^1.16.2"
+	"cross-env": "^5.0.1",
+    "laravel-mix": "^1.2.0",
+    "browser-sync": "^2.18.12",
+    "browser-sync-webpack-plugin": "^1.2.0",
+    "less": "^2.7.2",
+    "less-loader": "^4.0.5",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^3.0.1"
   },
   "license": "MIT",
   "main": "index.js",
@@ -58,7 +63,7 @@
   "maintainers": [
     {
       "name": "lucasreis",
-      "email": "lucasmreis@outlook.com"
+      "email": "lucas@programmer.com.br"
     }
   ],
   "dist": {
