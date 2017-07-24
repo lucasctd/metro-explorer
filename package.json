@@ -9,7 +9,7 @@
     "file management",
     "metro",
     "metro ui",
-	"typescript"
+    "typescript"
   ],
   "tags": [
     "Explorer",
@@ -27,7 +27,7 @@
     "prod": "npm run production",
     "production": "cross-env NODE_ENV=production node_modules/webpack/bin/webpack.js --progress --hide-modules --config=node_modules/laravel-mix/setup/webpack.config.js"
   },
-  "version": "2.0.0",
+  "version": "3.0.0",
   "author": {
     "name": "Lucas Reis",
     "email": "lucas@programmer.com.br",
@@ -38,15 +38,19 @@
     "url": "https://github.com/lucasctd/metro-explorer"
   },
   "dependencies": {
-    "jquery": "^3.1.1"
+    "huject": "^1.4.1",
+    "loglevel": "^1.4.1",
+    "ts-loader": "^2.3.1",
+    "typescript": "^2.4.2",
+    "vue": "^2.4.2",
+    "vue-class-component": "^5.0.2",
+    "vue-property-decorator": "^5.1.1"
   },
   "devDependencies": {
-	"cross-env": "^5.0.1",
-    "laravel-mix": "^1.2.0",
     "browser-sync": "^2.18.12",
     "browser-sync-webpack-plugin": "^1.2.0",
-    "less": "^2.7.2",
-    "less-loader": "^4.0.5",
+    "cross-env": "^5.0.1",
+    "laravel-mix": "^1.2.0",
     "stylus": "^0.54.5",
     "stylus-loader": "^3.0.1"
   },

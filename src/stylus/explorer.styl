@@ -1,201 +1,53 @@
-.explorer {
-    position: absolute;
-}
-.explorer *, .explorer *::before, .explorer *::after {
-    box-sizing: content-box;
-}
-.file {
-    background-color: #e8e8e8;
-    border: 1px solid darkgray;
-    height: 140px;
-    margin: 5px;
-    width: 120px;
-    z-index: 20;
-}
-.moveToTooltip{
-    background-color:white;
-    left: 103%;
-    top: -192%;
-    display: none;
-    position: relative;
-    opacity: .95;
-    border-radius: 4px;
-    color: blue;
-    white-space: nowrap;
-}
-.iconBorder{
-    border: 2px solid white;
-    -moz-border-radius: 40px; /* Para Firefox */
-    -webkit-border-radius: 40px; /*Para Safari e Chrome */
-    border-radius: 40px; /* Para Opera 10.5+*/
-    background-color: #1B6EAE;
-    width: 80px;
-    height: 80px;
-}
-.field {
-    border: 0 dashed gray;
-    height: 150px;
-    margin: 5px;
-    position: absolute;
-    width: 130px;
-    z-index: 10;
-}
-.newFileHelper {
-    border: 1px solid white;
-    float: left;
-    height: 140px;
-    margin: 5px -129px 5px 4px;
-    width: 120px;
-}
-.inputFileName {
-    background-color: #e8e8e8;
-    border: medium none;
-    color: black;
-    cursor: default;
-    height: 40px;
-    width: 117px;
+.explorer-container {
+    position relative
+    width 800px
+    height 600px
+    border 2px dashed black
 }
 
-.contextMenu{
-  background-color: white;
-  border: 2px solid gray;
-  height: auto;
-  width: auto;
-  min-width: 130px;
-  max-width: 180px;
-  z-index: 9999;
-}
-.contextMenuFile {
-  @extend .contextMenu;
-  position: relative;
-}
-.contextMenuFolder {
-    @extend .contextMenu;
-    position: relative;
-}
-.contextMenuVoid {
-    @extend .contextMenu;
-    position: absolute;
-}
-.baseDialog {
-    background-color: white;
-    border: 2px solid gray;
-    display: none;
-    overflow-x: hidden;
-    overflow-y: auto;
-    position: absolute;
-    z-index: 9999;
-}
-.baseDialogContent{
-    padding-top:20px !important;
-    padding-bottom:20px !important;
-}
-._selected {
-    background-color: blue;
-    box-sizing: inherit;
-    height: 140px;
-    top: -126px;
-    position: relative;
-    width: 120px;
-}
-.contextMenuOption {
-    padding: 10px !important;
-}
-.contextMenuOption:hover {
-    background-color: gray;
-    color: white;
-}
-.disabledContextMenuOption {
-    background-color: white !important;
-    color: #c8c8c8 !important;
-    cursor: default !important;
-    font-style: italic !important;
-}
-.explorerButton {
-    background-color: #1b58b8;
-    border: 3px solid white;
-    color: white;
-    font-weight: bold;
-    height: 45px;
-    padding: 10px;
-    text-align: center;
-    width: 170px;
-}
-.explorerButton:hover {
-    opacity: 0.7;
-}
-.explorerButtonDisabled {
-    background-color: darkgray !important;
-    cursor: default;
-}
-.explorerButtonDisabled:hover {
-    background-color: darkgray !important;
-	opacity: 1 !important;
-}
-.explorerInput {
-    height: 30px;
-}
-.onLeft {
-    float: left;
-}
-.onRight {
-    float: right;
-}
-.transferEffect {
-    border: 1px solid gray;
-}
-.handCursor {
-    cursor: pointer;
-}
-.bold {
-    font-weight: bold;
-}
-for $num in (4 6 8 9 98)
-    .opacity{$num}{
-        opacity: $num > 10 ? ($num / 100) : ($num / 10)
+.explorer-file {
+    width 110px
+    height 140px
+    border 1px solid darkgrey
+    position: relative
+    .icon {
+        margin 15px auto
+        display table
+        color gray
     }
-.gray {
-    color: gray;
-}
-.white {
-    color: white;
-}
-for $num in (8 10 11 12 14 16 18 30 40 45 50)
-    .ft{$num}{
-        font-size: unit($num, 'pt');
+    .file-name {
+        text-align center
+        color gray
+        cursor pointer
     }
-for $pos in (center justify left)
-    .txt{$pos}{
-        text-align: $pos;
+    .file-name:hover {
+        color black
     }
-.txtmargin {
-    padding: 2px 7px;
-}
-.displayNone {
-    display: none;
-}
-.center {
-    margin: 0 auto !important;
-}
-for $radius in (10 20)
-    .radius$radius{
-        border-radius: unit($radius, 'px');
+    .file-selected {
+        position absolute
+        width 100%
+        height 100%
+        background-color blue
+        opacity .6
+        z-index: 2
     }
-
-.closeBaseDialog {
-    background: rgba(0, 0, 0, 0) url("../icons/close-base-dialog.png") no-repeat scroll 0 0;
-    height: 32px;
-    position: relative;
-    width: 32px;
-    z-index: 9999;
+    .icon-area {
+        position absolute
+        width 100%
+        height 100%
+        z-index 1
+    }
 }
-.closeBaseDialog:hover {
-    opacity: 0.4;
-}
-.quickAccessLink {
-    color: #23649d;
-}
-.quickAccessLink:hover {
-    background-color: #23649d;
-    color: white;
+.explorer-context-menu {
+    width 150px
+    height auto
+    background-color white
+    border 1px solid gray
+    -moz-box-shadow    inset 0 0 10px #000000
+    -webkit-box-shadow inset 0 0 10px #000000
+    box-shadow         inset 0 0 10px #000000
+    p {
+        padding-top 5px
+        padding-bottom 5px
+    }
 }

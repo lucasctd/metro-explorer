@@ -17,16 +17,12 @@ mix.options({
     publicPath: 'build'
 });
 
-mix.scripts('./resources/standalone/explorer.js', 'build/js/explorer.js')
-	.scripts('jquery.js', 'build/js/jquery.js')
-	.stylus(['explorerIcons.styl', 'explorer.styl'], './resources/assets/css/explorer.css')
-	.styles(['reset.css', 'explorer.css', '../extensions/exUpload/exUpload.css'], 'build/css/explorer.css')
-	.copyDirectory('./resources/assets/icons', 'build/icons')
-	.copyDirectory('./resources/assets/templates', 'build/templates')
-	.copyDirectory('./resources/lang', 'build/lang');
-   //.styles('resources/css/app.css', 'build/css/app.css')
-   .browserSync({
-		proxy: 'localhost',
+mix.ts('./src/ts/App.ts', 'build/js/explorer.js')
+	.stylus('./src/stylus/explorer.styl', './build/css/explorer.css')
+    .styles('./src/css/font-awesome.css', './build/css/font-awesome.css')
+    .copyDirectory('./src/fonts', './build/fonts')
+    .browserSync({
+		proxy: 'localhost:8080',
 		files: [
 			'build/mix-manifest.json',
 			'build/css/*.css',

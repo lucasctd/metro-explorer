@@ -1,4 +1,4 @@
-import OptionInterface as Option from './Option';
+import Option from './Option';
 
 export interface ContextMenu {
     show (): void;
