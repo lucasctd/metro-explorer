@@ -1,10 +1,10 @@
 import Vue from 'vue';
-import FileComponent from '../components/FileComponent';
-import ContextMenuComponent from '../components/ContextMenuComponent';
+import ExplorerComponent from '../components/ExplorerComponent';
 import Upload from '../impl/Upload';
 import UploadInterface from '../interfaces/Upload';
 import File from '../interfaces/File';
 import FileImpl from '../impl/File';
+import {Option} from './Option';
 import {Container} from 'huject';
 
 export class Explorer {
@@ -16,15 +16,17 @@ export class Explorer {
 
 	constructor(id: string) {
 		this.id = id;
-        this.file = new FileImpl(1, "Arquivo", undefined, "file-word-o");
-		let data = {file: this.file};
+
+		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", [new Option("New", (e, file) => {
+		    console.log(e);
+            console.log(file);
+        })])]};
+
         this.vue = new Vue({
 			el: this.id,
             data: data,
             components: {
-                "ex-context-menu" : ContextMenuComponent,
-                "ex-file": FileComponent
-
+                "ex-plorer": ExplorerComponent
             }
 		});
         this.container = new Container();

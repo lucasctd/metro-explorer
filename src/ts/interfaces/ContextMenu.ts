@@ -1,7 +1,7 @@
-import Option from './Option';
+import {Option} from './Option';
 
-export interface ContextMenu {
-    show (): void;
-    close (): void;
-	addOption (option: Option): void;
+export abstract class ContextMenu {
+    abstract show (): void;
+    abstract close (): void;
+    abstract addOption (option: Option): void;
 }

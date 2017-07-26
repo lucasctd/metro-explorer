@@ -1,8 +1,9 @@
-interface Option {
-	id: number;
-	name: string;
-	parent: File;
-	icon?: string;
-}
+import File from './File';
 
-export default Option;
+type OptionCallbackType = (e, File) => any;
+
+abstract class Option {
+	name: string;
+    callback: OptionCallbackType;
+}
+export {Option, OptionCallbackType};
