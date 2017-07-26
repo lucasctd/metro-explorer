@@ -16,11 +16,21 @@ export class Explorer {
 
 	constructor(id: string) {
 		this.id = id;
-
-		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", [new Option("New", (e, file) => {
-		    console.log(e);
-            console.log(file);
-        })])]};
+		let options: Array<Option> = [
+			new Option("Show", (e, file) => {
+				console.log("Show");
+				console.log(file);
+			}),
+			new Option("Edit", (e, file) => {
+				console.log("Edit");
+				console.log(file);
+			}),
+			new Option("Delete", (e, file) => {
+				console.log("Delete");
+				console.log(file);
+			})
+		]
+		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", options)]};
 
         this.vue = new Vue({
 			el: this.id,
@@ -33,10 +43,10 @@ export class Explorer {
 		this.registerDI();
 	}
 
-	private registerDI(){
+	private registerDI() {
         this.container.register(UploadInterface, Upload);
     }
-
+	
 	build (): void {
 
 	}

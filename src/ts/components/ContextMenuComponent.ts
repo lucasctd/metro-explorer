@@ -28,4 +28,26 @@ export default class ContextMenuComponent extends Vue {
 
     @Prop()
     file: File;
+	
+	_show: boolean = false;
+	
+	@Watch('show')
+	onShowChanged(val: boolean, oldVal: boolean) {
+		console.log(val);
+	}
+	
+	mounted(){
+		console.log("Mounted");
+		this._show = this.show;
+		console.log(this._show);
+		this.registerListeners();
+	}
+	
+	registerListeners() {
+		document.addEventListener("click", (e) => {
+			console.log("Hide Menu");
+			this._show = false;
+		});
+	}
+	
 }
