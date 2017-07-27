@@ -3,11 +3,7 @@
 It's a simple library which may help you to handle files with JS. It may be used to display files a user has
 uploaded to your server. You only need to pass them as JS Objects and they will e displayed. You can also add a context menu
 which will be displayed when a user right click a file.
-<<<<<<< HEAD
 You may know more about it checking the master branch or at <a href="http://www.metroui.us" target="_blank">www.metroui.us.</a>
-=======
-You may know more about it checking the master branch or at <a href="www.metroui.us" target="_blank">www.metroui.us.</a>
->>>>>>> 4d31a1705a2afc54764e19ecbd393e69debd541f
 </p>
 <p>
 Btw, in this branch. I am reimpleting Metro-Explorer using Typescript, Vue JS and Stylus.
