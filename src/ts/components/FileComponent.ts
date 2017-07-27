@@ -10,7 +10,7 @@ import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-dec
                         <i class="fa fa-4x icon" :class="icon"></i>
                         <p class="file-name">{{file.name}}</p>
                     </div>
-                    <ex-context-menu :show="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
+                    <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
                </div>`,
     components: {
         "ex-context-menu" : ContextMenuComponent

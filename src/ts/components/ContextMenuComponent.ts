@@ -4,13 +4,16 @@ import {Option} from '../interfaces/Option';
 import File from "../interfaces/File";
 
 @Component({
-    template: `<div class="explorer-context-menu" v-show="show" :style="{ top: top + 'px', left: left + 'px'}" @click.stop="">
-                    <div class="box">
-                        <div class="option" v-for="option in options" @click.stop="option.callback($event, file)">
-                            <a href="javascript:void(0)">{{option.name}}</a>
+    template: `
+                <transition name="explorer-fade">
+                    <div class="explorer-context-menu" v-show="showMenu" :style="{ top: top + 'px', left: left + 'px'}" @click.stop="">
+                        <div class="box">
+                            <div class="option" v-for="option in options" @click.stop="option.callback($event, file)">
+                                <a href="javascript:void(0)">{{option.name}}</a>
+                            </div>
                         </div>
-                    </div>
-               </div>`
+                   </div>
+                </transition>`
 })
 export default class ContextMenuComponent extends Vue {
 
@@ -28,25 +31,27 @@ export default class ContextMenuComponent extends Vue {
 
     @Prop()
     file: File;
-	
-	_show: boolean = false;
+
+    showMenu: boolean = false;
 	
 	@Watch('show')
 	onShowChanged(val: boolean, oldVal: boolean) {
-		console.log(val);
+        this.showMenu = val;
 	}
+
+    @Watch('showMenu')
+    onShowMenuChanged(val: boolean, oldVal: boolean) {
+        this.$emit('update:show', val)
+    }
 	
 	mounted(){
-		console.log("Mounted");
-		this._show = this.show;
-		console.log(this._show);
 		this.registerListeners();
 	}
 	
 	registerListeners() {
+	    const that = this;
 		document.addEventListener("click", (e) => {
-			console.log("Hide Menu");
-			this._show = false;
+            that.showMenu = false;
 		});
 	}
 	
