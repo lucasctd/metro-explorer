@@ -4,6 +4,8 @@ import Upload from '../impl/Upload';
 import UploadInterface from '../interfaces/Upload';
 import File from '../interfaces/File';
 import FileImpl from '../impl/File';
+import {Draggable as DraggableInterface} from '../interfaces/Draggable';
+import {Draggable} from '../impl/Draggable';
 import {Option} from './Option';
 import {Container} from 'huject';
 
@@ -47,6 +49,7 @@ export class Explorer {
 
 	private registerDI() {
         this.container.register(UploadInterface, Upload);
+		this.container.register(DraggableInterface, Draggable);
     }
 	
 	build (): void {
