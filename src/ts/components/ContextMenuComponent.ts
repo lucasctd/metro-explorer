@@ -6,9 +6,9 @@ import File from "../interfaces/File";
 @Component({
     template: `
                 <transition name="explorer-fade">
-                    <div class="explorer-context-menu" v-show="showMenu" :style="{ top: top + 'px', left: left + 'px'}" @click.stop="">
+                    <div class="explorer-context-menu" v-show="showMenu" :style="{ top: top + 'px', left: left + 'px'}">
                         <div class="box">
-                            <div class="option" v-for="option in options" @click.stop="option.callback($event, file)">
+                            <div v-if="option.visible" class="option" :class="{disabled: option.disabled}" v-for="option in options" @click.stop="callback($event, option)">
                                 <a href="javascript:void(0)">{{option.name}}</a>
                             </div>
                         </div>
@@ -46,6 +46,13 @@ export default class ContextMenuComponent extends Vue {
 	
 	mounted(){
 		this.registerListeners();
+	}
+	
+	callback(e, option: Option){
+        if(!option.disabled){
+            this.showMenu = false;
+            option.callback(e, this.file);
+        }
 	}
 	
 	registerListeners() {

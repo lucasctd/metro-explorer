@@ -5,6 +5,8 @@ class Option implements OptionInterface {
 
     name: string;
     callback: OptionCallbackType;
+    disabled: boolean = false;
+	visible: boolean = true;
 
     constructor(name: string, callback: OptionCallbackType) {
         this.name = name;

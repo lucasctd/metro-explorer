@@ -4,6 +4,8 @@ import Upload from '../impl/Upload';
 import UploadInterface from '../interfaces/Upload';
 import File from '../interfaces/File';
 import FileImpl from '../impl/File';
+import {Draggable as DraggableInterface} from '../interfaces/Draggable';
+import {Draggable} from '../impl/Draggable';
 import {Option} from './Option';
 import {Container} from 'huject';
 
@@ -16,11 +18,13 @@ export class Explorer {
 
 	constructor(id: string) {
 		this.id = id;
-		let options: Array<Option> = [
-			new Option("Show", (e, file) => {
+		let opt = new Option("Show", (e, file) => {
 				console.log("Show");
 				console.log(file);
-			}),
+			});
+			opt.disabled = true;
+		let options: Array<Option> = [
+			opt,
 			new Option("Edit", (e, file) => {
 				console.log("Edit");
 				console.log(file);
@@ -45,6 +49,7 @@ export class Explorer {
 
 	private registerDI() {
         this.container.register(UploadInterface, Upload);
+		this.container.register(DraggableInterface, Draggable);
     }
 	
 	build (): void {
