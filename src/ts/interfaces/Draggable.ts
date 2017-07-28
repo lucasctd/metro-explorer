@@ -1,5 +1,5 @@
 abstract class Draggable {
-	el: string;
+	el: any;
     grid: number;
 	limit: any;
 	moveCursor: boolean;

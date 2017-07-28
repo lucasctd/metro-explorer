@@ -6,15 +6,11 @@ class Draggable implements DraggableInterface {
 
 	private draggable;
 	
-    el: string;
-    grid: number;
+    el: any;
+    grid: number = 100;
 	limit: any;
     moveCursor: boolean = true;
 
-    constructor() {
-        console.log("build Draggable");
-    }
-	
 	start() : void {
 		const that = this;
 		const opt = {
@@ -26,12 +22,10 @@ class Draggable implements DraggableInterface {
 			}
 		};
 		this.draggable = new DraggableLib (this.el, opt);
-		console.log(this.draggable);
 	}
 	
 	/* Events */
 	onDrag(event, args) {
-		console.log(event);
 		console.log(args);
 	}
 	

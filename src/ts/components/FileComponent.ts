@@ -2,11 +2,11 @@ import Vue from 'vue';
 import File from '../interfaces/File';
 import Draggable from '../interfaces/Draggable';
 import ContextMenuComponent from '../components/ContextMenuComponent';
-import {Inject} from 'huject';
+import {container} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    template: `<div class="explorer-file" @click="selected = !selected" @contextmenu="contextMenu">
+    template: `<div :id="'ex_' + file.id" class="explorer-file" @click="selected = !selected" @contextmenu="contextMenu">
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -16,6 +16,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
                </div>`,
     components: {
         "ex-context-menu" : ContextMenuComponent
+		
     }
 })
 export default class FileComponent extends Vue {
@@ -23,23 +24,21 @@ export default class FileComponent extends Vue {
     @Prop()
     file: File;
 
-    @Inject
+	@Prop()
+	dragLimitSelector: string;
+	
     draggable: Draggable = null;
 
     selected: boolean = false;
     cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
-
-    constructor() {
-        super();
-        console.log(this.draggable);
-        console.log("build FileComponent");
-    }
-
+	
     mounted(){
-        console.log("mount");
-        console.log(this.draggable);
+		this.draggable = container.resolve(Draggable);
+		this.draggable.el = document.querySelector("#ex_" + this.file.id);
+		this.draggable.limit = document.querySelector(this.dragLimitSelector);
+		this.draggable.start();
     }
 
     get icon () {

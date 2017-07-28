@@ -1,23 +1,15 @@
 import Vue from 'vue';
 import ExplorerComponent from '../components/ExplorerComponent';
 
-import Upload from './Upload';
-import UploadInterface from '../interfaces/Upload';
-
 import File from '../interfaces/File';
 import {File as FileImpl} from './File';
 
-import {Draggable as DraggableInterface} from '../interfaces/Draggable';
-import Draggable from './Draggable';
-
 import Option from './Option';
-import {Container} from 'huject';
 
 class Explorer {
 
 	private id: string;
 	private vue: Vue;
-    public container;
     public file: File;
 
 	constructor(id: string) {
@@ -47,14 +39,7 @@ class Explorer {
                 "ex-plorer": ExplorerComponent
             }
 		});
-        this.container = new Container();
-		this.registerDI();
 	}
-
-	private registerDI() {
-        this.container.register(UploadInterface, Upload);
-		this.container.register(DraggableInterface, Draggable);
-    }
 	
 	build (): void {
 
