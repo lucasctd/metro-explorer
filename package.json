@@ -38,6 +38,7 @@
     "url": "https://github.com/lucasctd/metro-explorer"
   },
   "dependencies": {
+    "draggable": "^4.1.2",
     "huject": "^1.4.1",
     "loglevel": "^1.4.1",
     "ts-loader": "^2.3.1",

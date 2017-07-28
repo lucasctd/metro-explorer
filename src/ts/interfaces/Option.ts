@@ -8,4 +8,5 @@ abstract class Option {
 	disabled: boolean;
 	visible: boolean;
 }
+export default Option;
 export {Option, OptionCallbackType};

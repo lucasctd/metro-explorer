@@ -4,8 +4,7 @@ import {Option} from '../interfaces/Option';
 import File from "../interfaces/File";
 
 @Component({
-    template: `
-                <transition name="explorer-fade">
+    template: `<transition name="explorer-fade">
                     <div class="explorer-context-menu" v-show="showMenu" :style="{ top: top + 'px', left: left + 'px'}">
                         <div class="box">
                             <div v-if="option.visible" class="option" :class="{disabled: option.disabled}" v-for="option in options" @click.stop="callback($event, option)">

@@ -1,7 +1,9 @@
 import Vue from 'vue';
 import File from '../interfaces/File';
+import Draggable from '../interfaces/Draggable';
 import ContextMenuComponent from '../components/ContextMenuComponent';
-import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
+import {Inject} from 'huject';
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
     template: `<div class="explorer-file" @click="selected = !selected" @contextmenu="contextMenu">
@@ -21,10 +23,24 @@ export default class FileComponent extends Vue {
     @Prop()
     file: File;
 
+    @Inject
+    draggable: Draggable = null;
+
     selected: boolean = false;
     cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
+
+    constructor() {
+        super();
+        console.log(this.draggable);
+        console.log("build FileComponent");
+    }
+
+    mounted(){
+        console.log("mount");
+        console.log(this.draggable);
+    }
 
     get icon () {
         return 'fa-' + this.file.icon;

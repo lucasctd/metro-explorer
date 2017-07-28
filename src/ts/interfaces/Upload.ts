@@ -4,4 +4,5 @@ abstract class Upload{
     abstract upload(file: File) : void;
 }
 
+export {Upload};
 export default Upload;

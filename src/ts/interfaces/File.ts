@@ -18,3 +18,4 @@ abstract class File {
 
 }
 export default File;
+export {File};

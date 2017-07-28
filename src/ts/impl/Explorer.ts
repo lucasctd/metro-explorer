@@ -1,19 +1,23 @@
 import Vue from 'vue';
 import ExplorerComponent from '../components/ExplorerComponent';
-import Upload from '../impl/Upload';
+
+import Upload from './Upload';
 import UploadInterface from '../interfaces/Upload';
+
 import File from '../interfaces/File';
-import FileImpl from '../impl/File';
+import {File as FileImpl} from './File';
+
 import {Draggable as DraggableInterface} from '../interfaces/Draggable';
-import {Draggable} from '../impl/Draggable';
-import {Option} from './Option';
+import Draggable from './Draggable';
+
+import Option from './Option';
 import {Container} from 'huject';
 
-export class Explorer {
+class Explorer {
 
 	private id: string;
 	private vue: Vue;
-    private container;
+    public container;
     public file: File;
 
 	constructor(id: string) {
@@ -33,7 +37,7 @@ export class Explorer {
 				console.log("Delete");
 				console.log(file);
 			})
-		]
+		];
 		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", options)]};
 
         this.vue = new Vue({
@@ -72,3 +76,6 @@ export class Explorer {
 		
 	}
 }
+
+export {Explorer};
+export default Explorer;

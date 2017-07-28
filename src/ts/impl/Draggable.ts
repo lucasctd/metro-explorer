@@ -1,19 +1,18 @@
 import {Draggable as DraggableInterface} from '../interfaces/Draggable';
-import DraggableLib from 'Draggable';
+declare function require(name:string);
+var DraggableLib = require('draggable');
 
 class Draggable implements DraggableInterface {
 
-	private draggable : DraggableLib;
+	private draggable;
 	
     el: string;
     grid: number;
 	limit: any;
-	moveCursor: boolean = true;
+    moveCursor: boolean = true;
 
-    constructor(el: string, grid: number, limit: any) {
-		this.el = el;
-		this.grid = grid;
-		this.limit = limit;
+    constructor() {
+        console.log("build Draggable");
     }
 	
 	start() : void {
@@ -22,11 +21,12 @@ class Draggable implements DraggableInterface {
 			grid: this.grid,
 			limit: this.limit,
 			setCursor: this.moveCursor,
-			onDrag => (e, x, y){
+			onDrag: (e, x, y) => {
 				that.onDrag(e, [x, y]);
 			}
-		}
-		this.draggable = new Draggable (this.el, opt);
+		};
+		this.draggable = new DraggableLib (this.el, opt);
+		console.log(this.draggable);
 	}
 	
 	/* Events */
@@ -56,9 +56,7 @@ class Draggable implements DraggableInterface {
 	
 	}
 	
-	set moveCursor(moveCursor: boolean) {
-		this.moveCursor = moveCursor;
-	}
 }
 
 export {Draggable};
+export default Draggable;

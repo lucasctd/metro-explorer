@@ -17,5 +17,5 @@ class Option implements OptionInterface {
         this.callback(e, file);
     }
 }
-
+export default Option;
 export {Option, OptionCallbackType};

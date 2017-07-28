@@ -16,4 +16,5 @@ abstract class Draggable {
 	abstract destroy();
 	abstract start() : void;
 }
+export default Draggable;
 export {Draggable};
