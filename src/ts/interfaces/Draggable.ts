@@ -1,8 +1,7 @@
 abstract class Draggable {
 	el: any;
-    grid: number;
+    grid: any;
 	limit: any;
-	moveCursor: boolean;
 	
 	/* Events */
 	abstract onDrag(event, args);

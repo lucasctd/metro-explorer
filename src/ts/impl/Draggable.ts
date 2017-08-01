@@ -9,7 +9,11 @@ class Draggable implements DraggableInterface {
     el: any;
     grid: number = 100;
 	limit: any;
-    moveCursor: boolean = true;
+	moveCursor: boolean = true;
+	
+	constructor() {
+		console.log("loading Draggable");
+	}
 
 	start() : void {
 		const that = this;
