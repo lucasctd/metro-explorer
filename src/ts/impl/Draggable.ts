@@ -1,13 +1,13 @@
 import {Draggable as DraggableInterface} from '../interfaces/Draggable';
 declare function require(name:string);
-var DraggableLib = require('draggable');
+const DraggableLib = require('draggable');
 
 class Draggable implements DraggableInterface {
 
 	private draggable;
 	
     el: any;
-    grid: number = 100;
+    grid: number = 110;
 	limit: any;
 	moveCursor: boolean = true;
 	
@@ -16,29 +16,38 @@ class Draggable implements DraggableInterface {
 	}
 
 	start() : void {
-		const that = this;
-		const opt = {
-			grid: this.grid,
-			limit: this.limit,
-			setCursor: this.moveCursor,
-			onDrag: (e, x, y) => {
-				that.onDrag(e, [x, y]);
-			}
-		};
-		this.draggable = new DraggableLib (this.el, opt);
+		this.draggable = new DraggableLib (this.el, this.makeDraggableOptions());
 	}
+
+	private makeDraggableOptions() {
+        const that = this;
+	    return {
+            grid: this.grid,
+            limit: this.limit,
+            setCursor: this.moveCursor,
+            onDragStart: (e, x, y) => {
+                that.onDrag(e, [x, y]);
+            },
+            onDrag: (e, x, y) => {
+                that.onDragging(e, [x, y]);
+            },
+            onDragEnd: (e, x, y) => {
+                that.onDrop(e, [x, y]);
+            }
+        };
+    }
 	
 	/* Events */
-	onDrag(event, args) {
-		console.log(args);
+	onDrag(element, args) {
+		console.log("onDrag");
 	}
 	
-	onDragging(event, args) {
-	
+	onDragging(element, args) {
+        console.log("onDragging");
 	}
 	
-	onDrop(event, args) {
-	
+	onDrop(element, args) {
+        console.log("onDrop");
 	}
 	
 	/* Methods */

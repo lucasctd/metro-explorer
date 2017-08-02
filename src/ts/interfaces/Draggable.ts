@@ -4,9 +4,9 @@ abstract class Draggable {
 	limit: any;
 	
 	/* Events */
-	abstract onDrag(event, args);
-	abstract onDragging(event, args);
-	abstract onDrop(event, args);
+	abstract onDrag(element, args);
+	abstract onDragging(element, args);
+	abstract onDrop(element, args);
 	
 	/* Methods */
 	abstract getCoord() : any;

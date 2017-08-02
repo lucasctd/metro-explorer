@@ -16,16 +16,24 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
                </div>`,
     components: {
         "ex-context-menu" : ContextMenuComponent
-		
     }
 })
 export default class FileComponent extends Vue {
+
+    private FILE_WIDTH: number = 110;
+    private FILE_HEIGHT: number = 140;
 
     @Prop()
     file: File;
 
 	@Prop()
 	dragLimitSelector: string;
+
+	@Prop()
+    coll: number;
+
+    @Prop()
+    row: number;
 	
     draggable: Draggable = null;
 
@@ -38,7 +46,9 @@ export default class FileComponent extends Vue {
 		this.draggable = container.resolve(Draggable);
 		this.draggable.el = document.querySelector("#ex_" + this.file.id);
 		this.draggable.limit = document.querySelector(this.dragLimitSelector);
-		this.draggable.start();
+		this.registerListeners();
+        this.draggable.start();
+        this.draggable.setCoord((this.FILE_WIDTH + 5) * 2, (this.FILE_HEIGHT + 5) * 0);
     }
 
     get icon () {
@@ -49,5 +59,11 @@ export default class FileComponent extends Vue {
         this.cmTop = e.clientY - 10;
         this.cmLeft = e.clientX - 10;
         this.showContextMenu = true;
+    }
+
+    registerListeners() {
+        const that = this;
+        document.addEventListener("click", (e) => {
+        });
     }
 }

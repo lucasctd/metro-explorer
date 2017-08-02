@@ -9,6 +9,6 @@ import UploadInterface from './interfaces/Upload';
 
 const container = new Container();
 container.register(UploadInterface, Upload);
-container.register(DraggableInterface, Draggable);
+container.register(DraggableInterface, Draggabilly);
 
 export {container};
