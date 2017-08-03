@@ -2,7 +2,7 @@ import Vue from 'vue';
 import File from '../interfaces/File';
 import Draggable from '../interfaces/Draggable';
 import ContextMenuComponent from '../components/ContextMenuComponent';
-import {container} from '../huject.config';
+import {DependencyInjection} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
@@ -36,6 +36,7 @@ export default class FileComponent extends Vue {
     row: number;
 	
     draggable: Draggable = null;
+    dependencyInjection: DependencyInjection = null;
 
     selected: boolean = false;
     cmTop: number = 0;
@@ -43,7 +44,8 @@ export default class FileComponent extends Vue {
     showContextMenu: boolean = false;
 	
     mounted(){
-		this.draggable = container.resolve(Draggable);
+        this.dependencyInjection = new DependencyInjection();
+		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
 		this.draggable.el = document.querySelector("#ex_" + this.file.id);
 		this.draggable.limit = document.querySelector(this.dragLimitSelector);
 		this.registerListeners();

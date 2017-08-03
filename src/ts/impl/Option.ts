@@ -1,14 +1,10 @@
 import {Option as OptionInterface, OptionCallbackType} from '../interfaces/Option';
 import File from '../interfaces/File';
 
-class Option implements OptionInterface {
-
-    name: string;
-    callback: OptionCallbackType;
-    disabled: boolean = false;
-	visible: boolean = true;
+class Option extends OptionInterface {
 
     constructor(name: string, callback: OptionCallbackType) {
+        super();
         this.name = name;
         this.callback = callback;
     }

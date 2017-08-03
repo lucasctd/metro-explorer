@@ -2,15 +2,14 @@ import {Draggable as DraggableInterface} from '../interfaces/Draggable';
 declare function require(name:string);
 const DraggabillyLib = require('draggabilly');
 
-class Draggabilly implements DraggableInterface {
+class Draggabilly extends DraggableInterface {
 
 	private draggabilly;
 
-    el: any;
     grid: any = [110, 140];
-	limit: any;
 
 	constructor() {
+		super();
 		console.log("loading Draggabilly");
 	}
 
@@ -53,8 +52,7 @@ class Draggabilly implements DraggableInterface {
 	
 	setCoord(x: number, y: number) {
 	    this.el.style.left = x + "px";
-        this.el.style.top = y + "px";
-        this.el.style.position = "absolute";
+        //this.el.style.top = y + "px";
 	}
 	
 	destroy() {

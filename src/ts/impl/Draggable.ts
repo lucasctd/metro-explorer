@@ -2,16 +2,15 @@ import {Draggable as DraggableInterface} from '../interfaces/Draggable';
 declare function require(name:string);
 const DraggableLib = require('draggable');
 
-class Draggable implements DraggableInterface {
+class Draggable extends DraggableInterface {
 
 	private draggable;
 	
-    el: any;
     grid: number = 110;
-	limit: any;
 	moveCursor: boolean = true;
-	
+
 	constructor() {
+		super();
 		console.log("loading Draggable");
 	}
 

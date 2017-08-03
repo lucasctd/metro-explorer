@@ -1,7 +1,8 @@
 import UploadInterface from '../interfaces/Upload';
 import File from '../interfaces/File';
 
-class Upload implements UploadInterface {
+class Upload extends UploadInterface {
+
     upload(file: File) : void{
 
     }

@@ -7,8 +7,24 @@ import Draggabilly from './impl/Draggabilly';
 import Upload from './impl/Upload';
 import UploadInterface from './interfaces/Upload';
 
-const container = new Container();
-container.register(UploadInterface, Upload);
-container.register(DraggableInterface, Draggabilly);
+class DependencyInjection {
 
-export {container};
+    private container;
+
+    constructor() {
+        this.container = new Container();
+        this.register();
+    }
+
+    protected register(): void {
+        this.container.register(UploadInterface, Upload);
+        this.container.register(DraggableInterface, Draggable);
+    }
+
+    public getContainer (): Container{
+        return this.container;
+    }
+}
+
+export {DependencyInjection};
+export default DependencyInjection;
