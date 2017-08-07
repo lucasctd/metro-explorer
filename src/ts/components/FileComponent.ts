@@ -6,7 +6,7 @@ import {DependencyInjection} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    template: `<div :id="'ex_' + file.id" class="explorer-file" @click="selected = !selected" @contextmenu="contextMenu">
+    template: `<div :id="'ex_' + file.id" class="explorer-file" @click.stop="selected = !selected" @contextmenu.prevent="contextMenu">
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -66,6 +66,7 @@ export default class FileComponent extends Vue {
     registerListeners() {
         const that = this;
         document.addEventListener("click", (e) => {
+            this.selected = false;
         });
     }
 }
