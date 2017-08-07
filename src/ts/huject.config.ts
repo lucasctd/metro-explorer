@@ -18,7 +18,7 @@ class DependencyInjection {
 
     protected register(): void {
         this.container.register(UploadInterface, Upload);
-        this.container.register(DraggableInterface, Draggable);
+        this.container.register(DraggableInterface, Draggabilly);
     }
 
     public getContainer (): Container{

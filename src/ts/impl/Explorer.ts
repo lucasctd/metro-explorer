@@ -10,7 +10,7 @@ class Explorer {
 
 	private id: string;
 	private vue: Vue;
-    public file: File;
+    public files: Array<File>;
 
 	constructor(id: string) {
 		this.id = id;
