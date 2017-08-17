@@ -10,7 +10,6 @@ class Draggabilly extends DraggableInterface {
 
 	constructor() {
 		super();
-		console.log("loading Draggabilly");
 	}
 
 	start() : void {

@@ -39,7 +39,7 @@ export default class ContextMenuComponent extends Vue {
 	}
 
     @Watch('showMenu')
-    onShowMenuChanged(val: boolean, oldVal: boolean) {
+    onShowMenuChange(val: boolean, oldVal: boolean) {
         this.$emit('update:show', val)
     }
 	

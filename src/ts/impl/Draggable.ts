@@ -11,7 +11,6 @@ class Draggable extends DraggableInterface {
 
 	constructor() {
 		super();
-		console.log("loading Draggable");
 	}
 
 	start() : void {

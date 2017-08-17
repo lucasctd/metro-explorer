@@ -6,7 +6,7 @@ import {DependencyInjection} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    template: `<div :id="'ex_' + file.id" class="explorer-file" @click.stop="selected = !selected" @contextmenu.prevent="contextMenu">
+    template: `<div :id="'ex_' + file.id" class="explorer-file" @click.stop="selected = !selected" @contextmenu.prevent="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -20,9 +20,6 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 })
 export default class FileComponent extends Vue {
 
-    private FILE_WIDTH: number = 110;
-    private FILE_HEIGHT: number = 140;
-
     @Prop()
     file: File;
 
@@ -30,10 +27,10 @@ export default class FileComponent extends Vue {
 	dragLimitSelector: string;
 
 	@Prop()
-    coll: number;
+    left: number;
 
     @Prop()
-    row: number;
+    top: number;
 	
     draggable: Draggable = null;
     dependencyInjection: DependencyInjection = null;
@@ -50,7 +47,7 @@ export default class FileComponent extends Vue {
 		this.draggable.limit = document.querySelector(this.dragLimitSelector);
 		this.registerListeners();
         this.draggable.start();
-        this.draggable.setCoord((this.FILE_WIDTH + 5) * 2, (this.FILE_HEIGHT + 5) * 0);
+        this.draggable.setCoord(this.left, this.top);        
     }
 
     get icon () {

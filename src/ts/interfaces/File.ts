@@ -6,7 +6,8 @@ abstract class File {
 	name: string;
 	parent: File;
 	icon?: string;
-	options: Array<OptionInterface>;
+    options: Array<OptionInterface>;
+    field: number = -1;
 
     constructor(id: number, name: string, parent: File, icon: string, options: Array<OptionInterface>) {
         this.id = id;

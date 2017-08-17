@@ -30,7 +30,7 @@ class Explorer {
 				console.log(file);
 			})
 		];
-		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", options)]};
+		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", options), new FileImpl(2, "Arquivo", undefined, "file-word-o", options)]};
 
         this.vue = new Vue({
 			el: this.id,
@@ -39,27 +39,13 @@ class Explorer {
                 "ex-plorer": ExplorerComponent
             }
 		});
-	}
-	
-	build (): void {
-
-	}
-	
-	addFile (file: File): void {
-		
-	}
-	
-	move (file: File): void	{
-		
-	}
-	
-	rename (file: File): void {
-		
-	}
-	
-	show (file: File): void {
-		
-	}
+		const that = this;
+		/*setTimeout(() => {
+			console.log('change file name');
+			//console.log(that.vue.files[0]);
+            this.vue.files[0].name = "Fox";
+        }, 5000);*/
+	}	
 }
 
 export {Explorer};
