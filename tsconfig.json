@@ -8,10 +8,10 @@
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "lib": [
-      //"dom",
+      "dom",
       //"es5",
       //"es2015.promise"
-      "es6", "dom"
+      "es7"
     ],
     "types": ["reflect-metadata"]
   },
