@@ -4,7 +4,7 @@ import FileComponent from '../components/FileComponent';
 import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
 
 @Component({
-    template: `<div id="explorer_component" style="border: 2px dashed gray" :style="{width: width + 'px', height: height + 'px'}">
+    template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
                    <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
                </div>`,
     components: {
@@ -15,9 +15,9 @@ export default class ExplorerComponent extends Vue {
 
     @Prop()
     files: Array<File>;
-	@Prop()
+	@Prop({"default": 800})
 	width: number;
-	@Prop()
+	@Prop({"default": 600})
 	height: number;
 	
 	dragLimitSelector: string = null;
@@ -32,10 +32,10 @@ export default class ExplorerComponent extends Vue {
 	}
 	
 	mounted(){
-		this.setFields();
+		this.updateFilesField();
 	}
 	
-	setFields() {
+	updateFilesField() {
 		let usedFields: Array<number> = [];
 		this.files.forEach(f => {
 			if(f.field !== -1){
@@ -64,16 +64,16 @@ export default class ExplorerComponent extends Vue {
 	}
 	
 	show (file: File): void {
-		
+
 	}
 	
 	getLeft(file: File) : number {
-		let top = Math.trunc(file.field / this.maxSizeX);
-		return (top * this.FILE_WIDTH) + 5;
+		let left = (file.field / this.maxSizeY) - Math.trunc(file.field / this.maxSizeY);
+		return ((left + 1) * 5) + (left * 5 * this.FILE_WIDTH);
 	}
 	
 	getTop(file: File) : number {
 		let top = Math.trunc(file.field / this.maxSizeX);
-		return (top * this.FILE_HEIGHT) + 5;
+		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
 }

@@ -6,13 +6,15 @@ import {File as FileImpl} from './File';
 
 import Option from './Option';
 
-class Explorer {
+class Explorer extends Vue{
 
+    el = "#explorer";
 	private id: string;
 	private vue: Vue;
     public files: Array<File>;
 
 	constructor(id: string) {
+		super();
 		this.id = id;
 		let opt = new Option("Show", (e, file) => {
 				console.log("Show");
@@ -30,8 +32,8 @@ class Explorer {
 				console.log(file);
 			})
 		];
-		let data = {files: [new FileImpl(1, "Arquivo", undefined, "file-word-o", options), new FileImpl(2, "Arquivo", undefined, "file-word-o", options)]};
-
+		let data = {files: [new FileImpl(1, "Print", undefined, "file-word-o", options), new FileImpl(2, "Fox", undefined, "file-word-o", options)]};
+		data.files[0].field = 10;
         this.vue = new Vue({
 			el: this.id,
             data: data,
@@ -39,13 +41,27 @@ class Explorer {
                 "ex-plorer": ExplorerComponent
             }
 		});
-		const that = this;
-		/*setTimeout(() => {
-			console.log('change file name');
-			//console.log(that.vue.files[0]);
-            this.vue.files[0].name = "Fox";
-        }, 5000);*/
-	}	
+	}
+	
+	build (): void {
+
+	}
+	
+	addFile (file: File): void {
+		
+	}
+	
+	move (file: File): void	{
+		
+	}
+	
+	rename (file: File): void {
+		
+	}
+	
+	show (file: File): void {
+		
+	}
 }
 
 export {Explorer};
