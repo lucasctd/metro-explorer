@@ -1,6 +1,7 @@
 import {Explorer} from './impl/Explorer';
 import UploadInterface from './interfaces/Upload';
-import Option from './interfaces';
+import Option from './impl/Option';
+import FileImpl from './impl/File';
 
 let opt = new Option("Show", (e, file) => {
 				console.log("Show");
@@ -15,7 +16,8 @@ let opt = new Option("Show", (e, file) => {
 				console.log("Delete");
 			})
 		];
-		let data = [new FileImpl(1, "Print", undefined, "file-word-o", options), new FileImpl(2, "Fox", undefined, "file-word-o", options)];
+		let files = [new FileImpl(1, "Print", undefined, "file-word-o"), new FileImpl(2, "Fox", undefined, "file-word-o")];
 
-const e = new Explorer("#explorer");
-//console.log(impl.upload.print());
+const explorer = new Explorer("#explorer");
+explorer.setFiles(files);
+explorer.run();

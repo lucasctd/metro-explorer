@@ -6,11 +6,12 @@ import store from '../state/AppState';
 
 @Component({
     template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
-                   <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
+                   <ex-file v-for="file in store.state.files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
                </div>`,
     components: {
         "ex-file" : FileComponent
-    }
+    },
+	store
 })
 export default class ExplorerComponent extends Vue {
 

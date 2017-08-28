@@ -8,8 +8,9 @@ abstract class File {
 	icon?: string;
     options: Array<OptionInterface>;
     field: number = -1;
+    renaming: boolean = false;
 
-    constructor(id: number, name: string, parent: File, icon: string, options: Array<OptionInterface>) {
+    constructor(id: number, name: string, parent: File, icon: string, options?: Array<OptionInterface>) {
         this.id = id;
         this.name = name;
         this.parent = parent;

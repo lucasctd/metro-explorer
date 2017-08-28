@@ -11,7 +11,8 @@ import store from '../state/AppState';
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
-                        <p class="file-name">{{file.name}}</p>
+                        <p class="file-name" v-show='!file.renaming'>{{file.name}}</p>
+                        <input v-model='file.name' @blur='file.renaming = false' v-show='file.renaming' @click.stop="selected = false" class="rename-input"/>
                     </div>
                     <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
                </div>`,
@@ -32,7 +33,7 @@ export default class FileComponent extends Vue {
 
     @Prop()
     top: number;
-	
+
     draggable: Draggable = null;
     dependencyInjection: DependencyInjection = null;
 
@@ -67,20 +68,4 @@ export default class FileComponent extends Vue {
             this.selected = false;
         });
     }
-
-    delete (file: File): void {
-		store.dispatch('deleteFile', file);
-	}
-	
-	move (file: File): void	{
-		
-	}
-	
-	rename (file: File): void {
-		
-	}
-	
-	show (file: File): void {
-
-	}
 }

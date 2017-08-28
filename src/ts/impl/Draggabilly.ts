@@ -42,7 +42,9 @@ class Draggabilly extends DraggableInterface {
 	onDrop(event, args) {
 		const el = event.path.filter(p => p.id && p.id.startsWith('ex_'))[0];
 		const field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
-		store.dispatch('updateField', {id: Number(this.el.id.replace('ex_', '')), field: field});
+		let file = store.getters.getFileById(Number(this.el.id.replace('ex_', '')));
+		file.field = field;
+		store.dispatch('updateFile', file);
 	}
 	
 	/* Methods */

@@ -16,10 +16,10 @@ export default new Vuex.Store({
         SET_NUM_GRID_X(state, value){
             state.numGridX = value;
         },
-        UPDATE_FIELD(state, params){
+        UPDATE_FILE(state, file){
             state.files.forEach(f => {
-                if(f.id === params.id){
-                    f.field = params.field;
+                if(f.id === file.id){
+                    f = file;
                 }
             })
         },
@@ -31,8 +31,8 @@ export default new Vuex.Store({
         setFiles({commit}, files){
             commit('SET_FILES', files);
         },
-        updateField({commit}, params){
-            commit('UPDATE_FIELD', params);
+        updateFile({commit}, file){
+            commit('UPDATE_FILE', file);
         },
         setNumGridX({commit}, value){
             commit('SET_NUM_GRID_X', value);
@@ -40,5 +40,11 @@ export default new Vuex.Store({
         deleteFile({commit}, file){
             commit('DELETE_FILE', file);
         }
-    }
+    },
+	getters: {
+		getFileById(state, id) {
+			let list = state.files.filter(f => f.id === id);
+			return list.length > 0 ? list[0] : null;
+		}
+	}
 })
