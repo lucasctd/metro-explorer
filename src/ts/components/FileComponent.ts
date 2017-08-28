@@ -4,6 +4,7 @@ import Draggable from '../interfaces/Draggable';
 import ContextMenuComponent from '../components/ContextMenuComponent';
 import {DependencyInjection} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
+import store from '../state/AppState';
 
 @Component({
     template: `<div :id="'ex_' + file.id" class="explorer-file" @click.stop="selected = !selected" @contextmenu.prevent="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
@@ -66,4 +67,20 @@ export default class FileComponent extends Vue {
             this.selected = false;
         });
     }
+
+    delete (file: File): void {
+		store.dispatch('deleteFile', file);
+	}
+	
+	move (file: File): void	{
+		
+	}
+	
+	rename (file: File): void {
+		
+	}
+	
+	show (file: File): void {
+
+	}
 }

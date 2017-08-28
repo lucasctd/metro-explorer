@@ -2,6 +2,7 @@ import Vue from 'vue';
 import File from '../interfaces/File';
 import FileComponent from '../components/FileComponent';
 import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
+import store from '../state/AppState';
 
 @Component({
     template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
@@ -13,16 +14,14 @@ import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-dec
 })
 export default class ExplorerComponent extends Vue {
 
-    @Prop()
-    files: Array<File>;
+    
 	@Prop({"default": 800})
 	width: number;
 	@Prop({"default": 600})
 	height: number;
 	
 	dragLimitSelector: string = null;
-	maxSizeX: number = 5;
-	maxSizeY: number = 5;
+	files: Array<File> = null;
 	private FILE_WIDTH: number = 110;
 	private FILE_HEIGHT: number = 140;
 	
@@ -32,7 +31,9 @@ export default class ExplorerComponent extends Vue {
 	}
 	
 	mounted(){
+		this.files = store.state.files;
 		this.updateFilesField();
+		this.setGridSize();
 	}
 	
 	updateFilesField() {
@@ -50,30 +51,30 @@ export default class ExplorerComponent extends Vue {
 			}		
 		});
 	}
-	
-	addFile (file: File): void {
-		
-	}
-	
-	move (file: File): void	{
-		
-	}
-	
-	rename (file: File): void {
-		
-	}
-	
-	show (file: File): void {
 
+	setGridSize(): void {
+		const x: number = Math.trunc(this.width / this.FILE_WIDTH);
+		const y: number = Math.trunc(this.height / this.FILE_HEIGHT)
+		store.dispatch('setNumGridX', x - 1);
+	}
+	
+	add (file: File): void {
+		
 	}
 	
 	getLeft(file: File) : number {
-		let left = (file.field / this.maxSizeY) - Math.trunc(file.field / this.maxSizeY);
-		return ((left + 1) * 5) + (left * 5 * this.FILE_WIDTH);
+		let field = null;
+		if(file.field < store.state.numGridX){
+			field = file.field;
+		}else{
+			field = (file.field / store.state.numGridX) - Math.trunc(file.field / store.state.numGridX);
+			field*=store.state.numGridX;
+		}
+		return (field * 5) + (field * this.FILE_WIDTH);
 	}
 	
 	getTop(file: File) : number {
-		let top = Math.trunc(file.field / this.maxSizeX);
+		let top = Math.trunc(file.field / store.state.numGridX);
 		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
 }

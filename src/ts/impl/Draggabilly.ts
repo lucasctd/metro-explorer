@@ -1,6 +1,7 @@
 import {Draggable as DraggableInterface} from '../interfaces/Draggable';
 declare function require(name:string);
 const DraggabillyLib = require('draggabilly');
+import store from '../state/AppState';
 
 class Draggabilly extends DraggableInterface {
 
@@ -39,9 +40,9 @@ class Draggabilly extends DraggableInterface {
 	}
 	
 	onDrop(event, args) {
-        console.log("onDrag");
-        console.log(event);
-        console.log(args);
+		const el = event.path.filter(p => p.id && p.id.startsWith('ex_'))[0];
+		const field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
+		store.dispatch('updateField', {id: Number(this.el.id.replace('ex_', '')), field: field});
 	}
 	
 	/* Methods */
@@ -51,11 +52,17 @@ class Draggabilly extends DraggableInterface {
 	
 	setCoord(x: number, y: number) {
 	    this.el.style.left = x + "px";
-        //this.el.style.top = y + "px";
+        this.el.style.top = y + "px";
 	}
 	
 	destroy() {
         this.draggabilly.destroy();
+	}
+
+	getField(left: number, fileWidth: number, top: number, fileHeight: number) : number {
+		const coll: number = Math.trunc(left / fileWidth);
+		const row: number = Math.trunc(top / fileHeight);
+		return row * store.state.numGridX + coll;
 	}
 	
 }
