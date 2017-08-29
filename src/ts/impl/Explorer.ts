@@ -52,7 +52,10 @@ class Explorer extends Vue{
 	}
 
 	private renameFile(e, file: File): void {
-		file.renaming = true;
+        e.preventDefault();
+        file.renaming = true;
+        console.log(document.getElementById('ex_' + file.id).getElementsByClassName('icon-area')[0].getElementsByTagName('input')[0]);
+        document.getElementById('ex_' + file.id).getElementsByClassName('icon-area')[0].getElementsByTagName('input')[0].focus();
 		store.dispatch('updateFile', file);
 	}
 

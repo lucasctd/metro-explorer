@@ -6,7 +6,7 @@ import store from '../state/AppState';
 
 @Component({
     template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
-                   <ex-file v-for="file in store.state.files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
+                   <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
                </div>`,
     components: {
         "ex-file" : FileComponent
@@ -15,7 +15,6 @@ import store from '../state/AppState';
 })
 export default class ExplorerComponent extends Vue {
 
-    
 	@Prop({"default": 800})
 	width: number;
 	@Prop({"default": 600})
@@ -35,6 +34,11 @@ export default class ExplorerComponent extends Vue {
 		this.files = store.state.files;
 		this.updateFilesField();
 		this.setGridSize();
+	}
+
+    @Watch('files', {deep: true})
+    onFilesChanged(files: Array<File>) {
+        store.dispatch('setFiles', files);
 	}
 	
 	updateFilesField() {

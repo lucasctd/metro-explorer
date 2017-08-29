@@ -12,7 +12,7 @@ import store from '../state/AppState';
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
                         <p class="file-name" v-show='!file.renaming'>{{file.name}}</p>
-                        <input v-model='file.name' @blur='file.renaming = false' v-show='file.renaming' @click.stop="selected = false" class="rename-input"/>
+                        <input v-model='file.name' @blur='file.renaming = false' v-show='file.renaming' @click.stop="selected = false" class="rename-input" style="font-size: 12pt"/>
                     </div>
                     <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
                </div>`,
