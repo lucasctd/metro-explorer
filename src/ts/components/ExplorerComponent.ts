@@ -1,15 +1,18 @@
 import Vue from 'vue';
 import File from '../interfaces/File';
 import FileComponent from '../components/FileComponent';
+import ContextMenuComponent from '../components/ContextMenuComponent';
 import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
 import store from '../state/AppState';
 
 @Component({
     template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
                    <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
+				   <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
                </div>`,
     components: {
-        "ex-file" : FileComponent
+        "ex-file" : FileComponent,
+		"ex-context-menu" : ContextMenuComponent
     },
 	store
 })
@@ -21,7 +24,6 @@ export default class ExplorerComponent extends Vue {
 	height: number;
 	
 	dragLimitSelector: string = null;
-	files: Array<File> = null;
 	private FILE_WIDTH: number = 110;
 	private FILE_HEIGHT: number = 140;
 	
@@ -31,16 +33,10 @@ export default class ExplorerComponent extends Vue {
 	}
 	
 	mounted(){
-		this.files = store.state.files;
 		this.updateFilesField();
 		this.setGridSize();
 	}
 
-    @Watch('files', {deep: true})
-    onFilesChanged(files: Array<File>) {
-        store.dispatch('setFiles', files);
-	}
-	
 	updateFilesField() {
 		let usedFields: Array<number> = [];
 		this.files.forEach(f => {
@@ -81,5 +77,11 @@ export default class ExplorerComponent extends Vue {
 	getTop(file: File) : number {
 		let top = Math.trunc(file.field / store.state.numGridX);
 		return (5 * top) + (top * this.FILE_HEIGHT);
+	}
+	
+	/** Computed **/
+	
+	get files(): Array<File> {
+		return store.state.files;
 	}
 }

@@ -42,9 +42,11 @@ export default new Vuex.Store({
         }
     },
 	getters: {
-		getFileById(state, id) {
-			let list = state.files.filter(f => f.id === id);
-			return list.length > 0 ? list[0] : null;
+		getFileById(state) {
+			return id => {
+				let list = state.files.filter(f => f.id === id);
+				return list.length > 0 ? list[0] : null;
+			}			
 		}
 	}
 })

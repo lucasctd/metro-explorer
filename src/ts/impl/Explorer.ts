@@ -47,15 +47,13 @@ class Explorer extends Vue{
 		this.files = files;
 	}
 	
-	private deleteFile(e, file: File): void {
-		console.log('deleteFile');
+	private deleteFile(e, file: FileImpl): void {
+		file.visible = false;
+		setTimeout(() => store.dispatch('deleteFile', file), 750);
 	}
 
 	private renameFile(e, file: File): void {
-        e.preventDefault();
         file.renaming = true;
-        console.log(document.getElementById('ex_' + file.id).getElementsByClassName('icon-area')[0].getElementsByTagName('input')[0]);
-        document.getElementById('ex_' + file.id).getElementsByClassName('icon-area')[0].getElementsByTagName('input')[0].focus();
 		store.dispatch('updateFile', file);
 	}
 
