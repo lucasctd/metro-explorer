@@ -9,7 +9,7 @@ import * as _ from "lodash";
 
 @Component({
     template: `<transition name="explorer-fade">
-				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="selected = !selected" @contextmenu.prevent="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
+				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="selected = !selected" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -71,6 +71,7 @@ export default class FileComponent extends Vue {
     }
 
     contextMenu(e){
+		document.dispatchEvent(new Event('closeAllContextMenu'));
         this.cmTop = e.clientY - 10;
         this.cmLeft = e.clientX - 10;
         this.showContextMenu = true;

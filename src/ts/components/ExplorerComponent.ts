@@ -4,11 +4,12 @@ import FileComponent from '../components/FileComponent';
 import ContextMenuComponent from '../components/ContextMenuComponent';
 import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
 import store from '../state/AppState';
+import Option from '../impl/Option';
 
 @Component({
-    template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}">
+    template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
                    <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
-				   <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
+				   <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
                </div>`,
     components: {
         "ex-file" : FileComponent,
@@ -23,9 +24,13 @@ export default class ExplorerComponent extends Vue {
 	@Prop({"default": 600})
 	height: number;
 	
+	cmTop: number = 0;
+    cmLeft: number = 0;
+    showContextMenu: boolean = false;
 	dragLimitSelector: string = null;
+	options: Array<Option> = [];
 	private FILE_WIDTH: number = 110;
-	private FILE_HEIGHT: number = 140;
+	private FILE_HEIGHT: number = 140;	
 	
 	constructor() {
 		super();
@@ -35,6 +40,11 @@ export default class ExplorerComponent extends Vue {
 	mounted(){
 		this.updateFilesField();
 		this.setGridSize();
+		this.loadContextMenu();
+	}
+	
+	loadContextMenu() {
+		this.options.push(new Option('New Folder', () => console.log('New Folder')));
 	}
 
 	updateFilesField() {
@@ -52,6 +62,13 @@ export default class ExplorerComponent extends Vue {
 			}		
 		});
 	}
+	
+	contextMenu(e){
+		document.dispatchEvent(new Event('closeAllContextMenu'));
+        this.cmTop = e.clientY - 10;
+        this.cmLeft = e.clientX - 10;
+        this.showContextMenu = true;
+    }
 
 	setGridSize(): void {
 		const x: number = Math.trunc(this.width / this.FILE_WIDTH);
@@ -59,7 +76,7 @@ export default class ExplorerComponent extends Vue {
 		store.dispatch('setNumGridX', x - 1);
 	}
 	
-	add (file: File): void {
+	add(file: File): void {
 		
 	}
 	

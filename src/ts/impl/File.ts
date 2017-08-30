@@ -1,5 +1,4 @@
 import {File as FileInterface} from '../interfaces/File';
-import {Option as OptionInterface} from '../interfaces/Option';
 
 class File extends FileInterface {
 
