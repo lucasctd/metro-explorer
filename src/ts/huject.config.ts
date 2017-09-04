@@ -7,7 +7,7 @@ import Draggabilly from './impl/Draggabilly';
 import Upload from './impl/Upload';
 import UploadInterface from './interfaces/Upload';
 
-class DependencyInjection {
+class DependencyInjector {
 
     private container;
 
@@ -26,5 +26,5 @@ class DependencyInjection {
     }
 }
 
-export {DependencyInjection};
-export default DependencyInjection;
+export {DependencyInjector};
+export default DependencyInjector;
