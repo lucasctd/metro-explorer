@@ -1,68 +1,61 @@
 import Vue from 'vue';
-import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
-import {Option} from '../interfaces/Option';
-import File from "../interfaces/File";
+import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
-    template: `<transition name="explorer-fade">
-                    <div class="explorer-context-menu" v-show="showMenu" :style="{ top: top + 'px', left: left + 'px'}">
-                        <div class="box">
-                            <div v-if="option.visible" class="option" :class="{disabled: option.disabled}" v-for="option in options" @click.stop="callback($event, option)">
-                                <a href="javascript:void(0)">{{option.name}}</a>
+    template: `<div>
+                    <div class="explorer-modal" v-show="showModal"></div>
+                    <transition name="explorer-fade">
+                        <div class="explorer-dialog" v-show="showDialog" :style="{ width: width + 'px', height: height + 'px'}">
+                            <span class="fa fa-times-circle close-icon fa-2x" :style="{opacity: opacity}" title="Close" @click="showModal = showDialog = false" 
+                                @mouseover="onMouseOverCloseIcon" @mouseleave="onMouseOutCloseIcon" v-show="closable"></span>
+                            <div class="content">
+                                <slot></slot>
                             </div>
-                        </div>
-                   </div>
-                </transition>`
+                       </div>
+                    </transition>
+                </div>`
 })
-export default class ContextMenuComponent extends Vue {
+export default class DialogComponent extends Vue {
 
-    @Prop({default: false})
+    @Prop({'default': false})
     show: boolean;
 
-    @Prop()
-    top: number;
+    @Prop({'default': false})
+    closable: boolean;
 
-    @Prop()
-    left: number;
+    @Prop({'default': true})
+    modal: boolean;
 
-    @Prop()
-    options: Array<Option>;
+    @Prop({'default': 500})
+    width: number;
 
-    @Prop()
-    file: File;
+    @Prop({'default': 300})
+    height: number;
 
-    showMenu: boolean = false;
+    showDialog: boolean = false;
+    showModal: boolean = false;
+    opacity: number = 1;
 	
 	@Watch('show')
-	onShowChanged(val: boolean, oldVal: boolean) {
-        this.showMenu = val;
+	onShowChange(val: boolean, oldVal: boolean) {
+        this.showDialog = val;
 	}
 
-    @Watch('showMenu')
-    onShowMenuChange(val: boolean, oldVal: boolean) {
+    @Watch('showDialog')
+    onShowDialogChange(val: boolean, oldVal: boolean) {
         this.$emit('update:show', val)
     }
 	
 	mounted(){
-		this.registerListeners();
+      this.showDialog = this.show;
+      this.showModal = this.modal && this.show;
 	}
-	
-	callback(e, option: Option){
-        if(!option.disabled){
-            this.showMenu = false;
-            option.callback(e, this.file);
-        }
-	}
-	
-	registerListeners() {
-	    const that = this;
-		document.addEventListener("click", (e) => {
-            that.showMenu = false;
-		});
-		
-		document.addEventListener("closeAllContextMenu", (e) => {
-            that.showMenu = false;
-		});
-	}
-	
+
+    onMouseOverCloseIcon(){
+	    this.opacity = .5;
+    }
+
+    onMouseOutCloseIcon(){
+        this.opacity = 1;
+    }
 }
