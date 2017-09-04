@@ -2,7 +2,7 @@ import Vue from 'vue';
 import File from '../interfaces/File';
 import Draggable from '../interfaces/Draggable';
 import ContextMenuComponent from '../components/ContextMenuComponent';
-import {DependencyInjection} from '../huject.config';
+import {DependencyInjector} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import store from '../state/AppState';
 import * as _ from "lodash";
@@ -38,7 +38,7 @@ export default class FileComponent extends Vue {
     top: number;
 
     draggable: Draggable = null;
-    dependencyInjection: DependencyInjection = null;
+    dependencyInjection: DependencyInjector = null;
 
     selected: boolean = false;
     cmTop: number = 0;
@@ -54,10 +54,10 @@ export default class FileComponent extends Vue {
 	
 	updateFileName = _.debounce(function (file) {
 		store.dispatch('updateFile', file);
-	}, 500)
+	}, 500);
 	
     mounted(){
-        this.dependencyInjection = new DependencyInjection();
+        this.dependencyInjection = new DependencyInjector();
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
 		this.draggable.el = document.querySelector("#ex_" + this.file.id);
 		this.draggable.limit = document.querySelector(this.dragLimitSelector);
@@ -72,9 +72,9 @@ export default class FileComponent extends Vue {
 
     contextMenu(e){
 		document.dispatchEvent(new Event('closeAllContextMenu'));
-        this.cmTop = e.clientY - 10;
-        this.cmLeft = e.clientX - 10;
-        this.showContextMenu = true;
+        this.cmTop = e.clientY;
+        this.cmLeft = e.clientX;
+        setTimeout(() => this.showContextMenu = true, 30);
     }
 
     registerListeners() {

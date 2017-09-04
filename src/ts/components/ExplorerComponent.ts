@@ -2,18 +2,20 @@ import Vue from 'vue';
 import File from '../interfaces/File';
 import FileComponent from '../components/FileComponent';
 import ContextMenuComponent from '../components/ContextMenuComponent';
-import { Component, Inject, Model, Prop, Watch, Provide } from 'vue-property-decorator';
+import DialogComponent from '../components/DialogComponent';
+import { Component, Prop} from 'vue-property-decorator';
 import store from '../state/AppState';
 import Option from '../impl/Option';
 
 @Component({
-    template: `<div id="explorer_component" class="explorer_component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
+    template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
                    <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
 				   <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
                </div>`,
     components: {
         "ex-file" : FileComponent,
-		"ex-context-menu" : ContextMenuComponent
+		"ex-context-menu" : ContextMenuComponent,
+        "ex-dialog" : DialogComponent
     },
 	store
 })
@@ -34,7 +36,7 @@ export default class ExplorerComponent extends Vue {
 	
 	constructor() {
 		super();
-		this.dragLimitSelector = "#explorer_component";
+		this.dragLimitSelector = "#explorer-component";
 	}
 	
 	mounted(){
@@ -65,14 +67,14 @@ export default class ExplorerComponent extends Vue {
 	
 	contextMenu(e){
 		document.dispatchEvent(new Event('closeAllContextMenu'));
-        this.cmTop = e.clientY - 10;
-        this.cmLeft = e.clientX - 10;
-        this.showContextMenu = true;
+        this.cmTop = e.clientY;
+        this.cmLeft = e.clientX;
+        setTimeout(() => this.showContextMenu = true, 30);
     }
 
 	setGridSize(): void {
 		const x: number = Math.trunc(this.width / this.FILE_WIDTH);
-		const y: number = Math.trunc(this.height / this.FILE_HEIGHT)
+		const y: number = Math.trunc(this.height / this.FILE_HEIGHT);
 		store.dispatch('setNumGridX', x - 1);
 	}
 	
