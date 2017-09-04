@@ -1,5 +1,6 @@
 
 import ExplorerComponent from '../components/ExplorerComponent';
+import DialogComponent from '../components/DialogComponent';
 import File from '../interfaces/File';
 import {File as FileImpl} from './File';
 import Vue from '../Vue';
@@ -23,7 +24,8 @@ class Explorer extends Vue{
 			el: this.id,
 			store,
 			components: {
-				"ex-plorer": ExplorerComponent
+				"ex-plorer": ExplorerComponent,
+                "ex-dialog": DialogComponent
 			}
 		});
 	}
@@ -47,21 +49,21 @@ class Explorer extends Vue{
 		this.files = files;
 	}
 	
-	private deleteFile(e, file: FileImpl): void {
+	protected deleteFile(e, file: FileImpl): void {
 		file.visible = false;
 		setTimeout(() => store.dispatch('deleteFile', file), 750);
 	}
 
-	private renameFile(e, file: File): void {
+    protected renameFile(e, file: File): void {
         file.renaming = true;
 		store.dispatch('updateFile', file);
 	}
 
-	private moveFile(e, file: File): void {
+    protected moveFile(e, file: File): void {
 		console.log('moveFile');
 	}
 	
 }
 
-export {Explorer};
+export {Explorer, store, DialogComponent};
 export default Explorer;
