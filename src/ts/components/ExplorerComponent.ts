@@ -1,5 +1,6 @@
 import Vue from 'vue';
 import File from '../interfaces/File';
+import FileImpl from '../impl/File';
 import FileComponent from '../components/FileComponent';
 import ContextMenuComponent from '../components/ContextMenuComponent';
 import DialogComponent from '../components/DialogComponent';
@@ -9,8 +10,11 @@ import Option from '../impl/Option';
 
 @Component({
     template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
-                   <ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
-				   <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
+                   	<ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
+				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
+				   	<ex-dialog id="explorer-dialog" :show="true">
+				   		<ex-file v-for="folder in folders" :key="folder.id" :file="folder" dragLimitSelector="explorer-dialog"></ex-file>
+					</ex-dialog>
                </div>`,
     components: {
         "ex-file" : FileComponent,
@@ -32,14 +36,15 @@ export default class ExplorerComponent extends Vue {
 	dragLimitSelector: string = null;
 	options: Array<Option> = [];
 	private FILE_WIDTH: number = 110;
-	private FILE_HEIGHT: number = 140;	
+	private FILE_HEIGHT: number = 140;
+	private currentDir: File = new FileImpl(0,"Root" , null, "folder-o");
 	
 	constructor() {
 		super();
 		this.dragLimitSelector = "#explorer-component";
 	}
 	
-	mounted(){
+	mounted() {
 		this.updateFilesField();
 		this.setGridSize();
 		this.loadContextMenu();
@@ -65,7 +70,7 @@ export default class ExplorerComponent extends Vue {
 		});
 	}
 	
-	contextMenu(e){
+	contextMenu(e) {
 		document.dispatchEvent(new Event('closeAllContextMenu'));
         this.cmTop = e.clientY;
         this.cmLeft = e.clientX;
@@ -82,7 +87,7 @@ export default class ExplorerComponent extends Vue {
 		
 	}
 	
-	getLeft(file: File) : number {
+	getLeft(file: File): number {
 		let field = null;
 		if(file.field < store.state.numGridX){
 			field = file.field;
@@ -93,7 +98,7 @@ export default class ExplorerComponent extends Vue {
 		return (field * 5) + (field * this.FILE_WIDTH);
 	}
 	
-	getTop(file: File) : number {
+	getTop(file: File): number {
 		let top = Math.trunc(file.field / store.state.numGridX);
 		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
@@ -102,5 +107,11 @@ export default class ExplorerComponent extends Vue {
 	
 	get files(): Array<File> {
 		return store.state.files;
+	}
+
+	get folders(): Array<File> {
+		return store.state.files.filter(f => {
+			return f.dir === true && this.currentDir.id !== f.id;
+		});
 	}
 }

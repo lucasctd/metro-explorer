@@ -84,6 +84,10 @@ export default class ContextMenuComponent extends Vue {
 		document.addEventListener("closeAllContextMenu", (e) => {
             that.showMenu = false;
 		});
+
+        document.addEventListener("click", (e) => {
+            that.showMenu = false;
+        });
 	}
 	
 }

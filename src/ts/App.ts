@@ -16,7 +16,11 @@ let opt = new Option("Show", (e, file) => {
 				console.log("Delete");
 			})
 		];
-		let files = [new FileImpl(1, "Print", undefined, "file-word-o"), new FileImpl(2, "Fox", undefined, "file-word-o")];
+		let files = [
+			new FileImpl(1, "Print", undefined, "file-word-o"),
+			new FileImpl(2, "Fox", undefined, "file-word-o"),
+            new FileImpl(3, "Folder", undefined, "folder-o", null, true)
+		];
 
 const explorer = new Explorer("#explorer");
 explorer.setFiles(files);

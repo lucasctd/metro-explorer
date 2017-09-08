@@ -19,7 +19,6 @@ class Explorer extends Vue{
 	}
 	
 	run(): void {
-		store.dispatch('setFiles', this.files);
 		this.vue = new Vue({
 			el: this.id,
 			store,
@@ -47,7 +46,8 @@ class Explorer extends Vue{
 			}
 		});
 		this.files = files;
-	}
+        store.dispatch('setFiles', this.files);
+    }
 	
 	protected deleteFile(e, file: FileImpl): void {
 		file.visible = false;
@@ -60,6 +60,7 @@ class Explorer extends Vue{
 	}
 
     protected moveFile(e, file: File): void {
+
 		console.log('moveFile');
 	}
 	
