@@ -11,6 +11,7 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
                             <div class="content">
                                 <slot></slot>
                             </div>
+							<slot name="footer"></slot>
                        </div>
                     </transition>
                 </div>`
@@ -20,7 +21,7 @@ export default class DialogComponent extends Vue {
     @Prop({'default': false})
     show: boolean;
 
-    @Prop({'default': false})
+    @Prop({'default': true})
     closable: boolean;
 
     @Prop({'default': true})

@@ -14,6 +14,7 @@ import Option from '../impl/Option';
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
 				   	<ex-dialog id="explorer-dialog" :show="true">
 				   		<ex-file v-for="folder in folders" :key="folder.id" :file="folder" dragLimitSelector="explorer-dialog"></ex-file>
+						<button @click="" slot="footer" :disabled="selectedFolder == null" class="explorer-move-button" :class="{disabled: selectedFolder == null, enabled: selectedFolder != null}">Move</button>
 					</ex-dialog>
                </div>`,
     components: {
@@ -35,10 +36,11 @@ export default class ExplorerComponent extends Vue {
     showContextMenu: boolean = false;
 	dragLimitSelector: string = null;
 	options: Array<Option> = [];
+	selectedFolder: File = null;
 	private FILE_WIDTH: number = 110;
 	private FILE_HEIGHT: number = 140;
-	private currentDir: File = new FileImpl(0,"Root" , null, "folder-o");
-	
+	private currentDir: File = new FileImpl(0, "Root", null, "folder-o");
+		
 	constructor() {
 		super();
 		this.dragLimitSelector = "#explorer-component";
