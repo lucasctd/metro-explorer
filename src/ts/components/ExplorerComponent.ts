@@ -30,7 +30,10 @@ export default class ExplorerComponent extends Vue {
 	width: number;
 	@Prop({"default": 600})
 	height: number;
-	
+
+	@Prop()
+	explorerId: string;
+
 	cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
@@ -82,7 +85,7 @@ export default class ExplorerComponent extends Vue {
 	setGridSize(): void {
 		const x: number = Math.trunc(this.width / this.FILE_WIDTH);
 		const y: number = Math.trunc(this.height / this.FILE_HEIGHT);
-		store.dispatch('setNumGridX', x - 1);
+		store.dispatch('setNumGridX', {id: this.explorerId, numGridX: x - 1});
 	}
 	
 	add(file: File): void {
@@ -91,28 +94,28 @@ export default class ExplorerComponent extends Vue {
 	
 	getLeft(file: File): number {
 		let field = null;
-		if(file.field < store.state.numGridX){
+		if(file.field < store.getters.getNumGridX(this.explorerId)){
 			field = file.field;
 		}else{
-			field = (file.field / store.state.numGridX) - Math.trunc(file.field / store.state.numGridX);
-			field*=store.state.numGridX;
+			field = (file.field / store.getters.getNumGridX(this.explorerId)) - Math.trunc(file.field / store.getters.getNumGridX(this.explorerId));
+			field*=store.getters.getNumGridX(this.explorerId);
 		}
 		return (field * 5) + (field * this.FILE_WIDTH);
 	}
-	
+
 	getTop(file: File): number {
-		let top = Math.trunc(file.field / store.state.numGridX);
+		let top = Math.trunc(file.field / store.getters.getNumGridX(this.explorerId));
 		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
-	
+
 	/** Computed **/
-	
+
 	get files(): Array<File> {
-		return store.state.files;
+		return store.getters.getFiles(this.explorerId);
 	}
 
 	get folders(): Array<File> {
-		return store.state.files.filter(f => {
+		return store.getters.getFiles(this.explorerId).filter(f => {
 			return f.dir === true && this.currentDir.id !== f.id;
 		});
 	}

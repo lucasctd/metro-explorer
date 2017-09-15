@@ -22,6 +22,6 @@ let opt = new Option("Show", (e, file) => {
             new FileImpl(3, "Folder", undefined, "folder-o", null, true)
 		];
 
-const explorer = new Explorer("#explorer");
+const explorer = new Explorer("explorer");
 explorer.setFiles(files);
 explorer.run();

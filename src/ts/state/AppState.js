@@ -8,25 +8,22 @@ export default new Vuex.Store({
     state: {
         data: []
     },
-    getDataById(id){
-        return state.data.find(d => d.id === id);
-    },
     mutations: {
         SET_FILES(state, payload){
-            this.getDataById(payload.id).files = payload.files;
+            state.data.find(d => d.id === payload.id).files = payload.files;
         },
         SET_NUM_GRID_X(state, payload){
-            this.getDataById(payload.id).numGridX = payload.numGridX;
+            state.data.find(d => d.id === payload.id).numGridX = payload.numGridX;
         },
         UPDATE_FILE(state, payload){
-            this.getDataById(payload.id).files.forEach(f => {
+            getDataById(payload.id).files.forEach(f => {
                 if(f.id === payload.file.id){
                     f = file;
                 }
             })
         },
         DELETE_FILE(state, payload){
-            this.getDataById(payload.id).files = this.getDataById(payload.id).files.filter(f => f.id !== payload.file.id);
+            state.data.find(d => d.id === payload.id).files = this.getDataById(payload.id).files.filter(f => f.id !== payload.file.id);
         },
 		ADD_EXPLORER_DATA(state, data){
             state.data.push(data);
@@ -52,13 +49,19 @@ export default new Vuex.Store({
 	getters: {
 		getFileById(state) {
 			return id => {
-				let list = this.getDataById(payload.id).files.filter(f => f.id === id);
+				let list = state.data.find(d => d.id === payload.id).files.filter(f => f.id === id);
 				return list.length > 0 ? list[0] : null;
 			}			
         },
         getFiles(state) {
             return id => {
-                return this.getDataById(payload.id).files;
+                const obj = state.data.find(d => d.id === id);
+                return obj ? obj.files : null;
+            }
+        },
+        getNumGridX(state) {
+		    return id => {
+		        return state.data.find(d => d.id === id).numGridX;
             }
         }
 	}

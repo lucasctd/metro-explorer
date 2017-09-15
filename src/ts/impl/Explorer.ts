@@ -21,7 +21,7 @@ class Explorer extends Vue{
 	
 	run(): void {
 		this.vue = new Vue({
-			el: this.data.id,
+			el: "#"+this.data.id,
 			store,
 			components: {
 				"ex-plorer": ExplorerComponent,
@@ -31,7 +31,7 @@ class Explorer extends Vue{
 	}
 	
 	public setFiles(files: Array<File>): void {
-		this.data.files.forEach(f => {
+		files.forEach(f => {
 			if(!f.options && f.dir !== true){
 				f.options = [
 						new Option("Move", (e, file) => {
@@ -47,7 +47,7 @@ class Explorer extends Vue{
 			}
 		});
 		this.data.files = files;
-        store.dispatch('setFiles', {id: this.data.id, file: this.data.files});
+        store.dispatch('setFiles', this.data);
     }
 	
 	protected deleteFile(e, file: FileImpl): void {
