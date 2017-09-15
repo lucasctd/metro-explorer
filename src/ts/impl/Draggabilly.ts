@@ -64,7 +64,7 @@ class Draggabilly extends DraggableInterface {
 	getField(left: number, fileWidth: number, top: number, fileHeight: number) : number {
 		const coll: number = Math.trunc(left / fileWidth);
 		const row: number = Math.trunc(top / fileHeight);
-		return row * store.getters.getNumGridX("explorer") + coll;
+		return row * store.getters.getNumGridX(this.rootId) + coll;
 	}
 	
 }

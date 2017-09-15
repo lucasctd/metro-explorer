@@ -2,6 +2,7 @@ abstract class Draggable {
 	el: any;
     grid: any;
 	limit: any;
+	rootId: string;
 	
 	/* Events */
 	abstract onDrag(element, args);

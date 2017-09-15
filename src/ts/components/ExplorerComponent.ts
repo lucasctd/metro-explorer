@@ -4,16 +4,16 @@ import FileImpl from '../impl/File';
 import FileComponent from '../components/FileComponent';
 import ContextMenuComponent from '../components/ContextMenuComponent';
 import DialogComponent from '../components/DialogComponent';
-import { Component, Prop} from 'vue-property-decorator';
+import {Component, Prop} from 'vue-property-decorator';
 import store from '../state/AppState';
 import Option from '../impl/Option';
 
 @Component({
     template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
-                   	<ex-file v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
+                   	<ex-file :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeft(file)" :top="getTop(file)" :dragLimitSelector="dragLimitSelector"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
 				   	<ex-dialog id="explorer-dialog" :show="true">
-				   		<ex-file v-for="folder in folders" :key="folder.id" :file="folder" dragLimitSelector="explorer-dialog"></ex-file>
+				   		<ex-file v-for="folder in folders" :key="folder.id" :rootId="rootId" :file="folder" dragLimitSelector="explorer-dialog"></ex-file>
 						<button @click="" slot="footer" :disabled="selectedFolder == null" class="explorer-move-button" :class="{disabled: selectedFolder == null, enabled: selectedFolder != null}">Move</button>
 					</ex-dialog>
                </div>`,
@@ -31,15 +31,13 @@ export default class ExplorerComponent extends Vue {
 	@Prop({"default": 600})
 	height: number;
 
-	@Prop()
-	explorerId: string;
-
 	cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
 	dragLimitSelector: string = null;
 	options: Array<Option> = [];
 	selectedFolder: File = null;
+	rootId: string;
 	private FILE_WIDTH: number = 110;
 	private FILE_HEIGHT: number = 140;
 	private currentDir: File = new FileImpl(0, "Root", null, "folder-o");
@@ -47,6 +45,7 @@ export default class ExplorerComponent extends Vue {
 	constructor() {
 		super();
 		this.dragLimitSelector = "#explorer-component";
+		this.rootId = this.$parent.$el.id;
 	}
 	
 	mounted() {
@@ -85,7 +84,7 @@ export default class ExplorerComponent extends Vue {
 	setGridSize(): void {
 		const x: number = Math.trunc(this.width / this.FILE_WIDTH);
 		const y: number = Math.trunc(this.height / this.FILE_HEIGHT);
-		store.dispatch('setNumGridX', {id: this.explorerId, numGridX: x - 1});
+		store.dispatch('setNumGridX', {id: this.rootId, numGridX: x - 1});
 	}
 	
 	add(file: File): void {
@@ -94,28 +93,27 @@ export default class ExplorerComponent extends Vue {
 	
 	getLeft(file: File): number {
 		let field = null;
-		if(file.field < store.getters.getNumGridX(this.explorerId)){
+		if(file.field < store.getters.getNumGridX(this.rootId)){
 			field = file.field;
 		}else{
-			field = (file.field / store.getters.getNumGridX(this.explorerId)) - Math.trunc(file.field / store.getters.getNumGridX(this.explorerId));
-			field*=store.getters.getNumGridX(this.explorerId);
+			field = (file.field / store.getters.getNumGridX(this.rootId)) - Math.trunc(file.field / store.getters.getNumGridX(this.rootId));
+			field*=store.getters.getNumGridX(this.rootId);
 		}
 		return (field * 5) + (field * this.FILE_WIDTH);
 	}
 
 	getTop(file: File): number {
-		let top = Math.trunc(file.field / store.getters.getNumGridX(this.explorerId));
+		let top = Math.trunc(file.field / store.getters.getNumGridX(this.rootId));
 		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
 
 	/** Computed **/
-
 	get files(): Array<File> {
-		return store.getters.getFiles(this.explorerId);
+		return store.getters.getFiles(this.rootId);
 	}
 
 	get folders(): Array<File> {
-		return store.getters.getFiles(this.explorerId).filter(f => {
+		return store.getters.getFiles(this.rootId).filter(f => {
 			return f.dir === true && this.currentDir.id !== f.id;
 		});
 	}

@@ -25,7 +25,7 @@ import * as _ from "lodash";
 })
 export default class FileComponent extends Vue {
 
-    @Prop()
+    @Prop({required: true})
     file: File;
 
 	@Prop()
@@ -36,6 +36,9 @@ export default class FileComponent extends Vue {
 
     @Prop()
     top: number;
+
+    @Prop({required: true})
+    rootId: string;
 
     draggable: Draggable = null;
     dependencyInjection: DependencyInjector = null;
@@ -60,7 +63,8 @@ export default class FileComponent extends Vue {
         this.dependencyInjection = new DependencyInjector();
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
 		this.draggable.el = document.querySelector("#ex_" + this.file.id);
-		this.draggable.limit = document.querySelector(this.dragLimitSelector);
+        this.draggable.limit = document.querySelector(this.dragLimitSelector);
+        this.draggable.rootId = this.rootId;
 		this.registerListeners();
         this.draggable.start();
         this.draggable.setCoord(this.left, this.top);        
