@@ -1,7 +1,7 @@
 <h2>Metro-Explorer</h2>
 <p>
 It's a simple library which may help you to handle files with JS. It may be used to display files a user has
-uploaded to your server. You only need to pass them as JS Objects and they will e displayed. You can also add a context menu
+uploaded to your server. You only need to pass them as JS Objects and they will be displayed. You can also add a context menu
 which will be displayed when a user right click on a file.
 You may know more about it checking the master branch or at <a href="http://www.metroui.us" target="_blank">www.metroui.us.</a>
 </p>
