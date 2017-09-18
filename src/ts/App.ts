@@ -19,7 +19,7 @@ let opt = new Option("Show", (e, file) => {
 		let files = [
 			new FileImpl(1, "Print", undefined, "file-word-o"),
 			new FileImpl(2, "Fox", undefined, "file-word-o"),
-            new FileImpl(3, "Folder", undefined, "folder-o", null, true)
+            new FileImpl(3, "Folder", undefined, "folder-o", [new Option('Open', null), new Option('Delete', null)], true)
 		];
 
 const explorer = new Explorer("explorer");

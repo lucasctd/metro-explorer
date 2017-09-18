@@ -21,12 +21,19 @@
 }
 
 .explorer-move-button.enabled {
-	background-color: darkgray
+	/*background-color: darkgray*/
+    background-color gray
+    color white
+    &:hover {
+        opacity: .7
+    }
 }
 
 .explorer-move-button.disabled {
-    background-color: lightgray;
-    box-shadow: 1px 1px 2px #888888;
+    background-color lightgray
+    color gray
+    /*background-color: lightgray;
+    box-shadow: 1px 1px 2px #888888;*/
 }
 
 @import "context-menu.styl"

@@ -1,11 +1,6 @@
 .explorer-dialog {
     display table
-    margin 100px auto
     position absolute
-    top 0
-    left 0
-    bottom 0
-    right 0
     background-color white
     border 1px solid gray
     border-radius 10px
@@ -17,14 +12,35 @@
         right 5px
         color #EE0000
         cursor pointer
+        opacity: 1
+        &:hover {
+            opacity: .7
+        }
+    }
+
+    .header {
+        position relative
+        height 40px
+        width calc(100% - 20px) /* minus 20px of padding (left & right)*/
+        padding 10px
     }
 
     .content {
+        position relative
         width calc(100% - 20px)
         height auto
-        position absolute
         top 40px
         padding 10px
+        overflow-x hidden
+        overflow-y auto
+    }
+
+    .footer {
+        position relative
+        width calc(100% - 20px) /* minus 20px of padding (left & right)*/
+        height 50px
+        padding 10px
+        border-top 1px solid gray
     }
 }
 .explorer-modal {
@@ -37,3 +53,4 @@
     opacity .9
     z-index 10
 }
+

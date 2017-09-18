@@ -5,13 +5,17 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
     template: `<div>
                     <div class="explorer-modal" v-show="showModal"></div>
                     <transition name="explorer-fade">
-                        <div class="explorer-dialog" v-show="showDialog" :style="{ width: width + 'px', height: height + 'px'}">
-                            <span class="fa fa-times-circle close-icon fa-2x" :style="{opacity: opacity}" title="Close" @click="showModal = showDialog = false" 
-                                @mouseover="onMouseOverCloseIcon" @mouseleave="onMouseOutCloseIcon" v-show="closable"></span>
-                            <div class="content">
-                                <slot></slot>
+                        <div class="explorer-dialog" v-show="showDialog" :style="{ width: width + 'px', height: height + 'px', top: top + 'px', left: left + 'px'}">
+                            <span class="fa fa-times-circle close-icon fa-2x" title="Close" @click="closeDialog" v-show="closable"></span>
+                            <div class="header"> 
+                                <span class="fa fa-times-circle close-icon fa-2x" title="Close" @click="closeDialog" v-show="closable"></span> 
+                            </div> 
+                            <div class="content" :style="{height: contentHeight + 'px'}"> 
+                                <slot></slot> 
+                            </div> 
+                            <div class="footer"> 
+                                <slot name="footer"></slot> 
                             </div>
-							<slot name="footer"></slot>
                        </div>
                     </transition>
                 </div>`
@@ -35,9 +39,11 @@ export default class DialogComponent extends Vue {
 
     showDialog: boolean = false;
     showModal: boolean = false;
-    opacity: number = 1;
-	
-	@Watch('show')
+    top: number = null;
+    left: number = null;
+    contentHeight: number = 0;
+
+    @Watch('show')
 	onShowChange(val: boolean, oldVal: boolean) {
         this.showDialog = val;
 	}
@@ -46,17 +52,17 @@ export default class DialogComponent extends Vue {
     onShowDialogChange(val: boolean, oldVal: boolean) {
         this.$emit('update:show', val)
     }
-	
-	mounted(){
-      this.showDialog = this.show;
-      this.showModal = this.modal && this.show;
-	}
 
-    onMouseOverCloseIcon(){
-	    this.opacity = .5;
+    mounted(){
+        this.showDialog = this.show;
+        this.showModal = this.modal && this.show;
+        this.contentHeight = this.height - 40 - 55;//dialog's height minus content's top minus footer's height
+        this.top = (window.innerHeight - this.height - 100) / 2;
+        this.left = window.innerWidth / 2 - this.width / 2;
     }
 
-    onMouseOutCloseIcon(){
-        this.opacity = 1;
+    closeDialog() {
+        this.showModal = false;
+        this.showDialog = false;
     }
 }
