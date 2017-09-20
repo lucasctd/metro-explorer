@@ -3,9 +3,9 @@ import { Component, Prop, Watch } from 'vue-property-decorator';
 
 @Component({
     template: `<div>
-                    <div class="explorer-modal" v-show="showModal"></div>
+                    <div class="explorer-modal" v-show="showModal" :class="{global:global}"></div>
                     <transition name="explorer-fade">
-                        <div class="explorer-dialog" v-show="showDialog" :style="{ width: width + 'px', height: height + 'px', top: top + 'px', left: left + 'px'}">
+                        <div class="explorer-dialog" :class="{global:global}" v-show="showDialog" :style="{ width: width + 'px', height: height + 'px', top: top + 'px', left: left + 'px'}">
                             <span class="fa fa-times-circle close-icon fa-2x" title="Close" @click="closeDialog" v-show="closable"></span>
                             <div class="header"> 
                                 <span class="fa fa-times-circle close-icon fa-2x" title="Close" @click="closeDialog" v-show="closable"></span> 
@@ -30,6 +30,9 @@ export default class DialogComponent extends Vue {
 
     @Prop({'default': true})
     modal: boolean;
+	
+	@Prop({'default': true})
+    global: boolean;
 
     @Prop({'default': 500})
     width: number;
