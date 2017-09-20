@@ -9,7 +9,7 @@ import * as _ from "lodash";
 
 @Component({
     template: `<transition name="explorer-fade">
-				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="selected = !selected" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
+				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="click" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
                     <div v-show="selected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -53,13 +53,9 @@ export default class FileComponent extends Vue {
 		if(file.renaming === true){
 			setTimeout(() => document.getElementById('rename_' + file.id).focus(), 100);
 		}		
-	}
+	}	
 	
-	updateFileName = _.debounce(function (file) {
-		store.dispatch('updateFile', file);
-	}, 500);
-	
-    mounted(){
+    mounted() {
         this.dependencyInjection = new DependencyInjector();
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
 		this.draggable.el = document.querySelector("#ex_" + this.file.id);
@@ -69,12 +65,19 @@ export default class FileComponent extends Vue {
         this.draggable.start();
         this.draggable.setCoord(this.left, this.top);        
     }
-
-    get icon () {
-        return 'fa-' + this.file.icon;
-    }
-
-    contextMenu(e){
+	
+	click() {
+		this.selected = !this.selected;
+		if(this.selected) {
+			store.dispatch('updateFile', file);
+		}
+	}
+	
+	updateFileName = _.debounce(function (file) {
+		store.dispatch('updateFile', file);
+	}, 500);
+	
+	contextMenu(e){
 		document.dispatchEvent(new Event('closeAllContextMenu'));
         this.cmTop = e.clientY;
         this.cmLeft = e.clientX;
@@ -87,4 +90,8 @@ export default class FileComponent extends Vue {
             this.selected = false;
         });
     }
+
+    get icon () {
+        return 'fa-' + this.file.icon;
+    }    
 }

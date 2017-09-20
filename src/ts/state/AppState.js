@@ -27,23 +27,29 @@ export default new Vuex.Store({
         },
 		ADD_EXPLORER_DATA(state, data){
             state.data.push(data);
+        },
+		ADD_SELECTED_FILE(state, payload){
+            state.data.find(d => d.id === payload.id).selectedFiles.push(payload.file);
         }
     },
     actions: {
-        setFiles({commit}, payload){
+        setFiles({commit}, payload) {
             commit('SET_FILES', payload);
         },
-        updateFile({commit}, payload){
+        updateFile({commit}, payload) {
             commit('UPDATE_FILE', payload);
         },
-        setNumGridX({commit}, payload){
+        setNumGridX({commit}, payload) {
             commit('SET_NUM_GRID_X', payload);
         },
-        deleteFile({commit}, payload){
+        deleteFile({commit}, payload) {
             commit('DELETE_FILE', payload);
         },
-        addExplorerData({commit}, data){
+        addExplorerData({commit}, data) {
             commit('ADD_EXPLORER_DATA', data);
+        },
+        addSelectedFile({commit}, payload) {
+            commit('ADD_SELECTED_FILE', payload);
         }
     },
 	getters: {
@@ -62,6 +68,11 @@ export default new Vuex.Store({
         getNumGridX(state) {
 		    return id => {
 		        return state.data.find(d => d.id === id).numGridX;
+            }
+        },
+        getSelectedFiles(state) {
+		    return id => {
+		        return state.data.find(d => d.id === id).selectedFiles;
             }
         }
 	}
