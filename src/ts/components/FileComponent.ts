@@ -9,8 +9,8 @@ import * as _ from "lodash";
 
 @Component({
     template: `<transition name="explorer-fade">
-				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="click" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
-                    <div v-show="selected" class="file-selected"></div>
+				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="fileSelected = !fileSelected" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
+                    <div v-show="fileSelected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
                         <p class="file-name" v-show='!file.renaming'>{{file.name}}</p>
@@ -31,19 +31,22 @@ export default class FileComponent extends Vue {
 	@Prop()
 	dragLimitSelector: string;
 
-	@Prop()
+	@Prop({required: false})
     left: number;
 
-    @Prop()
+    @Prop({required: false})
     top: number;
 
     @Prop({required: true})
     rootId: string;
+	
+	@Prop({required: false})
+	selected: boolean;
 
     draggable: Draggable = null;
     dependencyInjection: DependencyInjector = null;
-
-    selected: boolean = false;
+    
+	fileSelected: boolean = false;
     cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
@@ -53,6 +56,23 @@ export default class FileComponent extends Vue {
 		if(file.renaming === true){
 			setTimeout(() => document.getElementById('rename_' + file.id).focus(), 100);
 		}		
+	}
+
+	@Watch('fileSelected')
+    onFileSelectedChange(val, old) {
+		if(this.fileSelected) {
+			this.$emit('select', this.file);
+			//store.dispatch('addSelectedFile', {file: this.file, id: this.rootId});
+		} else {
+			this.$emit('deselect', this.file);
+			//store.dispatch('removeSelectedFile', {file: this.file, id: this.rootId});
+		}
+		this.$emit('update:selected', val);
+	}
+
+	@Watch('selected')
+    onSelectedChange(val, old) {
+		this.fileSelected = val;
 	}	
 	
     mounted() {
@@ -65,13 +85,6 @@ export default class FileComponent extends Vue {
         this.draggable.start();
         this.draggable.setCoord(this.left, this.top);        
     }
-	
-	click() {
-		this.selected = !this.selected;
-		if(this.selected) {
-			store.dispatch('updateFile', file);
-		}
-	}
 	
 	updateFileName = _.debounce(function (file) {
 		store.dispatch('updateFile', file);
@@ -87,7 +100,7 @@ export default class FileComponent extends Vue {
     registerListeners() {
         const that = this;
         document.addEventListener("click", (e) => {
-            this.selected = false;
+            this.fileSelected = false;
         });
     }
 

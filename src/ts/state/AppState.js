@@ -23,14 +23,17 @@ export default new Vuex.Store({
             })
         },
         DELETE_FILE(state, payload){
-            state.data.find(d => d.id === payload.id).files = this.getDataById(payload.id).files.filter(f => f.id !== payload.file.id);
+            state.data.find(d => d.id === payload.id).files = state.data.find(d => d.id === payload.id).files.filter(f => f.id !== payload.file.id);
         },
 		ADD_EXPLORER_DATA(state, data){
             state.data.push(data);
         },
-		ADD_SELECTED_FILE(state, payload){
+		/*ADD_SELECTED_FILE(state, payload){
             state.data.find(d => d.id === payload.id).selectedFiles.push(payload.file);
-        }
+        },
+		REMOVE_SELECTED_FILE(state, payload){
+            state.data.find(d => d.id === payload.id).selectedFiles = state.data.find(d => d.id === payload.id).selectedFiles.filter(f => f.id !== payload.file.id);
+        }*/
     },
     actions: {
         setFiles({commit}, payload) {
@@ -48,9 +51,12 @@ export default new Vuex.Store({
         addExplorerData({commit}, data) {
             commit('ADD_EXPLORER_DATA', data);
         },
-        addSelectedFile({commit}, payload) {
+       /* addSelectedFile({commit}, payload) {
             commit('ADD_SELECTED_FILE', payload);
-        }
+        },
+        removeSelectedFile({commit}, payload) {
+            commit('REMOVE_SELECTED_FILE', payload);
+        }*/
     },
 	getters: {
 		getFileById(state) {
@@ -70,10 +76,10 @@ export default new Vuex.Store({
 		        return state.data.find(d => d.id === id).numGridX;
             }
         },
-        getSelectedFiles(state) {
+        /*getSelectedFiles(state) {
 		    return id => {
 		        return state.data.find(d => d.id === id).selectedFiles;
             }
-        }
+        }*/
 	}
 })

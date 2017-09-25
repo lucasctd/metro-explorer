@@ -11,7 +11,7 @@ abstract class File {
     renaming: boolean = false;
     dir: boolean = false;
 
-    constructor(id: number, name: string, parent: File, icon: string, options?: Array<OptionInterface>, dir?: boolean) {
+    constructor(id?: number, name?: string, parent?: File, icon?: string, options?: Array<OptionInterface>, dir?: boolean) {
         this.id = id;
         this.name = name;
         this.parent = parent;
