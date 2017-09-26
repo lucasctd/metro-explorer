@@ -10,12 +10,12 @@ import Option from '../impl/Option';
 
 @Component({
     template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
-                   	<ex-file :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeft(file, numGridX)" :top="getTop(file, numGridX)" :dragLimitSelector="dragLimitSelector"></ex-file>
+                   	<ex-file :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" :dragLimitSelector="dragLimitSelector"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
-				   	<ex-dialog id="explorer-dialog" :show="true" :width="moveDialogWidth">
+				   	<ex-dialog id="explorer-dialog" :show="true" :width="moveDialogWidthPx">
 				   		<ex-file v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
-							:left="getLeft(folder, moveDialogNumGridX, index)" :top="getTop(folder, moveDialogNumGridX, index)" dragLimitSelector="explorer-dialog"></ex-file>
-						<button @click="" slot="footer" :disabled="selectedFolder == null" class="explorer-move-button" :class="{disabled: selectedFolder == null, enabled: selectedFolder != null}">Move</button>
+							:left="getLeftPos(folder, moveDialogWidth, index)" :top="getTopPos(folder, moveDialogWidth, index)" dragLimitSelector="explorer-dialog"></ex-file>
+						<button @click="" slot="footer" :disabled="!selectedFolder.id" class="explorer-move-button" :class="{disabled: selectedFolder === null, enabled: selectedFolder !== null}">Move</button>
 					</ex-dialog>
                </div>`,
     components: {
@@ -32,20 +32,18 @@ export default class ExplorerComponent extends Vue {
 	@Prop({"default": 600})
 	height: number;
 
-	cmTop: number = 0;
-    cmLeft: number = 0;
+	cmTop: number = 0;//contextMenu
+    cmLeft: number = 0;//contextMenu
     showContextMenu: boolean = false;
 	dragLimitSelector: string = null;
 	options: Array<Option> = [];
 	selectedFolder: File = new FileImpl();
 	rootId: string;
-	moveDialogWidth: number = 500;
+	moveDialogWidthPx: number = 600;
 	
 	private FILE_WIDTH: number = 110;
 	private FILE_HEIGHT: number = 140;
 	private currentDir: File = new FileImpl(0, "Root", null, "folder-o");
-	private numGridX: number = null;
-	private moveDialogNumGridX: number = 3;
 		
 	constructor() {
 		super();
@@ -55,13 +53,11 @@ export default class ExplorerComponent extends Vue {
 	
 	mounted() {
 		this.updateFilesField();
-		this.setGridSize();
-		this.setMoveDialogGridSize();
+		store.dispatch('setWidth', {id: this.rootId, explorerWidth: this.explorerWidth});
 		this.loadContextMenu();
 	}
 	
 	selectFolder(folder) {
-		console.log(folder);
 		this.selectedFolder = folder;
 	}
 	
@@ -92,40 +88,23 @@ export default class ExplorerComponent extends Vue {
         setTimeout(() => this.showContextMenu = true, 30);
     }
 	
-	setMoveDialogGridSize() {
-		this.moveDialogNumGridX = Math.trunc(this.moveDialogWidth / this.FILE_WIDTH) - 1;
-	}
-
-	setGridSize(): void {
-		const gridX: number = Math.trunc(this.width / this.FILE_WIDTH);
-		//const y: number = Math.trunc(this.height / this.FILE_HEIGHT);
-		store.dispatch('setNumGridX', {id: this.rootId, numGridX: gridX - 1});
-		this.numGridX = gridX - 1;
-	}
-	
 	add(file: File): void {
 		
 	}
 	
-	getLeft(file: File, numGridX: number, fileField?: number): number {
-		
+	getLeftPos(file: File, numGridX: number, fileField?: number): number {
 		let field = null;
-		fileField = fileField ? fileField : file.field;
+		fileField = fileField !== undefined ? fileField : file.field;
 		if(fileField < numGridX){
 			field = fileField;
 		}else{
 			field = (fileField / numGridX) - Math.trunc(fileField / numGridX);
 			field*=numGridX;
 		}
-		if(file.dir === true){
-			console.log(file.dir);
-			console.log('numGridX');
-			console.log(numGridX);
-		}
 		return (field * 5) + (field * this.FILE_WIDTH);
 	}
 
-	getTop(file: File, numGridX: number, fileField?: number): number {
+	getTopPos(file: File, numGridX: number, fileField?: number): number {
 		let top = Math.trunc((fileField ? fileField : file.field) / numGridX);
 		return (5 * top) + (top * this.FILE_HEIGHT);
 	}
@@ -139,5 +118,13 @@ export default class ExplorerComponent extends Vue {
 		return store.getters.getFiles(this.rootId).filter(f => {
 			return f.dir === true && this.currentDir.id !== f.id;
 		});
+	}
+	
+	get explorerWidth(): number {
+		return Math.trunc(this.width / this.FILE_WIDTH) - 1;
+	}
+	
+	get moveDialogWidth(): number {
+		return Math.trunc(this.moveDialogWidthPx / this.FILE_WIDTH) - 1;
 	}
 }

@@ -12,8 +12,8 @@ export default new Vuex.Store({
         SET_FILES(state, payload){
             state.data.find(d => d.id === payload.id).files = payload.files;
         },
-        SET_NUM_GRID_X(state, payload){
-            state.data.find(d => d.id === payload.id).numGridX = payload.numGridX;
+        SET_WIDTH(state, payload){
+            state.data.find(d => d.id === payload.id).width = payload.explorerWidth;
         },
         UPDATE_FILE(state, payload){
             getDataById(payload.id).files.forEach(f => {
@@ -42,8 +42,8 @@ export default new Vuex.Store({
         updateFile({commit}, payload) {
             commit('UPDATE_FILE', payload);
         },
-        setNumGridX({commit}, payload) {
-            commit('SET_NUM_GRID_X', payload);
+        setWidth({commit}, payload) {
+            commit('SET_WIDTH', payload);
         },
         deleteFile({commit}, payload) {
             commit('DELETE_FILE', payload);
@@ -71,9 +71,9 @@ export default new Vuex.Store({
                 return obj ? obj.files : null;
             }
         },
-        getNumGridX(state) {
+        getWidth(state) {
 		    return id => {
-		        return state.data.find(d => d.id === id).numGridX;
+		        return state.data.find(d => d.id === id).width;
             }
         },
         /*getSelectedFiles(state) {

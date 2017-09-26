@@ -4,7 +4,7 @@ class StateData {
 
 	id: string;
 	files: Array<File>;
-    numGridX: number = 5;
+    width: number = 5; //in blocks
 	//selectedFiles: Array<File> = [];
 	
 	constructor(id: string,	files?: Array<File>){
