@@ -49,6 +49,7 @@ export default class DialogComponent extends Vue {
     @Watch('show')
 	onShowChange(val: boolean, oldVal: boolean) {
         this.showDialog = val;
+        this.showModal = this.modal && this.show;
 	}
 
     @Watch('showDialog')
