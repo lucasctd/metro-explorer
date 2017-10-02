@@ -62,10 +62,8 @@ export default class FileComponent extends Vue {
     onFileSelectedChange(val, old) {
 		if(this.fileSelected) {
 			this.$emit('select', this.file);
-			//store.dispatch('addSelectedFile', {file: this.file, id: this.rootId});
 		} else {
 			this.$emit('deselect', this.file);
-			//store.dispatch('removeSelectedFile', {file: this.file, id: this.rootId});
 		}
 		this.$emit('update:selected', val);
 	}
@@ -94,11 +92,11 @@ export default class FileComponent extends Vue {
 		document.dispatchEvent(new Event('closeAllContextMenu'));
         this.cmTop = e.clientY;
         this.cmLeft = e.clientX;
+        this.fileSelected = true;
         setTimeout(() => this.showContextMenu = true, 30);
     }
 
     registerListeners() {
-        const that = this;
         document.addEventListener("click", (e) => {
             this.fileSelected = false;
         });
