@@ -16,9 +16,9 @@ export default new Vuex.Store({
             state.data.find(d => d.id === payload.id).width = payload.explorerWidth;
         },
         UPDATE_FILE(state, payload){
-            getDataById(payload.id).files.forEach(f => {
+          state.data.find(d => d.id === payload.id).files.forEach(f => {
                 if(f.id === payload.file.id){
-                    f = file;
+                    f = payload.file;
                 }
             })
         },
