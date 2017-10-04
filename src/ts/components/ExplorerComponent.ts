@@ -4,7 +4,7 @@ import FileImpl from '../impl/File';
 import FileComponent from '../components/FileComponent';
 import ContextMenuComponent from '../components/ContextMenuComponent';
 import DialogComponent from '../components/DialogComponent';
-import {Component, Prop} from 'vue-property-decorator';
+import {Component, Prop, Watch} from 'vue-property-decorator';
 import store from '../state/AppState';
 import Option from '../impl/Option';
 
@@ -58,6 +58,12 @@ export default class ExplorerComponent extends Vue {
 		this.loadContextMenu();
 	}
 	
+	@Watch('currentDir')
+    onCurrentDirChange() {
+		console.log("currentDir");
+		this.updateFilesField();
+	}	
+	
 	selectFolder(folder) {
 		this.selectedFolder = folder;
 	}
@@ -81,10 +87,14 @@ export default class ExplorerComponent extends Vue {
 				usedFields.push(f.field);
 			}		
 		});
-		let counter = -1;
+		let counter = 0;
 		this.files.forEach(f => {
 			if(f.field === -1){
-				while(usedFields.includes(counter++));
+				console.log(f);
+				while(usedFields.includes(counter)){
+					counter++;
+				}
+				usedFields.push(counter);
 				f.field = counter;
 			}		
 		});
@@ -103,16 +113,15 @@ export default class ExplorerComponent extends Vue {
 	move() {
 	    this.selectedFiles.forEach(f => {
             let file = f as FileImpl;
-	        if(this.selectedFolder.parent.id === this.currentDir.id){
-	            file.visible = false;
-            }
+			file.visible = false;
+			file.field = -1;
             setTimeout(() => {//wait for the fade out effect gets done.
                 file.parent = this.selectedFolder;
                 store.dispatch('updateFile', {id: this.rootId, file: file});
             }, 450);
         });
         this.$parent.$data['showMoveDialog'] = false;
-        this.$parent.$options.methods['moveFile'].call(null, this.selectedFiles);
+        this.$parent.$options.methods['moveFile'].call(null, this.selectedFiles);		
     }
 	
 	getLeftPos(file: File, numGridX: number, fileField?: number): number {
@@ -137,20 +146,27 @@ export default class ExplorerComponent extends Vue {
             this.selectedFolder = null;
         });
     }
+	
+	createBackButton(): File {
+		const backButton = new FileImpl(-1,'Back', undefined, 'arrow-left');
+		backButton.field = 0;
+		return backButton;
+	}
+	
+	checkFilesThatShouldBeVisible(files: Array<File>): Array<File> {
+		return files.filter(f => {
+			const validFile: boolean = f.parent.id === this.currentDir.id;
+			f.visible = validFile;
+            return validFile;
+        });
+	}
 
 	/** Computed **/
 	get files(): Array<File> {
-		const files: Array<File> = store.getters.getFiles(this.rootId).filter(f => {
-		    const validFile: boolean = f.parent.id === this.currentDir.id;
-		    if(validFile === true){
-		        f.visible = true;
-            }
-            return validFile;
-        });
-		if(this.currentDir.id === 0){//if it`s not in the root folder
-            const backButton = new FileImpl(-1,'Back', undefined, 'arrow-left');
-            backButton.field = 0;
-		    files.push(backButton);
+		let files: Array<File> = store.getters.getFiles(this.rootId);
+		files = checkFilesThatShouldBeVisible(files);
+		if(this.currentDir.id !== 0){//if it's not the root folder
+		    files.set(createBackButton());
         }
 		return files;
 	}
