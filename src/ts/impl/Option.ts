@@ -3,10 +3,11 @@ import File from '../interfaces/File';
 
 class Option extends OptionInterface {
 
-    constructor(name: string, callback: OptionCallbackType) {
+    constructor(name: string, callback: OptionCallbackType, _default?: boolean) {
         super();
         this.name = name;
         this.callback = callback;
+		this._default = _default;
     }
 
     callbackFunc(e, file: File) {

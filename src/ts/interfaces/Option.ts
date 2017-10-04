@@ -7,6 +7,7 @@ abstract class Option {
     callback: OptionCallbackType;
 	disabled: boolean = false;
 	visible: boolean = true;
+	_default: boolean = false;
 }
 export default Option;
 export {Option, OptionCallbackType};
