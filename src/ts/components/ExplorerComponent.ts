@@ -10,12 +10,12 @@ import Option from '../impl/Option';
 
 @Component({
     template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
-                   	<ex-file :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" 
+                   	<ex-file :id="'ex_' + file.id" :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" 
                    	:dragLimitSelector="dragLimitSelector" @select="selectFile" @deselect="deselectFile"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
 				   	<ex-dialog id="explorer-dialog" :show="showMoveDialog" :width="moveDialogWidthPx">
-				   		<ex-file v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
-							:left="getLeftPos(folder, moveDialogWidth, index)" :top="getTopPos(folder, moveDialogWidth, index)" dragLimitSelector="explorer-dialog"></ex-file>
+				   		<ex-file :id="'dir_' + folder.id" v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
+							:left="getLeftPos(folder, moveDialogWidth, index)" :top="getTopPos(folder, moveDialogWidth, index)" dragLimitSelector="#explorer-dialog"></ex-file>
 						<button @click="move" slot="footer" :disabled="!selectedFolder.id" class="explorer-move-button" :class="{disabled: !selectedFolder.id, enabled: selectedFolder.id}">Move</button>
 					</ex-dialog>
                </div>`,
@@ -60,7 +60,6 @@ export default class ExplorerComponent extends Vue {
 	
 	@Watch('currentDir')
     onCurrentDirChange() {
-		console.log("currentDir");
 		this.updateFilesField();
 	}	
 	
@@ -90,7 +89,6 @@ export default class ExplorerComponent extends Vue {
 		let counter = 0;
 		this.files.forEach(f => {
 			if(f.field === -1){
-				console.log(f);
 				while(usedFields.includes(counter)){
 					counter++;
 				}
@@ -117,6 +115,7 @@ export default class ExplorerComponent extends Vue {
 			file.field = -1;
             setTimeout(() => {//wait for the fade out effect gets done.
                 file.parent = this.selectedFolder;
+				file.parent.id = this.unfoldFolderId(file.parent.id);
                 store.dispatch('updateFile', {id: this.rootId, file: file});
             }, 450);
         });
@@ -148,7 +147,13 @@ export default class ExplorerComponent extends Vue {
     }
 	
 	createBackButton(): File {
-		const backButton = new FileImpl(-1,'Back', undefined, 'arrow-left');
+		const backButton = new FileImpl(-1,'Back', undefined, 'arrow-left', 
+			[
+				new Option('Back', () => {
+					this.$parent.$data['currentDir'] = this.currentDir.parent;
+				}, true)
+			]
+		);
 		backButton.field = 0;
 		return backButton;
 	}
@@ -156,25 +161,37 @@ export default class ExplorerComponent extends Vue {
 	checkFilesThatShouldBeVisible(files: Array<File>): Array<File> {
 		return files.filter(f => {
 			const validFile: boolean = f.parent.id === this.currentDir.id;
-			f.visible = validFile;
+			let file = f as FileImpl;
+			file.visible = validFile;
             return validFile;
         });
+	}
+	
+	obfuscateFolderId(id: number): number {
+		return id * 10;
+	}
+	
+	unfoldFolderId(id: number): number {
+		return id / 10;
 	}
 
 	/** Computed **/
 	get files(): Array<File> {
 		let files: Array<File> = store.getters.getFiles(this.rootId);
-		files = checkFilesThatShouldBeVisible(files);
+		files = this.checkFilesThatShouldBeVisible(files);
 		if(this.currentDir.id !== 0){//if it's not the root folder
-		    files.set(createBackButton());
+		    files.push(this.createBackButton());
         }
 		return files;
 	}
 
 	get folders(): Array<File> {
-		return store.getters.getFiles(this.rootId).filter(f => {
+		let folders: Array<File> = store.getters.getFiles(this.rootId).filter(f => {
 			return f.dir === true && this.currentDir.id !== f.id;
+		}).map(f => {
+			return new FileImpl(this.obfuscateFolderId(f.id), f.name, f.parent, f.icon, f.options, f.dir);//make a deep copy of the directory (not only the "pointer") not only its reference.
 		});
+		return folders;
 	}
 	
 	get explorerWidth(): number {
@@ -190,6 +207,6 @@ export default class ExplorerComponent extends Vue {
     }
 
     get currentDir(): File {
-	   return this.$parent.$data['currentDir']
+	   return this.$parent.$data['currentDir'];
     }
 }
