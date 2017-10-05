@@ -84,6 +84,15 @@ export default class FileComponent extends Vue {
         this.draggable.setCoord(this.left, this.top);        
     }
 	
+	dblclick(e) {
+		let opt: Option = this.file.options.find(o => o._default);
+		if(opt !== undefined){
+			opt.callback(e, this.file);
+		}else{
+			this.file.options[0].callback(e, this.file);
+		}		
+	}
+	
 	updateFileName = _.debounce(function (file) {
 		store.dispatch('updateFile', file);
 	}, 500);
