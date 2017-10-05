@@ -6,10 +6,12 @@ import {DependencyInjector} from '../huject.config';
 import { Component, Prop, Watch } from 'vue-property-decorator';
 import store from '../state/AppState';
 import * as _ from "lodash";
+import Option from '../interfaces/Option';
 
 @Component({
     template: `<transition name="explorer-fade">
-				<div :id="'ex_' + file.id" class="explorer-file" v-show="file.visible" @click.stop="fileSelected = !fileSelected" @contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}">
+				<div :id="id" class="explorer-file" v-show="file.visible" @click.stop="fileSelected = !fileSelected" 
+					@contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}" @dblclick="dblclick">
                     <div v-show="fileSelected" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
@@ -24,6 +26,9 @@ import * as _ from "lodash";
     }
 })
 export default class FileComponent extends Vue {
+
+	@Prop({required: true})
+    id: string;
 
     @Prop({required: true})
     file: File;
@@ -76,12 +81,12 @@ export default class FileComponent extends Vue {
     mounted() {
         this.dependencyInjection = new DependencyInjector();
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
-		this.draggable.el = document.querySelector("#ex_" + this.file.id);
+		this.draggable.el = document.querySelector("#" + this.id);
         this.draggable.limit = document.querySelector(this.dragLimitSelector);
         this.draggable.rootId = this.rootId;
 		this.registerListeners();
         this.draggable.start();
-        this.draggable.setCoord(this.left, this.top);        
+        this.draggable.setCoord(this.left, this.top);
     }
 	
 	dblclick(e) {
