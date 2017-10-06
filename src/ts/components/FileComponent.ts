@@ -12,7 +12,7 @@ import Option from '../interfaces/Option';
     template: `<transition name="explorer-fade">
 				<div :id="id" class="explorer-file" v-show="file.visible" @click.stop="fileSelected = !fileSelected" 
 					@contextmenu.prevent.stop="contextMenu" :style="{top: top + 'px', left: left + 'px'}" @dblclick="dblclick">
-                    <div v-show="fileSelected" class="file-selected"></div>
+                    <div v-show="fileSelected && file.renaming === false" class="file-selected"></div>
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
                         <p class="file-name" v-show='!file.renaming'>{{file.name}}</p>
@@ -83,7 +83,8 @@ export default class FileComponent extends Vue {
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
 		this.draggable.el = document.querySelector("#" + this.id);
         this.draggable.limit = document.querySelector(this.dragLimitSelector);
-        this.draggable.rootId = this.rootId;
+        this.draggable.explorerId = this.rootId;
+		this.draggable.file = this.file;
 		this.registerListeners();
         this.draggable.start();
         this.draggable.setCoord(this.left, this.top);
@@ -99,7 +100,10 @@ export default class FileComponent extends Vue {
 	}
 	
 	updateFileName = _.debounce(function (file) {
-		store.dispatch('updateFile', file);
+		if(file.name.length === 0){
+			file.name = "undefined";
+		}
+		store.dispatch('updateFile', {id: this.rootId, file: file});
 	}, 500);
 	
 	contextMenu(e){
