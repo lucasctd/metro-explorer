@@ -54,7 +54,7 @@ export default class DialogComponent extends Vue {
 
     @Watch('showDialog')
     onShowDialogChange(val: boolean, oldVal: boolean) {
-        this.$emit('update:show', val)
+        this.$emit('syncShow', val)
     }
 
     mounted(){
