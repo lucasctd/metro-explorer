@@ -1,8 +1,11 @@
+import File from "./File";
+
 abstract class Draggable {
 	el: any;
     grid: any;
 	limit: any;
-	rootId: string;
+	file: File;
+	explorerId: string;	
 	
 	/* Events */
 	abstract onDrag(element, args);

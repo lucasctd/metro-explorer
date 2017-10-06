@@ -28,6 +28,9 @@ export default new Vuex.Store({
 		ADD_EXPLORER_DATA(state, data){
             state.data.push(data);
         },
+        ADD_FILE(state, payload){
+            state.data.find(d => d.id === payload.id).files.push(payload.file);
+        },
 		/*ADD_SELECTED_FILE(state, payload){
             state.data.find(d => d.id === payload.id).selectedFiles.push(payload.file);
         },
@@ -50,6 +53,9 @@ export default new Vuex.Store({
         },
         addExplorerData({commit}, data) {
             commit('ADD_EXPLORER_DATA', data);
+        },
+        addFile({commit}, payload) {
+            commit('ADD_FILE', payload);
         },
        /* addSelectedFile({commit}, payload) {
             commit('ADD_SELECTED_FILE', payload);

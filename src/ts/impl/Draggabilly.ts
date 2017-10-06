@@ -40,11 +40,9 @@ class Draggabilly extends DraggableInterface {
 	}
 	
 	onDrop(event, args) {
-		const el = event.path.filter(p => p.id && p.id.startsWith('ex_'))[0];
 		const field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
-		let file = store.getters.getFileById(Number(this.el.id.replace('ex_', '')));
-		file.field = field;
-		store.dispatch('updateFile', file);
+		this.file.field = field;
+		store.dispatch('updateFile', {id: this.explorerId, file: this.file});
 	}
 	
 	/* Methods */
@@ -64,7 +62,7 @@ class Draggabilly extends DraggableInterface {
 	getField(left: number, fileWidth: number, top: number, fileHeight: number) : number {
 		const coll: number = Math.trunc(left / fileWidth);
 		const row: number = Math.trunc(top / fileHeight);
-		return row * store.getters.getNumGridX(this.rootId) + coll;
+		return row * store.getters.getWidth(this.explorerId) + coll;
 	}
 	
 }
