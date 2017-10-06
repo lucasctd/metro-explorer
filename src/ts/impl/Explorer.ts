@@ -12,12 +12,24 @@ class Explorer extends Vue{
 
 	private vue: Vue;
 	private data: StateData;
-    private currentDir: File = new FileImpl(0, "Root", undefined, "folder-o");
+	private currentDir: File = new FileImpl(0, "Root", undefined, "folder-o");
+	private folderOptions: Array<Option> = null;
 
 	constructor(id: string, files?: Array<File>) {
 		super();
 		this.data = new StateData(id, files);
 		store.dispatch('addExplorerData', this.data);
+		this.folderOptions = [
+			new Option('Open', (e, folder: File) => {
+				this.openFolder(e, folder);
+			}),
+			new Option('Rename', (e, folder: File) => {
+				this.renameFile(e, folder);
+			}),
+			new Option('Delete', (e, folder: File) => {
+				this.deleteFolder(e, folder);
+			})
+		];
 	}
 	
 	run(): void {
@@ -36,6 +48,9 @@ class Explorer extends Vue{
 			methods: {
 				moveFile(files: Array<File>){
                     that.moveFile(files);
+				},
+				newFolder(){
+                    that.newFolder();
 				}
 			}
 		});
@@ -57,14 +72,7 @@ class Explorer extends Vue{
                         })
                     ];
 				}else{
-                    f.options = [
-                    	new Option('Open', (e, folder: File) => {
-							this.openFolder(e, folder);
-						}),
-						new Option('Delete', (e, folder: File) => {
-                            this.deleteFolder(e, folder);
-                        })
-					];
+                    f.options = this.folderOptions;
 				}
 			}
 			if(!f.parent){
@@ -99,7 +107,27 @@ class Explorer extends Vue{
     }
 
     protected deleteFolder(e, folder: File): void {
-    }
+	}
+	
+	protected newFolder(): void {
+		const file = new FileImpl(this.generateId(), 'New Folder', this.currentDir, 'folder-o', this.folderOptions, true);
+		file.renaming = true;
+		store.dispatch('addFile', {id: this.data.id, file});
+		setTimeout(() => {
+			const input = <HTMLElement> document.querySelector("#ex_" + file.id + " > .icon-area > .rename-input"); // cast, it could also be done like this document.querySelector("#ex_" + file.id + " > .icon-area > .rename-input") as HTMLElement
+			input.focus();	
+		}, 500);
+	}
+
+	private generateId(): number {
+		let id = Math.floor((Math.random() * 1000) + 1);
+		let usedIds: Array<number> = [];
+		usedIds = store.getters.getFiles(this.data.id).map(f => f.id);
+		while(usedIds.includes(id)){
+			id = Math.floor((Math.random() * 1000) + 1);
+		}
+		return id;
+	}
 	
 }
 
