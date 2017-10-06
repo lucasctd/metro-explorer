@@ -13,10 +13,10 @@ import Option from '../impl/Option';
                    	<ex-file :id="'ex_' + file.id" :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" 
                    	:dragLimitSelector="dragLimitSelector" @select="selectFile" @deselect="deselectFile"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
-				   	<ex-dialog id="explorer-dialog" :show="showMoveDialog" :width="moveDialogWidthPx">
-				   		<ex-file :id="'dir_' + folder.id" v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
+				   	<ex-dialog id="explorer-dialog" :show="showMoveDialog" :width="moveDialogWidthPx" @syncShow="updateShowMoveDialog">
+				   		<ex-file :id="'dir_' + folder.id" v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" @deselect="deselectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
 							:left="getLeftPos(folder, moveDialogWidth, index)" :top="getTopPos(folder, moveDialogWidth, index)" dragLimitSelector="#explorer-dialog"></ex-file>
-						<button @click="move" slot="footer" :disabled="!selectedFolder.id" class="explorer-move-button" :class="{disabled: !selectedFolder.id, enabled: selectedFolder.id}">Move</button>
+						<button @click="move" slot="footer" :disabled="numSelectedFolders === 0" class="explorer-move-button" :class="{disabled: numSelectedFolders === 0, enabled: numSelectedFolders > 0}">Move</button>
 					</ex-dialog>
                </div>`,
     components: {
@@ -39,6 +39,7 @@ export default class ExplorerComponent extends Vue {
 	dragLimitSelector: string = null;
 	options: Array<Option> = [];
 	selectedFolder: File = new FileImpl();
+	numSelectedFolders: number = 0;
     selectedFiles: Array<File> = [];
 	rootId: string;
 	moveDialogWidthPx: number = 600;
@@ -65,6 +66,11 @@ export default class ExplorerComponent extends Vue {
 	
 	selectFolder(folder) {
 		this.selectedFolder = folder;
+		this.numSelectedFolders++;
+	}
+	
+	deselectFolder(folder) {
+		this.numSelectedFolders--;
 	}
 
     selectFile(file: File) {
@@ -76,7 +82,10 @@ export default class ExplorerComponent extends Vue {
     }
 	
 	loadContextMenu() {
-		this.options.push(new Option('New Folder', () => console.log('New Folder')));
+		this.options.push(new Option('New Folder', () => {
+			this.$parent.$options.methods['newFolder'].call(null);
+			this.updateFilesField();			
+		}));
 	}
 
 	updateFilesField() {
@@ -114,8 +123,8 @@ export default class ExplorerComponent extends Vue {
 			file.visible = false;
 			file.field = -1;
             setTimeout(() => {//wait for the fade out effect gets done.
-                file.parent = this.selectedFolder;
-				file.parent.id = this.unfoldFolderId(file.parent.id);
+                file.parent = new FileImpl(this.unfoldFolderId(this.selectedFolder.id), this.selectedFolder.name, this.selectedFolder.parent, 
+					this.selectedFolder.icon, this.selectedFolder.options, this.selectedFolder.dir);
                 store.dispatch('updateFile', {id: this.rootId, file: file});
             }, 450);
         });
@@ -173,6 +182,10 @@ export default class ExplorerComponent extends Vue {
 	
 	unfoldFolderId(id: number): number {
 		return id / 10;
+	}
+	
+	updateShowMoveDialog(val: boolean) {
+		this.$parent.$data['showMoveDialog'] = val;
 	}
 
 	/** Computed **/
