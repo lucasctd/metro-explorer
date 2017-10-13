@@ -57,6 +57,10 @@ export default class ExplorerComponent extends Vue {
 		this.updateFilesField();
 		store.dispatch('setWidth', {id: this.rootId, explorerWidth: this.explorerWidth});
 		this.loadContextMenu();
+		
+		document.addEventListener("movingToChild", (e) => {
+            console.log(e);
+		});
 	}
 	
 	@Watch('currentDir')
@@ -118,8 +122,18 @@ export default class ExplorerComponent extends Vue {
 	}
 
 	move() {
+		let file: FileImpl = null;
+		let movingToChild: boolean = false;
+		const explorerElement = document.getElementById(this.rootId);
 	    this.selectedFiles.forEach(f => {
-            let file = f as FileImpl;
+            file = f as FileImpl;
+			if(f.dir === true){
+				movingToChild = this.checkIfMovingToChild(f);
+				if(movingToChild === true){
+					explorerElement.dispatchEvent(new CustomEvent("movingToChild", {'detail': {file: f}));
+					return; //continue
+				}
+			}
 			file.visible = false;
 			file.field = -1;
             setTimeout(() => {//wait for the fade out effect gets done.
@@ -129,8 +143,24 @@ export default class ExplorerComponent extends Vue {
             }, 450);
         });
         this.$parent.$data['showMoveDialog'] = false;
-        this.$parent.$options.methods['moveFile'].call(null, this.selectedFiles);		
+        this.$parent.$options.methods['move'].call(null, this.selectedFiles);		
     }
+	
+	private checkIfMovingToChild(folder: File): boolean {
+		let children: Array<File> = this.findFolderChildren(folder.id);
+		return children.length > 0;
+	}
+	
+	private findFolderChildren(parentId: number): Array<File> {
+		let children: Array<File> = [];
+		this.files.forEach(f => {
+			if(f.parent.id === parentId && f.dir === true) {
+				children.push(f);
+				children = children.concat(this.findFolderChildren(f.id));
+			}
+		});
+		return children;
+	}
 	
 	getLeftPos(file: File, numGridX: number, fileField?: number): number {
 		let field = null;

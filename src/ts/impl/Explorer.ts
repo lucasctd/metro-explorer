@@ -24,10 +24,10 @@ class Explorer extends Vue{
 				this.openFolder(e, folder);
 			}),
 			new Option('Rename', (e, folder: File) => {
-				this.renameFile(e, folder);
+				this.rename(e, folder);
 			}),
 			new Option('Delete', (e, folder: File) => {
-				this.deleteFolder(e, folder);
+				this.remove(e, folder);
 			})
 		];
 	}
@@ -47,7 +47,7 @@ class Explorer extends Vue{
 			},
 			methods: {
 				moveFile(files: Array<File>){
-                    that.moveFile(files);
+                    that.move(files);
 				},
 				newFolder(){
                     that.newFolder();
@@ -65,10 +65,10 @@ class Explorer extends Vue{
                             this.showMoveDialog();
                         }),
                         new Option("Rename", (e, file: File) => {
-                            this.renameFile(e, file);
+                            this.rename(e, file);
                         }),
                         new Option("Delete", (e, file: File) => {
-                            this.deleteFile(e, file);
+                            this.remove(e, file);
                         })
                     ];
 				}else{
@@ -83,13 +83,13 @@ class Explorer extends Vue{
         store.dispatch('setFiles', this.data);
     }
 	
-	protected deleteFile(e, file: File): void {
-		const f = file as FileImpl;
+	protected remove(e, file: File): void {
+		let f = file as FileImpl;
 		f.visible = false;
 		setTimeout(() => store.dispatch('deleteFile', {id: this.data.id, file: f}), 450);
 	}
 
-    protected renameFile(e, file: File): void {
+    protected rename(e, file: File): void {
         file.renaming = true;
 		store.dispatch('updateFile', {id: this.data.id, file: file});
 	}
@@ -98,17 +98,14 @@ class Explorer extends Vue{
         this.vue.$data['showMoveDialog'] = true;
 	}
 
-    protected moveFile(files: Array<File>): void {
-        console.log("moveFile func has been called");
+    protected move(files: Array<File>): void {
+        console.log("move func has been called");
 	}
 
     protected openFolder(e, folder: File): void {
 		this.vue.$data['currentDir'] = folder;
     }
 
-    protected deleteFolder(e, folder: File): void {
-	}
-	
 	protected newFolder(): void {
 		const file = new FileImpl(this.generateId(), 'New Folder', this.currentDir, 'folder-o', this.folderOptions, true);
 		file.renaming = true;
