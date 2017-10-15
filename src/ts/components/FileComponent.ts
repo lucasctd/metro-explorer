@@ -16,7 +16,7 @@ import Option from '../interfaces/Option';
                     <div class="icon-area">
                         <i class="fa fa-4x icon" :class="icon"></i>
                         <p class="file-name" v-show='!file.renaming'>{{file.name}}</p>
-                        <input :id="'rename_' + file.id" v-model='file.name' @blur="file.renaming = false" v-show="file.renaming" @keyup="updateFileName(file)" @click.stop="selected = false" class="rename-input" style="font-size: 12pt"/>
+                        <input :id="'rename_' + file.id" v-model='file.name' @blur="afterRenaming(file)" v-show="file.renaming" @keyup="updateFileName(file)" @click.stop="selected = false" class="rename-input" style="font-size: 12pt"/>
                     </div>
                     <ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="file.options" :file="file"></ex-context-menu>
                </div>
@@ -55,11 +55,13 @@ export default class FileComponent extends Vue {
     cmTop: number = 0;
     cmLeft: number = 0;
     showContextMenu: boolean = false;
+
+    rootElement: Element = null;
 	
 	@Watch('file', {deep: true})
     onFileChange(file: File) {
 		if(file.renaming === true){
-			setTimeout(() => document.getElementById('rename_' + file.id).focus(), 100);
+            this.focusInput();
 		}		
 	}
 
@@ -84,10 +86,14 @@ export default class FileComponent extends Vue {
 		this.draggable.el = document.querySelector("#" + this.id);
         this.draggable.limit = document.querySelector(this.dragLimitSelector);
         this.draggable.explorerId = this.rootId;
+        this.rootElement = document.querySelector("#" + this.rootId);
 		this.draggable.file = this.file;
 		this.registerListeners();
         this.draggable.start();
         this.draggable.setCoord(this.left, this.top);
+        if(this.file.renaming === true){
+            this.focusInput();
+        }
     }
 	
 	dblclick(e) {
@@ -98,16 +104,30 @@ export default class FileComponent extends Vue {
 			this.file.options[0].callback(e, this.file);
 		}		
 	}
+
+	focusInput() {
+        setTimeout(() => {
+            const input: HTMLInputElement = <HTMLInputElement> document.getElementById('rename_' + this.file.id);
+            input.focus();
+            input.select();
+        }, 100);
+    }
+
+	afterRenaming(file: File) {
+        if(file.name.length === 0){
+            file.name = "Undefined";
+            store.dispatch('updateFile', {id: this.rootId, file: file});
+        }
+        file.renaming = false;
+	}
 	
-	updateFileName = _.debounce(function (file) {
-		if(file.name.length === 0){
-			file.name = "undefined";
-		}
+	updateFileName = _.debounce(function (file: File) {
 		store.dispatch('updateFile', {id: this.rootId, file: file});
 	}, 500);
 	
 	contextMenu(e){
-		document.dispatchEvent(new Event('closeAllContextMenu'));
+        document.dispatchEvent(new Event('closeAllContextMenu'));
+        this.rootElement.dispatchEvent(new CustomEvent('deselectAllExcept', {'detail': this.file}));
         this.cmTop = e.clientY;
         this.cmLeft = e.clientX;
         this.fileSelected = true;
@@ -115,8 +135,11 @@ export default class FileComponent extends Vue {
     }
 
     registerListeners() {
-        document.addEventListener("click", (e) => {
+        this.rootElement.addEventListener("deselectAll", () => {
             this.fileSelected = false;
+        });
+        this.rootElement.addEventListener("deselectAllExcept", (e) => {
+            this.fileSelected = this.file.id === e['detail'].id.id;
         });
     }
 

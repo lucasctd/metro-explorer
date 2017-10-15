@@ -40,8 +40,7 @@ class Draggabilly extends DraggableInterface {
 	}
 	
 	onDrop(event, args) {
-		const field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
-		this.file.field = field;
+        this.file.field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
 		store.dispatch('updateFile', {id: this.explorerId, file: this.file});
 	}
 	

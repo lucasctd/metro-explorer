@@ -25,18 +25,12 @@ export default new Vuex.Store({
         DELETE_FILE(state, payload){
             state.data.find(d => d.id === payload.id).files = state.data.find(d => d.id === payload.id).files.filter(f => f.id !== payload.file.id);
         },
-		ADD_EXPLORER_DATA(state, data){
+		    ADD_EXPLORER_DATA(state, data){
             state.data.push(data);
         },
         ADD_FILE(state, payload){
             state.data.find(d => d.id === payload.id).files.push(payload.file);
         },
-		/*ADD_SELECTED_FILE(state, payload){
-            state.data.find(d => d.id === payload.id).selectedFiles.push(payload.file);
-        },
-		REMOVE_SELECTED_FILE(state, payload){
-            state.data.find(d => d.id === payload.id).selectedFiles = state.data.find(d => d.id === payload.id).selectedFiles.filter(f => f.id !== payload.file.id);
-        }*/
     },
     actions: {
         setFiles({commit}, payload) {
@@ -57,12 +51,6 @@ export default new Vuex.Store({
         addFile({commit}, payload) {
             commit('ADD_FILE', payload);
         },
-       /* addSelectedFile({commit}, payload) {
-            commit('ADD_SELECTED_FILE', payload);
-        },
-        removeSelectedFile({commit}, payload) {
-            commit('REMOVE_SELECTED_FILE', payload);
-        }*/
     },
 	getters: {
 		getFileById(state) {
@@ -82,10 +70,5 @@ export default new Vuex.Store({
 		        return state.data.find(d => d.id === id).width;
             }
         },
-        /*getSelectedFiles(state) {
-		    return id => {
-		        return state.data.find(d => d.id === id).selectedFiles;
-            }
-        }*/
 	}
 })

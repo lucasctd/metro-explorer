@@ -9,7 +9,7 @@ import store from '../state/AppState';
 import Option from '../impl/Option';
 
 @Component({
-    template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu">
+    template: `<div id="explorer-component" class="explorer-component" :style="{width: width + 'px', height: height + 'px'}" @contextmenu.prevent.stop="contextMenu" @click="click">
                    	<ex-file :id="'ex_' + file.id" :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" 
                    	:dragLimitSelector="dragLimitSelector" @select="selectFile" @deselect="deselectFile"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
@@ -110,9 +110,14 @@ export default class ExplorerComponent extends Vue {
 			}		
 		});
 	}
+
+    click() {
+        document.querySelector("#" + this.rootId).dispatchEvent(new Event('deselectAll'));
+	}
 	
 	contextMenu(e) {
 		document.dispatchEvent(new Event('closeAllContextMenu'));
+		this.click();
         this.cmTop = e.clientY;
         this.cmLeft = e.clientX;
         setTimeout(() => this.showContextMenu = true, 30);

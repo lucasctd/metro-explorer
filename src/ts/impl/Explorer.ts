@@ -82,14 +82,14 @@ class Explorer extends Vue{
 		this.data.files = files;
         store.dispatch('setFiles', this.data);
     }
-	
-	protected remove(e, file: File): void {
-		let f = file as FileImpl;
-		f.visible = false;
-		setTimeout(() => store.dispatch('deleteFile', {id: this.data.id, file: f}), 450);
-	}
 
-    protected rename(e, file: File): void {
+    protected remove(e, file: File): void {
+        const f = file as FileImpl;
+        f.visible = false;
+        setTimeout(() => store.dispatch('deleteFile', {id: this.data.id, file: f}), 450);
+    }
+	
+  protected rename(e, file: File): void {
         file.renaming = true;
 		store.dispatch('updateFile', {id: this.data.id, file: file});
 	}
@@ -106,14 +106,32 @@ class Explorer extends Vue{
 		this.vue.$data['currentDir'] = folder;
     }
 
+    protected removeFolder(e, folder: File): void {
+        let files: Array<File> = this.buscarChildren(folder.id);
+        files.push(folder);
+        files.forEach(file => {
+            const f = file as FileImpl;
+            f.visible = false;
+            setTimeout(() => store.dispatch('deleteFile', {id: this.data.id, file: f}), 450);
+        });
+	}
+
+	private buscarChildren(parentId: number): Array<File> {
+		let files: Array<File> = store.getters.getFiles(this.data.id);
+		let children: Array<File> = [];
+        files.forEach(f => {
+        	if(f.parent.id === parentId){
+                children.push(f);
+                children.concat(this.buscarChildren(f.id));
+			}
+        });
+        return children;
+	}
+	
 	protected newFolder(): void {
 		const file = new FileImpl(this.generateId(), 'New Folder', this.currentDir, 'folder-o', this.folderOptions, true);
 		file.renaming = true;
 		store.dispatch('addFile', {id: this.data.id, file});
-		setTimeout(() => {
-			const input = <HTMLElement> document.querySelector("#ex_" + file.id + " > .icon-area > .rename-input"); // cast, it could also be done like this document.querySelector("#ex_" + file.id + " > .icon-area > .rename-input") as HTMLElement
-			input.focus();	
-		}, 500);
 	}
 
 	private generateId(): number {
