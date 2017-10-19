@@ -46,7 +46,7 @@ class Explorer extends Vue{
                 "ex-dialog": DialogComponent
 			},
 			methods: {
-				moveFile(files: Array<File>){
+				move(files: Array<File>){
                     that.move(files);
 				},
 				newFolder(){
