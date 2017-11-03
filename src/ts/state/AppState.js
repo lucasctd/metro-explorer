@@ -53,11 +53,11 @@ export default new Vuex.Store({
         },
     },
 	getters: {
-		getFileById(state) {
-			return id => {
-				let list = state.data.find(d => d.id === payload.id).files.filter(f => f.id === id);
-				return list.length > 0 ? list[0] : null;
-			}			
+        getFileById(state) {
+          return id => {
+            let list = state.data.find(d => d.id === payload.id).files.filter(f => f.id === id);
+            return list.length > 0 ? list[0] : null;
+          }
         },
         getFiles(state) {
             return id => {
@@ -66,8 +66,8 @@ export default new Vuex.Store({
             }
         },
         getWidth(state) {
-		    return id => {
-		        return state.data.find(d => d.id === id).width;
+            return id => {
+                return state.data.find(d => d.id === id).width;
             }
         },
 	}
