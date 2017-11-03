@@ -1,7 +1,9 @@
 import {Draggable as DraggableInterface} from '../interfaces/Draggable';
 declare function require(name:string);
 const DraggabillyLib = require('draggabilly');
-import store from '../state/AppState';
+import store from '../state/AppState.js';
+import File from '../interfaces/File';
+import FileUtils from '../impl/FileUtils';
 
 class Draggabilly extends DraggableInterface {
 
@@ -40,9 +42,21 @@ class Draggabilly extends DraggableInterface {
 	}
 	
 	onDrop(event, args) {
-        this.file.field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
+		const field = this.getField(Number(this.el.style.left.replace('px', '')), this.el.clientWidth, Number(this.el.style.top.replace('px', '')), this.el.clientHeight);
+		const files: Array<File> = store.getters.getFiles(this.explorerId);
+		const rs = files.find(file => {
+			return file.field === field;
+		});
+		if(rs === undefined){
+			this.file.field = field;
+		}else{
+			//if it was put on another file, put it back on its last field.
+			const explorerWidthGrid = store.getters.getWidth(this.explorerId);
+			this.el.style.top = FileUtils.getTopPos(this.file, explorerWidthGrid) + "px";
+			this.el.style.left = FileUtils.getLeftPos(this.file, explorerWidthGrid) + "px";
+		}
 		store.dispatch('updateFile', {id: this.explorerId, file: this.file});
-	}
+    }
 	
 	/* Methods */
 	getCoord() : any {
