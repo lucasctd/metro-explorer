@@ -78,8 +78,8 @@ export default class FileComponent extends Vue {
 	@Watch('selected')
     onSelectedChange(val, old) {
 		this.fileSelected = val;
-	}	
-	
+	}
+
     mounted() {
         this.dependencyInjection = new DependencyInjector();
 		this.draggable = this.dependencyInjection.getContainer().resolve(Draggable);
@@ -108,8 +108,10 @@ export default class FileComponent extends Vue {
 	focusInput() {
         setTimeout(() => {
             const input: HTMLInputElement = <HTMLInputElement> document.getElementById('rename_' + this.file.id);
-            input.focus();
-            input.select();
+            if(document.activeElement !== input){
+                input.focus();
+                input.select();
+            }
         }, 100);
     }
 
