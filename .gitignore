@@ -6,3 +6,4 @@ build/mix-manifest.json
 build/css
 build/fonts
 build/js
+yarn-error.log

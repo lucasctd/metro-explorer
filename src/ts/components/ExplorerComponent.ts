@@ -14,7 +14,7 @@ import FileUtils from '../impl/FileUtils';
                    	<ex-file :id="'ex_' + file.id" :rootId="rootId" v-for="file in files" :key="file.id" :file="file" :left="getLeftPos(file, explorerWidth)" :top="getTopPos(file, explorerWidth)" 
                    	:dragLimitSelector="dragLimitSelector" @select="selectFile" @deselect="deselectFile"></ex-file>
 				   	<ex-context-menu :show.sync="showContextMenu" :top="cmTop" :left="cmLeft" :options="options"></ex-context-menu>
-				   	<ex-dialog id="explorer-dialog" :show="showMoveDialog" :width="moveDialogWidthPx" @syncShow="updateShowMoveDialog">
+				   	<ex-dialog id="explorer-dialog" :show.sync="showMoveDialog" :width="moveDialogWidthPx">
 				   		<ex-file :id="'dir_' + folder.id" v-for="(folder, index) in folders" :selected="selectedFolder.id === folder.id" @select="selectFolder" @deselect="deselectFolder" :key="folder.id" :rootId="rootId" :file="folder" 
 							:left="getLeftPos(folder, moveDialogWidth, index)" :top="getTopPos(folder, moveDialogWidth, index)" dragLimitSelector="#explorer-dialog"></ex-file>
 						<button @click="move" slot="footer" :disabled="numSelectedFolders === 0" class="explorer-move-button" :class="{disabled: numSelectedFolders === 0, enabled: numSelectedFolders > 0}">Move</button>
@@ -210,7 +210,7 @@ export default class ExplorerComponent extends Vue {
 	unfoldFolderId(id: number): number {
 		return id / 10;
 	}
-
+	
 	updateShowMoveDialog(val: boolean) {
 		this.$parent.$data['showMoveDialog'] = val;
 	}
@@ -245,6 +245,10 @@ export default class ExplorerComponent extends Vue {
 	get showMoveDialog(): boolean {
 	    return this.$parent.$data['showMoveDialog'];
     }
+	
+	set showMoveDialog(val: boolean) {
+		this.$parent.$data['showMoveDialog'] = val;
+	}
 
     get currentDir(): File {
 	   return this.$parent.$data['currentDir'];

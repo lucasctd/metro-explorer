@@ -59,7 +59,7 @@ export default class FileComponent extends Vue {
     rootElement: Element = null;
 	
 	@Watch('file', {deep: true})
-    onFileChange(file: File) {
+    onFileChange(file: File, oldFile: File) {
 		if(file.renaming === true){
             this.focusInput();
 		}		
@@ -108,10 +108,10 @@ export default class FileComponent extends Vue {
 	focusInput() {
         setTimeout(() => {
             const input: HTMLInputElement = <HTMLInputElement> document.getElementById('rename_' + this.file.id);
-            if(document.activeElement !== input){
-                input.focus();
-                input.select();
-            }
+			if(document.activeElement !== input){//do not focus and select if it's already focused.
+				input.focus();
+				input.select();
+			}
         }, 100);
     }
 
